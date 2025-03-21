@@ -160,9 +160,9 @@ export default function Home() {
         return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
     };
     return (
-        <div className="Home bg-gray-50 pt-[90px] flex flex-col items-center">
+        <div className="Home bg-gray-50  flex flex-col items-center">
             <div className="h-[60px] w-full border-b border-gray-300 flex flex-row items-center justify-center">
-                <div className="flex flex-row 2xl:w-[1400px] xl:w-[1280px]  h-full">
+                <div className="flex flex-row 2xl:w-[1300px] xl:w-[1280px]  h-full">
                     <div className="flex flex-row w-[200px] h-full border-r border-gray-300 items-center relative"
                          onMouseLeave={() => {
                              const id = setTimeout(() => {
@@ -215,7 +215,7 @@ export default function Home() {
 
             </div>
             {/*Banner*/}
-            <div className="h-[500px] 2xl:w-[1400px] xl:w-[1280px]  mt-[15px]">
+            <div className="h-[500px] 2xl:w-[1300px] xl:w-[1280px]  mt-[15px]">
                 <div className=" h-full grid grid-cols-3 gap-[20px] ">
                     <div className={`col-span-2 overflow-hidden relative`} >
                         <div
@@ -260,7 +260,7 @@ export default function Home() {
             </div>
             {/*Banner*/}
             {/*Categories*/}
-            <div className="2xl:w-[1400px] xl:w-[1280px]  flex items-center justify-center mt-[100px]">
+            <div className="2xl:w-[1300px] xl:w-[1280px]  flex items-center justify-center mt-[100px]">
                 <div className={`w-[600px] flex flex-col items-center`}>
                     <p className={`font-pop font-[500] text-[30px] text-cl-text`}>Featured Categories</p>
                     <div className={`border-b border-[2px] border-blue-600 w-[50px] mt-[4px]`}></div>
@@ -268,7 +268,7 @@ export default function Home() {
                 </div>
 
             </div>
-            <div className={`grid gap-[20px] grid-cols-3 2xl:w-[1400px] xl:w-[1280px] mt-[30px]`}>
+            <div className={`grid gap-[20px] grid-cols-3 2xl:w-[1300px] xl:w-[1280px] mt-[30px]`}>
                 {categoryFeatures.map((category) => (
                     <FeatureCategories category={category} key={category.id} />
                 ))}
@@ -276,7 +276,7 @@ export default function Home() {
             </div>
             {/*Categories*/}
             {/*Flash Sale*/}
-            <div className="2xl:w-[1400px] xl:w-[1280px]  flex items-center justify-center mt-[100px]">
+            <div className="2xl:w-[1300px] xl:w-[1280px]  flex items-center justify-center mt-[100px]">
                 <div className={`w-[600px] flex flex-col items-center`}>
                     <p className={`font-pop font-[500] text-[30px] text-cl-text`}>Flash sale</p>
                     <div className={`border-b border-[2px] border-blue-600 w-[50px] mt-[4px]`}></div>
@@ -284,7 +284,7 @@ export default function Home() {
                 </div>
             </div>
 
-            <div className={` 2xl:w-[1400px] xl:w-[1280px] mt-[30px] relative  `}>
+            <div className={` 2xl:w-[1300px] xl:w-[1280px] mt-[30px] relative  `}>
                 <div className={`h-[50px] w-full pr-[60px] pl-[60px] mb-[20px]  flex items-center justify-between`}>
                     <div className={`w-[200px] h-[50px] flex shadow rounded-[4px] pl-[25px] bg-white items-center`}>
                         <p className={`font-[500] font-pop text-[14px] text-gray-500`}>End in:</p>
@@ -330,7 +330,7 @@ export default function Home() {
             </div>
             {/*Flash Sale*/}
             {/*Trending*/}
-            <div className="2xl:w-[1400px] xl:w-[1280px]  flex items-center justify-center mt-[70px]">
+            <div className="2xl:w-[1300px] xl:w-[1280px]  flex items-center justify-center mt-[70px]">
                 <div className={`w-[600px] flex flex-col items-center`}>
                     <p className={`font-pop font-[500] text-[30px] text-cl-text`}>Trending products</p>
                     <div className={`border-b border-[2px] border-blue-600 w-[50px] mt-[4px]`}></div>
@@ -338,7 +338,7 @@ export default function Home() {
                 </div>
 
             </div>
-            <div className={`grid gap-[30px] grid-cols-4 2xl:w-[1400px] xl:w-[1280px] mt-[30px]`}>
+            <div className={`grid gap-[30px] grid-cols-4 2xl:w-[1300px] xl:w-[1280px] mt-[30px]`}>
                 {products.map((product) => (
                     <Product product={product} key={product.id} />
                 ))}
@@ -346,7 +346,7 @@ export default function Home() {
             </div>
             {/*Trending*/}
 
-            <div className={`2xl:w-[1400px] xl:w-[1280px] h-[380px] bg-white mt-[30px] grid grid-cols-3 gap-[30px] mb-[50px] shadow-[0px_0px_5px_rgba(0,0,0,0.2)] rounded-[5px]`}>
+            <div className={`2xl:w-[1300px] xl:w-[1280px] h-[380px] bg-white mt-[30px] grid grid-cols-3 gap-[30px] mb-[50px] shadow-[0px_0px_5px_rgba(0,0,0,0.2)] rounded-[5px]`}>
                 <div className={`col-span-1 p-[30px] `}>
                     <div>
                         <p className={`font-pop text-[18px] text-gray-800 ml-[6px]`}>Best sellers</p>
@@ -392,14 +392,14 @@ export default function Home() {
             </div>
 
             {/*Mall*/}
-            <div className="2xl:w-[1400px] xl:w-[1280px]  flex items-center justify-center mt-[50px]">
+            <div className="2xl:w-[1300px] xl:w-[1280px]  flex items-center justify-center mt-[50px]">
                 <div className={`w-[600px] flex flex-col items-center`}>
                     <p className={`font-pop font-[500] text-[30px] text-cl-text`}>MALL</p>
                     <div className={`border-b border-[2px] border-blue-600 w-[50px] mt-[4px]`}></div>
                     <p className={`text-center font-pop font-[400] text-gray-500 mt-[20px]`}>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form.</p>
                 </div>
             </div>
-            <div className={` 2xl:w-[1400px] xl:w-[1280px] mt-[30px] relative `}>
+            <div className={` 2xl:w-[1300px] xl:w-[1280px] mt-[30px] relative `}>
                 <div className={`flex h-full w-full justify-center items-center  relative`}>
                     <button onClick={()=> {
                         if (transformOfficialShop >= 1)

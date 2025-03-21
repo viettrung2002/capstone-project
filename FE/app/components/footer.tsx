@@ -27,7 +27,7 @@ export default function Footer() {
                 <div className={`grid grid-cols-4 gap-[30px] w-full h-[350px] border-b-gray-500 border-b mb-[0px]`}>
                     <div className={`col-span-1 border-gray-300  p-[20px] flex flex-col`}>
                         <div className={`text-gray-50  font-pop font-[500] text-[18px] `}>BuyNow</div>
-                        <div className={`w-[50px] border border-blue-600`}></div>
+                        <div className={`w-[50px] mt-[5px] border border-blue-500`}></div>
                         <div className={`flex items-center mt-[20px] text-gray-200 hover:text-blue-500 group`}>
                             <p className={` font-[300] font-pop text-[14px] ml-[0px] group-hover:ml-[5px] select-none transition-all duration-300 `}>About BuyNow</p>
                         </div>
@@ -55,7 +55,7 @@ export default function Footer() {
                     </div>
                     <div className={`col-span-1 border-gray-300 p-[20px] flex flex-col`}>
                         <div className={`text-gray-50  font-pop font-[500] text-[18px] `}>Follow us</div>
-                        <div className={`w-[50px] border border-blue-600`}></div>
+                        <div className={`w-[50px] mt-[5px] border border-blue-500`}></div>
                         <div className={`flex items-center mt-[20px] text-gray-200 hover:text-blue-500 group`}>
                             <FaFacebook className=""/>
                             <p className={` font-[300] font-pop text-[14px] ml-[6px] group-hover:ml-[10px] select-none transition-all duration-300 `}>Facebook</p>
@@ -71,7 +71,7 @@ export default function Footer() {
                     </div>
                     <div className={`col-span-1 border-gray-300  p-[20px] flex flex-col`}>
                         <div className={`text-gray-50  font-pop font-[500] text-[18px] `}>Shipping Partners</div>
-                        <div className={`w-[50px] border border-blue-600`}></div>
+                        <div className={`w-[50px] mt-[5px] border border-blue-500`}></div>
                         <div className={`grid grid-cols-3 grid-rows-3 w-6/10 mt-[20px] aspect-[16/10]`}>
                             <div className={`col-span-1 bg-gray-200 h-[25px] aspect-[16/9] rounded-[5px] relative `}>
                                 <Image src={`/logo/ghtk.png`} alt={"image"}  objectFit={"contain"} layout="fill" />
@@ -106,7 +106,7 @@ export default function Footer() {
                     </div>
                     <div className={`col-span-1 border-gray-300  p-[20px] flex flex-col`}>
                         <div className={`text-gray-50  font-pop font-[500] text-[18px] `}>Customer services</div>
-                        <div className={`w-[50px] border border-blue-600`}></div>
+                        <div className={`w-[50px] mt-[5px] border border-blue-500`}></div>
                         <div className={`flex items-center mt-[20px] text-gray-200 hover:text-blue-500 group`}>
                             <p className={` font-[300] font-pop text-[14px] ml-[0px] group-hover:ml-[5px] select-none transition-all duration-300 `}>Buying/Ordering Guide</p>
                         </div>

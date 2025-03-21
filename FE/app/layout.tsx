@@ -57,6 +57,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body  className={`${sfProRounded.variable} ${quicksand.variable} ${fre.variable} ${sfCompactRounded.variable} ${pop.variable}`} >
+
         <Navbar />
         {children}
         <Footer/>
