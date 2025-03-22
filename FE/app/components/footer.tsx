@@ -23,7 +23,6 @@ export default function Footer() {
                         </button>
                     </div>
                 </div>
-
                 <div className={`grid grid-cols-4 gap-[30px] w-full h-[350px] border-b-gray-500 border-b mb-[0px]`}>
                     <div className={`col-span-1 border-gray-300  p-[20px] flex flex-col`}>
                         <div className={`text-gray-50  font-pop font-[500] text-[18px] `}>BuyNow</div>
