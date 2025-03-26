@@ -7,6 +7,7 @@ import Product from "@/app/components/product";
 import {ProductSale, MiniProduct} from "@/app/components/product";
 import {useState, useEffect} from "react";
 import Image from "next/image";
+import {useRouter} from "next/navigation";
 type Slide = {
     id: number;
     text: string;
@@ -38,6 +39,7 @@ export default function Home() {
     const [transformSale, setTransformSale] = useState(0);
     const [transformOfficialShop, setTransformOfficialShop] = useState(0);
     const [timeLeft, setTimeLeft] = useState(3600);
+    const router = useRouter();
     const categoryFeatures: CategoryFeature[] = [
         {id: 1, category: ['TV Audio', 'Phone', 'Smart Television', 'Audios', 'Headphones'], image: '/features_categories/fetured-item-1.png'},
         {id: 2, category: ['Desktop & Laptop', 'Phone', 'Smart Television', 'Audios', 'Headphones'], image: '/features_categories/fetured-item-2.png'},
@@ -182,7 +184,7 @@ export default function Home() {
                         {isOpen?
                             (
                                 <ul className={`bg-gray-50 absolute top-[62px] border border-gray-200 w-[200px] pl-[30px] pt-[10px] pb-[10px] text-cl-text z-30`}>
-                                    <li className={`flex items-center w-full h-[35px] font-pop font-[400] text-[15px] hover:text-cl-hover-text `}>Smartphone</li>
+                                    <li onClick={()=> router.push("/categories")} className={`flex items-center w-full h-[35px] font-pop font-[400] text-[15px] hover:text-cl-hover-text `}>Smartphone</li>
                                     <li className={`flex items-center w-full h-[35px] font-pop font-[400] text-[15px] hover:text-cl-hover-text `}>Laptop</li>
                                     <li className={`flex items-center w-full h-[35px] font-pop font-[400] text-[15px] hover:text-cl-hover-text `}>Watch</li>
                                     <li className={`flex items-center w-full h-[35px] font-pop font-[400] text-[15px] hover:text-cl-hover-text `}>Television</li>

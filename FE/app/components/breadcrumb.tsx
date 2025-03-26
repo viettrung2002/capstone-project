@@ -1,3 +1,4 @@
+'use client'
 import { LuHouse } from "react-icons/lu";
 import { FaAngleRight } from "react-icons/fa6";
 import {useRouter} from "next/navigation";

@@ -48,7 +48,7 @@ export default function Product({product}: {product: Product}) {
                         <p className={`font-pop text-cl-hover-text text-[18px] font-[600] `}>${product.price - product.price * product.discount / 100}  </p>
                         <div className={`relative ml-[10px]`}>
                             <p className={`font-pop text-gray-400 text-[16px] font-[400] ml-[0px]`}>${product.price}  </p>
-                            <div className={`absolute w-full border-t border-gray-400 top-1/2 border-[1/2px]`}></div>
+                            <div className={`absolute w-full border-t border-gray-400 top-1/2 `}></div>
                         </div>
                     </div>
                 ): (
@@ -104,7 +104,7 @@ export function MiniProduct({product}: {product: Product}) {
                 <Image src={product.image} alt={"image"} width={1000} height={1000} className={"object-contain"}/>
             </div>
             <div className={`flex-1 h-[60px] flex flex-col justify-between ml-[20px] pt-[5px] pb-[5px] select-none`}>
-                <p className={`font-pop text-[15px] group-hover:text-cl-hover-text`}>{product.name}</p>
+                <p className={`font-pop text-[15px] text-gray-700 group-hover:text-cl-hover-text`}>{product.name}</p>
                 <p className={`font-pop text-[15px] text-gray-400`}>{product.price}$</p>
             </div>
         </div>

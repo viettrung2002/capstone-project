@@ -16,7 +16,7 @@ export default function Navbar() {
                 <div className=" w-[1300px] flex items-center justify-between ">
                     <div className="flex h-full items-center flex-row">
                         <Image src={"/cart.png"} alt={"Logo"} width={40} height={40}></Image>
-                        <p className={"font-fre ml-[5px] text-text font-[800] text-[28px]"}>BuyNow</p>
+                        <p className={"font-fre ml-[5px] text-text font-[800] text-gray-700 text-[28px]"}>BuyNow</p>
                     </div>
                     {/*Search*/}
                     <div className={`flex flex-row h-[45px] w-[580px] `}>
