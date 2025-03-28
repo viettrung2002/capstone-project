@@ -16,7 +16,7 @@
   --font-fre: var(--font-fre);
   --font-pop: var(--font-pop);
   --font-sf-compact: var(--font-sf-compact);
-  --color-cl-text: oklch(0.373 0.034 259.733);
+  --color-cl-text: oklch(0.278 0.033 256.848);
   --color-cl-hover-text: oklch(0.546 0.245 262.881);
   --color-cl-button-text: oklch(0.985 0.002 247.839);
   --color-cl-button : oklch(0.546 0.245 262.881);

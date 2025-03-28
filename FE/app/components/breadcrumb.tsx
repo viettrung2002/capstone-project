@@ -16,12 +16,12 @@ export default function Breadcrumb({ breadcrumbs }: BreadcrumbProps) {
             <div className="flex items-center w-full h-full px-[15px] pt-[2px] ">
                 <div onClick={()=>router.push("/")} className="flex items-center text-gray-700 hover:text-blue-500 transition-all duration-300 ">
                     <LuHouse className="mr-[5px]  text-[20px] mb-[2px]" />
-                    <p className="font-pop select-none   font-[400] text-[16px]">Home</p>
+                    <p className="font-sf select-none   font-[500] text-[16px]">Home</p>
                 </div>
                 {breadcrumbs.map((breadcrumb, index) => (
                         <div key={index} className="flex items-center ml-[5px]" >
                             <FaAngleRight className="mr-[5px] text-gray-700 text-[15px]" />
-                            <p onClick={()=> router.push(breadcrumb.href)} className={`font-pop hover:text-blue-500 transition-all duration-300 text-gray-700 font-[400] text-[16px] select-none`}>{breadcrumb.name}</p>
+                            <p onClick={()=> router.push(breadcrumb.href)} className={`font-sf hover:text-blue-500 transition-all duration-300 text-gray-700 font-[500] text-[16px] select-none`}>{breadcrumb.name}</p>
                         </div>
                 ))}
             </div>

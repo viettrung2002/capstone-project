@@ -2,7 +2,7 @@
 import { HiOutlineBars3, HiArrowLeft, HiArrowRight} from "react-icons/hi2";
 import { CiFacebook } from "react-icons/ci";
 import { FaFacebookF, FaInstagram } from "react-icons/fa6";
-import FeatureCategories from "@/app/components/FeatureCategory";
+import FeatureCategories from "@/app/components/feature_category";
 import Product from "@/app/components/product";
 import {ProductSale, MiniProduct} from "@/app/components/product";
 import {useState, useEffect} from "react";
@@ -180,32 +180,32 @@ export default function Home() {
                              setIsOpen(true);
                          }}>
                         <HiOutlineBars3 className="text-[18px] mb-[2px]" />
-                        <p className={`font-pop text-cl-text text-[15px] ml-[10px] font-[500] select-none`}>Categories</p>
+                        <p className={`font-sf text-cl-text text-[15px] ml-[10px] font-[500] select-none`}>Categories</p>
                         {isOpen?
                             (
                                 <ul className={`bg-gray-50 absolute top-[62px] border border-gray-200 w-[200px] pl-[30px] pt-[10px] pb-[10px] text-cl-text z-30`}>
-                                    <li onClick={()=> router.push("/categories")} className={`flex items-center w-full h-[35px] font-pop font-[400] text-[15px] hover:text-cl-hover-text `}>Smartphone</li>
-                                    <li className={`flex items-center w-full h-[35px] font-pop font-[400] text-[15px] hover:text-cl-hover-text `}>Laptop</li>
-                                    <li className={`flex items-center w-full h-[35px] font-pop font-[400] text-[15px] hover:text-cl-hover-text `}>Watch</li>
-                                    <li className={`flex items-center w-full h-[35px] font-pop font-[400] text-[15px] hover:text-cl-hover-text `}>Television</li>
-                                    <li className={`flex items-center w-full h-[35px] font-pop font-[400] text-[15px] hover:text-cl-hover-text `}>Video games</li>
-                                    <li className={`flex items-center w-full h-[35px] font-pop font-[400] text-[15px] hover:text-cl-hover-text `}>Camera</li>
-                                    <li className={`flex items-center w-full h-[35px] font-pop font-[400] text-[15px] hover:text-cl-hover-text `}>Headphone</li>
+                                    <li onClick={()=> router.push("/categories")} className={`flex items-center w-full h-[35px] font-sf font-[400] text-[15px] hover:text-cl-hover-text `}>Smartphone</li>
+                                    <li className={`flex items-center w-full h-[35px] font-sf font-[400] text-[15px] hover:text-cl-hover-text `}>Laptop</li>
+                                    <li className={`flex items-center w-full h-[35px] font-sf font-[400] text-[15px] hover:text-cl-hover-text `}>Watch</li>
+                                    <li className={`flex items-center w-full h-[35px] font-sf font-[400] text-[15px] hover:text-cl-hover-text `}>Television</li>
+                                    <li className={`flex items-center w-full h-[35px] font-sf font-[400] text-[15px] hover:text-cl-hover-text `}>Video games</li>
+                                    <li className={`flex items-center w-full h-[35px] font-sf font-[400] text-[15px] hover:text-cl-hover-text `}>Camera</li>
+                                    <li className={`flex items-center w-full h-[35px] font-sf font-[400] text-[15px] hover:text-cl-hover-text `}>Headphone</li>
 
                                 </ul>
                             ): null}
 
                     </div>
                     <div className=" w-[700px] flex flex-row text-cl-text">
-                        <p className={`select-none flex items-center h-full font-pop font-[500] text-[15px]  hover:text-cl-hover-text ml-[30px]`}>Home</p>
-                        <p className={`select-none flex items-center h-full font-pop font-[500] text-[15px]  hover:text-cl-hover-text ml-[30px]`}>Vouchers</p>
-                        <p className={`select-none flex items-center h-full font-pop font-[500] text-[15px]  hover:text-cl-hover-text ml-[30px]`}>Top Products</p>
-                        <p className={`select-none flex items-center h-full font-pop font-[500] text-[15px]  hover:text-cl-hover-text ml-[30px]`}>Seller Channel</p>
+                        <p className={`select-none flex items-center h-full font-sf font-[500] text-[15px]  hover:text-cl-hover-text ml-[30px]`}>Home</p>
+                        <p className={`select-none flex items-center h-full font-sf font-[500] text-[15px]  hover:text-cl-hover-text ml-[30px]`}>Vouchers</p>
+                        <p className={`select-none flex items-center h-full font-sf font-[500] text-[15px]  hover:text-cl-hover-text ml-[30px]`}>Top Products</p>
+                        <p className={`select-none flex items-center h-full font-sf font-[500] text-[15px]  hover:text-cl-hover-text ml-[30px]`}>Seller Channel</p>
 
                     </div>
 
                     <ul className="ml-auto h-full flex flex-row text-cl-text items-center">
-                        <li className={`select-none flex items-center h-full font-pop font-[500] text-[15px]  ml-[30px]`}>Contact us:</li>
+                        <li className={`select-none flex items-center h-full font-sf font-[500] text-[15px]  ml-[30px]`}>Contact us:</li>
                         <li className={`w-[35px] h-[35px] border border-gray-300 rounded-full flex items-center justify-center hover:bg-cl-button hover:text-cl-button-text transform duration-300 ml-[15px]`}>
                             <FaFacebookF className="text-[20px]" />
                         </li>
@@ -247,8 +247,8 @@ export default function Home() {
                     <div className={`col-span-1 grid grid-rows-2 gap-[20px]`}>
                         <div className={`flex flex-col col-span-1 relative justify-center `}>
                             <div className={`z-10 ml-[30px]`}>
-                                <p className={`font-pop text-gray-500 text-[15px]`}>New line required</p>
-                                <p className={`font-pop font-[600] text-cl-text text-[22px]`}>iPhone 12 Pro Max</p>
+                                <p className={`font-sf text-gray-500 text-[15px]`}>New line required</p>
+                                <p className={`font-sf font-[600] text-cl-text text-[22px]`}>iPhone 12 Pro Max</p>
                                 <p className={`font-sf-compact font-[700] text-cl-hover-text text-[22px]`}>$259.99</p>
                             </div>
 
@@ -264,9 +264,9 @@ export default function Home() {
             {/*Categories*/}
             <div className="2xl:w-[1300px] xl:w-[1280px]  flex items-center justify-center mt-[100px]">
                 <div className={`w-[600px] flex flex-col items-center`}>
-                    <p className={`font-pop font-[500] text-[30px] text-cl-text`}>Featured Categories</p>
+                    <p className={`font-sf font-[500] text-[30px] text-cl-text`}>Featured Categories</p>
                     <div className={`border-b border-[2px] border-blue-600 w-[50px] mt-[4px]`}></div>
-                    <p className={`text-center font-pop font-[400] text-gray-500 mt-[20px]`}>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form.</p>
+                    <p className={`text-center font-sf font-[400] text-gray-500 mt-[20px]`}>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form.</p>
                 </div>
 
             </div>
@@ -280,20 +280,20 @@ export default function Home() {
             {/*Flash Sale*/}
             <div className="2xl:w-[1300px] xl:w-[1280px]  flex items-center justify-center mt-[100px]">
                 <div className={`w-[600px] flex flex-col items-center`}>
-                    <p className={`font-pop font-[500] text-[30px] text-cl-text`}>Flash sale</p>
+                    <p className={`font-sf font-[500] text-[30px] text-cl-text`}>Flash sale</p>
                     <div className={`border-b border-[2px] border-blue-600 w-[50px] mt-[4px]`}></div>
-                    <p className={`text-center font-pop font-[400] text-gray-500 mt-[20px]`}>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form.</p>
+                    <p className={`text-center font-sf font-[400] text-gray-500 mt-[20px]`}>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form.</p>
                 </div>
             </div>
 
             <div className={` 2xl:w-[1300px] xl:w-[1280px] mt-[30px] relative  `}>
                 <div className={`h-[50px] w-full pr-[60px] pl-[60px] mb-[20px]  flex items-center justify-between`}>
                     <div className={`w-[200px] h-[50px] flex shadow rounded-[4px] pl-[25px] bg-white items-center`}>
-                        <p className={`font-[500] font-pop text-[14px] text-gray-500`}>End in:</p>
-                        <p className={`font-[500] font-pop text-[17px] text-gray-700 ml-[10px]`}>{formatTime(timeLeft)}</p>
+                        <p className={`font-[500] font-sf text-[14px] text-gray-500`}>End in:</p>
+                        <p className={`font-[500] font-sf text-[17px] text-gray-800 ml-[10px]`}>{formatTime(timeLeft)}</p>
                     </div>
-                    <button className={`flex items-center text-gray-700 hover:text-blue-600`}>
-                        <p className={`font-[400] font-pop text-[16px] `}>See more</p>
+                    <button className={`flex items-center text-gray-800 hover:text-blue-600`}>
+                        <p className={`font-[400] font-sf text-[16px] `}>See more</p>
                         <HiArrowRight className={`text-[20px] ml-[6px] mb-[1px]`}/>
                     </button>
 
@@ -334,9 +334,9 @@ export default function Home() {
             {/*Trending*/}
             <div className="2xl:w-[1300px] xl:w-[1280px]  flex items-center justify-center mt-[70px]">
                 <div className={`w-[600px] flex flex-col items-center`}>
-                    <p className={`font-pop font-[500] text-[30px] text-cl-text`}>Trending products</p>
+                    <p className={`font-sf font-[500] text-[30px] text-cl-text`}>Trending products</p>
                     <div className={`border-b border-[2px] border-blue-600 w-[50px] mt-[4px]`}></div>
-                    <p className={`text-center font-pop font-[400] text-gray-500 mt-[20px]`}>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form.</p>
+                    <p className={`text-center font-sf font-[400] text-gray-500 mt-[20px]`}>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form.</p>
                 </div>
 
             </div>
@@ -351,7 +351,7 @@ export default function Home() {
             <div className={`2xl:w-[1300px] xl:w-[1280px] h-[380px] bg-white mt-[30px] grid grid-cols-3 gap-[30px] mb-[50px] shadow-[0px_0px_5px_rgba(0,0,0,0.2)] rounded-[5px]`}>
                 <div className={`col-span-1 p-[30px] `}>
                     <div>
-                        <p className={`font-pop text-[18px] text-gray-800 ml-[6px]`}>Best sellers</p>
+                        <p className={`font-sf font-[600] text-[18px] text-gray-800 ml-[6px]`}>Best sellers</p>
                         <div className={`flex`}>
                             <div className={`border-t border-blue-500 w-[110px] `}></div>
                             <div className={`flex-1 border-t border-gray-300`}></div>
@@ -365,7 +365,7 @@ export default function Home() {
                 </div>
                 <div className={`col-span-1 p-[30px]`}>
                     <div>
-                        <p className={`font-pop text-[18px] text-gray-800 ml-[6px]`}>New arrivals</p>
+                        <p className={`font-sf text-[18px] font-[600] text-gray-800 ml-[6px]`}>New arrivals</p>
                         <div className={`flex`}>
                             <div className={`border-t border-blue-500 w-[120px] `}></div>
                             <div className={`flex-1 border-t border-gray-300`}></div>
@@ -379,7 +379,7 @@ export default function Home() {
                 </div>
                 <div className={`col-span-1 p-[30px]`}>
                     <div>
-                        <p className={`font-pop text-[18px] text-gray-800 ml-[6px]`}>Top rated</p>
+                        <p className={`font-sf text-[18px] font-[600] text-gray-800 ml-[6px]`}>Top rated</p>
                         <div className={`flex`}>
                             <div className={`border-t border-blue-500 w-[100px] `}></div>
                             <div className={`flex-1 border-t border-gray-300`}></div>
@@ -396,9 +396,9 @@ export default function Home() {
             {/*Mall*/}
             <div className="2xl:w-[1300px] xl:w-[1280px]  flex items-center justify-center mt-[50px]">
                 <div className={`w-[600px] flex flex-col items-center`}>
-                    <p className={`font-pop font-[500] text-[30px] text-cl-text`}>MALL</p>
+                    <p className={`font-sf font-[500] text-[30px] text-cl-text`}>MALL</p>
                     <div className={`border-b border-[2px] border-blue-600 w-[50px] mt-[4px]`}></div>
-                    <p className={`text-center font-pop font-[400] text-gray-500 mt-[20px]`}>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form.</p>
+                    <p className={`text-center font-sf font-[400] text-gray-500 mt-[20px]`}>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form.</p>
                 </div>
             </div>
             <div className={` 2xl:w-[1300px] xl:w-[1280px] mt-[30px] relative `}>
