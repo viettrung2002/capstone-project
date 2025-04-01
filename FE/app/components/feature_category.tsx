@@ -6,6 +6,7 @@ type CategoryFeature = {
     image: string;
 };
 export default function FeatureCategories({category}:{category: CategoryFeature}) {
+
     return (
         <div className={`col-span-1 border border-gray-300 h-[230px] flex flex-row items-center pr-[10px] pt-[30px] pb-[30px] pl-[35px] justify-between bg-white`}>
             <ul className={` h-full`}>
