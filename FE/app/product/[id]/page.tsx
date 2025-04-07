@@ -3,11 +3,19 @@ import {useParams} from "next/navigation";
 import {useEffect, useState} from "react";
 import Breadcrumb from "@/app/components/breadcrumb";
 import Image from "next/image";
-import {HiOutlineStar, HiTag, HiStar, HiReceiptPercent, HiChevronUp, HiChevronDown, HiMiniArrowPath,} from "react-icons/hi2";
+import {HiOutlineStar, HiTag, HiStar, HiReceiptPercent, HiChevronUp, HiChevronDown, HiMiniArrowPath, HiMiniArrowLongRight} from "react-icons/hi2";
+import { randomInt } from "crypto";
 export default function ProductInfo () {
     const {id}  = useParams()
     const [quantity, setQuantity] = useState(0)
     const [chooseColor , setChooseColor] = useState("")
+    const ratings = [
+        { stars: 5, percentage: 98.4 },
+        { stars: 4, percentage: 0.9 },
+        { stars: 3, percentage: 0.2 },
+        { stars: 2, percentage: 0.1 },
+        { stars: 1, percentage: 0.2 },
+      ];
     const breadcrumbs = [
         {name: "Category", href: "/categories" },
         {name: "2", href: "/categories" },
@@ -276,26 +284,41 @@ export default function ProductInfo () {
                     </div>
                     <div className="shadow-[0px_0px_5px_rgba(0,0,0,0.2)] p-[30px] mt-[30px]">
                         <p className="font-sf font-[500] text-[17px] text-gray-800">Đánh giá sản phẩm</p>
-                        <div className="w-full flex">
-
-                        </div>
-                        <div className="w-1/6 aspect-square border flex items-center justify-center">
-                            <div className="flex items-center">
-                                <HiStar className="text-yellow-500 text-[20px]"/>
-                                <div className="flex items-end">
-                                    <p className="font-sf font-[600] text-[30px] leading-[30px]">{products.star}</p>
-                                    <p className="font-sf text-[15px] text-gray-600 mb-[3px]  leading-[15px] ">/</p>
-                                    <p className="font-sf text-[15px] text-gray-600 mb-[1px] leading-[15px] ">5</p>
+                        <div className="w-full flex border border-gray-200 mt-[10px] py-[10px]">
+                            <div className="w-1/6 aspect-square  flex items-center justify-center">
+                                <div className="flex items-center">
+                                    <HiStar className="text-yellow-500 text-[20px]"/>
+                                    <div className="flex items-end">
+                                        <p className="font-sf font-[600] text-[30px] leading-[30px]">{products.star}</p>
+                                        <p className="font-sf text-[15px] text-gray-600 mb-[3px]  leading-[15px] ">/</p>
+                                        <p className="font-sf text-[15px] text-gray-600 mb-[1px] leading-[15px] ">5</p>
+                                    </div>
+                                    
+                                    
                                 </div>
+                                <div>
+
+                                </div>
+                            </div>
+                            <div className="w-3/6 pl-[10px]">
+                                {ratings.map((rating, index) => (
+                                    <div key={index} className="h-1/5 w-full  flex items-center">
+                                        <p className="font-sf text-[15px] w-[10px]">{rating.stars}</p>
+                                        <HiStar className="text-yellow-500 text-[14px] ml-[4px]"/>
+                                        <div className="h-[7px] w-[130px] bg-gray-200 rounded-full overflow-hidden ml-[10px]">
+                                            <div className={`h-full bg-blue-500 `} style={{width: `${rating.percentage}%`}}></div>
+                                        </div>
+                                        <p className="font-sf text-[14px] font-[600]  w-[50px] ml-[10px]">{rating.percentage}%</p>
+                                        <button className=" border border-gray-200 w-[40px] h-6/9 flex justify-center items-center rounded-full hover:bg-blue-500 text-gray-700 hover:text-gray-50 ">
+                                            <HiMiniArrowLongRight className="text-[18px]"/>
+                                        </button>
+                                    </div>
+
+                                ))}
                                 
                             </div>
-                            <div>
-
-                            </div>
                         </div>
-                        <div className="">
-
-                        </div>
+                        
                     </div>
                     
                     
