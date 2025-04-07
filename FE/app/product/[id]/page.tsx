@@ -33,6 +33,37 @@ export default function ProductInfo () {
         stock: 10
 
     }
+    const specifications = {
+        id: 1,
+        name: "iPhone 13 Pro",
+        brand: "Apple",
+        model: "iPhone 13 Pro",
+        releaseDate: "2021-09-24",
+        operatingSystem: "iOS 15",
+        displaySize: "6.1 inches",
+        displayResolution: "2532 x 1170 pixels",
+        displayType: "Super Retina XDR OLED",
+        rearCameraPrimary: "12 MP",
+        rearCameraUltraWide: "12 MP",
+        rearCameraTelephoto: "12 MP",
+        frontCamera: "12 MP",
+        processorBrand: "Apple",
+        processorModel: "A15 Bionic",
+        processorCores: 6,
+        processorSpeed: "3.23 GHz",
+        ram: "6 GB",
+        storage: "128 GB",
+        batteryCapacity: "3095 mAh",
+        batteryFastCharging: "20W",
+        bluetooth: "5.0",
+        wifi: "Wi-Fi 6",
+        nfc: true,
+        gps: true,
+        height: "146.7 mm",
+        width: "71.5 mm",
+        thickness: "7.65 mm",
+        weight: "204 g",
+      };
     useEffect(() => {
         console.log(chooseColor)
     }, [chooseColor]);
@@ -60,7 +91,7 @@ export default function ProductInfo () {
                         ))}
                     </div>
                 </div>
-                <div className="col-span-2  flex flex-col   ">
+                <div className="col-span-2  flex flex-col justify-center ">
                     <div className={" w-full "}>
                         <p className={"font-sf text-gray-800 text-[22px] font-[600]"}>Laptop Macbook Pro M4 2024</p>
                     </div>
@@ -172,25 +203,37 @@ export default function ProductInfo () {
                     </div>
                     <div className={"w-full border-b border-gray-200 mt-[10px] mb-[20px]"}>
                     </div>
-                    <div className={"h-[40px] w-full grid grid-cols-10 gap-[20px] "}>
-                        <button className={"border h-full col-span-4 flex justify-center items-center bg-blue-500 font-sf font-[400] text-[15px] text-gray-50 hover:bg-gray-700 rounded-[5px]"}>
-                            <p className={"mt-[1px]"}>Thêm vào giỏ hàng</p>
-                        </button>
-                        <button className={"border h-full col-span-3 flex justify-center items-center border-gray-200 text-gray-800 rounded-[5px] font-sf text-[15px]"}>
-                            <p className={"mt-[1px]"}>Mua ngay</p>
-                        </button>
-                        <button className={"border h-full col-span-3 flex justify-center items-center border-gray-200 rounded-[5px]"}>
-                            <HiMiniArrowPath className={"text-gray-600 mr-[5px]"}/>
-                            <p className={"font-sf text-[15px] text-gray-800 mt-[1px]"}>So sánh</p>
-                        </button>
+                    <div className={"h-[40px] w-full grid grid-cols-11 gap-[20px] "}>
+                        <div className="col-span-5  relative flex items-end ">
+                            <p className="font-sf text-gray-600 text-[14px] mb-[5px] absolute top-[-6px]">Tạm tính</p>
+                            <p className={"text-[14px] self-end mb-[3px] mr-[2px] text-blue-500 font-sf underline"}>đ</p>
+                            <p className={" font-sf font-[600] text-blue-500 text-[22px] leading-[24px] "}>{quantity * (products.price - products.price * products.discount / 100) }</p>
+                        </div>
+                        
+                            <button className={"border h-[40px] col-span-3 flex justify-center items-center border-gray-200 text-gray-800 rounded-[5px] font-sf text-[15px]"}>
+                                <p className={"mt-[1px]"}>Mua ngay</p>
+                            </button>
+                            <button className={"border h-[40px] col-span-3 flex justify-center items-center border-gray-200 rounded-[5px]"}>
+                                <HiMiniArrowPath className={"text-gray-600 mr-[5px]"}/>
+                                <p className={"font-sf text-[15px] text-gray-800 mt-[1px]"}>So sánh</p>
+                            </button>
+                       
+                        
                     </div>
-                    <div className={" w-full border border-gray-200 grid grid-cols-8 gap-[20px] "}>
-                        <div className={"col-span-5 border-r border-gray-200 pr-[30px] flex"}>
+                    <div className={"w-full border-b border-gray-200 mt-[20px] mb-[0px]"}>
+                    </div>
+                    <div className={" w-full  grid grid-cols-10 gap-x-[20px] mt-[20px] "}>
+                        <div className="col-span-4  border-gray-200">
+                            <button className={"border h-full w-full col-span-4 flex justify-center items-center bg-blue-500 font-sf font-[400] text-[15px] text-gray-50 hover:bg-gray-700 rounded-[5px]"}>
+                                <p className={"mt-[1px]"}>Thêm vào giỏ hàng</p>
+                            </button>
+                        </div>
+                        <div className={"col-span-6  pr-[30px] flex border-l border-gray-200 pl-[20px]"}>
                             <div className={"h-full aspect-square rounded-full bg-gray-300 mr-[15px]"}>
                             </div>
                             <div className={"flex flex-col justify-center"}>
-                                <p className={"font-sf text-gray-800 font-[500] text-[16px]"}>Apple Viet Nam store offical </p>
-                                <button className={"w-[140px] border py-[5px] mt-[5px] rounded-[5px] bg-blue-500 text-gray-50 hover:bg-gray-700 "}>
+                                <p className={"font-sf text-gray-800 font-[500] text-[15px]"}>Apple Viet Nam offical </p>
+                                <button className={"w-[120px] border py-[3px] mt-[3px] rounded-[5px] bg-blue-500 text-gray-50 hover:bg-gray-700 "}>
                                     <p className={"font-sf  font-[400] text-[16px]"}>Xem shop</p>
                                 </button>
                             </div>
@@ -205,26 +248,66 @@ export default function ProductInfo () {
                 </div>
             </div>
 
-            {/*Shop*/}
-            <div className={"w-[1300px] h-[130px] shadow-[0px_0px_5px_rgba(0,0,0,0.2)] mb-[10px] p-[30px] grid grid-cols-14 "}>
-                <div className={"col-span-5 border-r border-gray-200 pr-[30px] flex"}>
-                    <div className={"h-full aspect-square rounded-full bg-gray-300 mr-[15px]"}>
-
+            {/*THong tin san pham*/}
+            <div className="w-[1300px]  gap-x-[30px] grid grid-cols-11">
+                <div className="col-span-7  border-gray-300  ">
+                    <div className="shadow-[0px_0px_5px_rgba(0,0,0,0.2)] p-[30px]">
+                        <p className="font-sf font-[500] text-[17px] ">Mô tả sản phẩm</p>
+                        <div className="flex">
+                            <div>
+                            {Object.entries(specifications).map(([key]) => (
+                                <div key={key} className="h-[30px] border-b border-gray-200 flex pr-[10px]">
+                                    <div className=" h-[30px] flex items-center font-sf text-[15px] text-gray-600">
+                                        <p>{key}</p>
+                                    </div>
+                                </div>
+                            ))}
+                            </div>
+                            <div className="flex-1">
+                            {Object.entries(specifications).map(([,value], index) => (
+                                <div key={index} className="h-[30px] border-b border-gray-200 flex pr-[10px]">
+                                    <div className=" h-[30px] flex items-center font-sf text-[15px] text-gray-600">
+                                        <p>{value}</p>
+                                    </div>
+                                </div>
+                            ))}
+                            </div>                        
+                        </div>
                     </div>
-                    <div className={"flex flex-col justify-center"}>
-                        <p className={"font-sf text-gray-800 font-[500] text-[18px]"}>Apple Viet Nam store offical </p>
-                        <button className={"w-[140px] border py-[5px] mt-[5px] rounded-[5px] bg-blue-500 text-gray-50 hover:bg-gray-700 "}>
-                            <p className={"font-sf  font-[400] text-[16px]"}>Xem shop</p>
-                        </button>
+                    <div className="shadow-[0px_0px_5px_rgba(0,0,0,0.2)] p-[30px] mt-[30px]">
+                        <p className="font-sf font-[500] text-[17px] text-gray-800">Đánh giá sản phẩm</p>
+                        <div className="w-full flex">
+
+                        </div>
+                        <div className="w-1/6 aspect-square border flex items-center justify-center">
+                            <div className="flex items-center">
+                                <HiStar className="text-yellow-500 text-[20px]"/>
+                                <div className="flex items-end">
+                                    <p className="font-sf font-[600] text-[30px] leading-[30px]">{products.star}</p>
+                                    <p className="font-sf text-[15px] text-gray-600 mb-[3px]  leading-[15px] ">/</p>
+                                    <p className="font-sf text-[15px] text-gray-600 mb-[1px] leading-[15px] ">5</p>
+                                </div>
+                                
+                            </div>
+                            <div>
+
+                            </div>
+                        </div>
+                        <div className="">
+
+                        </div>
                     </div>
+                    
+                    
                 </div>
-                <div className={"col-span-3 border-r border-gray-200"}>
-
-                </div>
-                <div className={"col-span-3 border-r border-gray-200"}>
-
+                <div className="col-span-4  border-gray-300 px-[30px] shadow-[0px_0px_5px_rgba(0,0,0,0.2)]">
+                    <p className="font-sf font-[500] text-[17px]">Có thể bạn cũng thích</p>
+                    
+                        
                 </div>
             </div>
+           
+            
         </div>
     )
 }
