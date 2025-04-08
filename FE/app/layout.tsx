@@ -9,7 +9,7 @@ const sfProRounded = localFont({
     src: [
         { path: "../public/fonts/SFProRounded-Regular.woff2", weight: "400" },
         { path: "../public/fonts/SFProRounded-Bold.woff2", weight: "700" },
-        { path: "../public/fonts/SFProRounded-SemiBold.woff2", weight: "600" },
+        { path: "../public/fonts/SFProRounded-Semibold.woff2", weight: "600" },
         { path: "../public/fonts/SFProRounded-Medium.woff2", weight: "500" },
         { path: "../public/fonts/SFProRounded-Black.woff2", weight: "900" },
 
@@ -22,7 +22,7 @@ const sfCompactRounded = localFont({
     src: [
         { path: "../public/fonts/SFCompactRounded-Regular.ttf", weight: "400" },
         { path: "../public/fonts/SFCompactRounded-Bold.ttf", weight: "700" },
-        { path: "../public/fonts/SFCompactRounded-SemiBold.ttf", weight: "600" },
+        { path: "../public/fonts/SFCompactRounded-Semibold.ttf", weight: "600" },
         { path: "../public/fonts/SFCompactRounded-Medium.ttf", weight: "500" },
         { path: "../public/fonts/SFCompactRounded-Black.ttf", weight: "900" },
     ],

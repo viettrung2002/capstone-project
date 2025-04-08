@@ -5,6 +5,16 @@ import Breadcrumb from "@/app/components/breadcrumb";
 import Image from "next/image";
 import {HiOutlineStar, HiTag, HiStar, HiReceiptPercent, HiChevronUp, HiChevronDown, HiMiniArrowPath, HiMiniArrowLongRight} from "react-icons/hi2";
 import { randomInt } from "crypto";
+import {ProductR} from "@/app/components/product";
+type Product = {
+    id: number;
+    category: string;
+    name: string;
+    image: string;
+    star: number;
+    price: number;
+    discount: number;
+};
 export default function ProductInfo () {
     const {id}  = useParams()
     const [quantity, setQuantity] = useState(0)
@@ -16,6 +26,46 @@ export default function ProductInfo () {
         { stars: 2, percentage: 0.1 },
         { stars: 1, percentage: 0.2 },
       ];
+
+    const comments = [
+        {
+            username: "ngviettrung2002",
+            rate: 4,
+            create_at: Date.now(),
+            content: "Sản phẩm sử dụng rất tốt, giao hàng nhanh"
+        },
+        {
+            username: "hoanganh99",
+            rate: 5,
+            create_at: new Date("2024-12-15T10:20:00").getTime(),
+            content: "Chất lượng tuyệt vời, đóng gói cẩn thận, sẽ ủng hộ tiếp!"
+        },
+        {
+            username: "minhthu_21",
+            rate: 3,
+            create_at: new Date("2025-02-02T08:45:00").getTime(),
+            content: "Giao hàng hơi chậm nhưng sản phẩm ổn, dùng tạm được."
+        },
+        {
+            username: "quanghuyyy",
+            rate: 4,
+            create_at: new Date("2025-01-10T17:30:00").getTime(),
+            content: "Mọi thứ đều ổn, chỉ có điều màu hơi khác so với ảnh."
+        },
+        {
+            username: "trangbaby",
+            rate: 5,
+            create_at: new Date("2024-11-28T14:15:00").getTime(),
+            content: "Mình rất hài lòng, hàng giống mô tả, rất đáng tiền!"
+        },
+        {
+            username: "phuclong",
+            rate: 2,
+            create_at: new Date("2025-03-12T09:00:00").getTime(),
+            content: "Sản phẩm không đúng mô tả, hỗ trợ khách hàng không tốt."
+        }
+    ];
+
     const breadcrumbs = [
         {name: "Category", href: "/categories" },
         {name: "2", href: "/categories" },
@@ -41,6 +91,98 @@ export default function ProductInfo () {
         stock: 10
 
     }
+    const recomendedProducts : Product[] = [
+        {
+            id: 1,
+            category: "Laptop",
+            name: "MacBook Pro M4",
+            image: "/products/product-1.jpg",
+            star: 4.5,
+            price: 4000,
+            discount: 10,
+        },
+        {
+            id: 2,
+            category: "Laptop",
+            name: "MacBook Air M2",
+            image: "/products/product-2.jpg",
+            star: 4.2,
+            price: 2500,
+            discount: 5,
+        },
+        {
+            id: 3,
+            category: "Laptop",
+            name: "Dell XPS 15",
+            image: "/products/product-3.jpg",
+            star: 4.7,
+            price: 3300,
+            discount: 8,
+        },
+        {
+            id: 4,
+            category: "Laptop",
+            name: "HP Spectre x360",
+            image: "/products/product-4.jpg",
+            star: 4.3,
+            price: 2900,
+            discount: 7,
+        },
+        {
+            id: 5,
+            category: "Laptop",
+            name: "Asus ROG Zephyrus",
+            image: "/products/product-5.jpg",
+            star: 4.8,
+            price: 3500,
+            discount: 12,
+        },
+        {
+            id: 6,
+            category: "Laptop",
+            name: "Lenovo ThinkPad X1",
+            image: "/products/product-6.jpg",
+            star: 4.4,
+            price: 2700,
+            discount: 6,
+        },
+        {
+            id: 7,
+            category: "Laptop",
+            name: "Acer Swift 5",
+            image: "/products/product-7.jpg",
+            star: 4.1,
+            price: 2100,
+            discount: 9,
+        },
+        {
+            id: 8,
+            category: "Laptop",
+            name: "MSI Prestige 14",
+            image: "/products/product-8.jpg",
+            star: 4.0,
+            price: 2400,
+            discount: 10,
+        },
+        {
+            id: 9,
+            category: "Laptop",
+            name: "Razer Blade 14",
+            image: "/products/product-9.jpg",
+            star: 4.6,
+            price: 3700,
+            discount: 15,
+        },
+        {
+            id: 10,
+            category: "Laptop",
+            name: "Surface Laptop 5",
+            image: "/products/product-10.jpg",
+            star: 4.2,
+            price: 2600,
+            discount: 5,
+        },
+    ]
     const specifications = {
         id: 1,
         name: "iPhone 13 Pro",
@@ -77,7 +219,7 @@ export default function ProductInfo () {
     }, [chooseColor]);
     return (
         <div className="w-full flex  flex-col items-center">
-            <div className={`w-[1300px] h-[40px] mt-[10px] px-[10px] items-center flex `}>
+            <div className={`w-[1300px] h-[40px] mt-[10px]  items-center flex mb-[20px]`}>
                 <div className="flex items-center w-[250px] h-full  ">
                     <Breadcrumb breadcrumbs={breadcrumbs} />
                 </div>
@@ -259,7 +401,7 @@ export default function ProductInfo () {
             {/*THong tin san pham*/}
             <div className="w-[1300px]  gap-x-[30px] grid grid-cols-11">
                 <div className="col-span-7  border-gray-300  ">
-                    <div className="shadow-[0px_0px_5px_rgba(0,0,0,0.2)] p-[30px]">
+                    <div className="shadow-[0px_0px_5px_rgba(0,0,0,0.2)] p-[30px] pt-[25px]">
                         <p className="font-sf font-[500] text-[17px] ">Mô tả sản phẩm</p>
                         <div className="flex">
                             <div>
@@ -284,7 +426,7 @@ export default function ProductInfo () {
                     </div>
                     <div className="shadow-[0px_0px_5px_rgba(0,0,0,0.2)] p-[30px] mt-[30px]">
                         <p className="font-sf font-[500] text-[17px] text-gray-800">Đánh giá sản phẩm</p>
-                        <div className="w-full flex border border-gray-200 mt-[10px] py-[10px]">
+                        <div className="w-full flex border border-gray-200 mt-[10px] mb-[20px] py-[10px]">
                             <div className="w-1/6 aspect-square  flex items-center justify-center">
                                 <div className="flex items-center">
                                     <HiStar className="text-yellow-500 text-[20px]"/>
@@ -318,14 +460,58 @@ export default function ProductInfo () {
                                 
                             </div>
                         </div>
+                        <div className={`w-full grid grid-rows-6 gap-[20px]`}>
+                            {comments.map((comment, index) => (
+                                <div key={index} className="row-span-1 border-b border-gray-200 min-h-[100px] flex pb-[20px]">
+                                    <div className={`h-[50px] w-[50px] rounded-full bg-gray-300 mr-[15px]`}>
+
+                                    </div>
+                                    <div className={`flex-1 flex flex-col w-[calc(100%-60px)] `}>
+                                        {/*Ten*/}
+                                        <div className={``}>
+                                            <p className={`font-sf text-gray-800 text-[15px]`}>{comment.username}</p>
+                                        </div>
+                                        {/*So sao danh gia*/}
+                                        <div className={` flex` }>
+                                            {[...Array(5)].map((_, index) => {
+                                                if (index <= comment.rate) {
+                                                    return <HiStar className={"text-yellow-500 text-[14px]"} key={index}/>
+                                                } else {
+                                                    return <HiOutlineStar className={`text-yellow-500 text-[14px]`} key={index}/>
+                                                }
+                                            })}
+                                        </div>
+                                        {/*Ngay tao*/}
+                                        <div className={`mt-[3px]`}>
+                                            <p className={`font-sf text-[11px] text-gray-600`}>{new Date(comment.create_at).toLocaleString("vi-VN", {
+                                                hour: "2-digit",
+                                                minute: "2-digit",
+                                                day: "2-digit",
+                                                month: "2-digit",
+                                                year: "numeric",
+                                            })}</p>
+                                        </div>
+                                        <div className={`flex-1 overflow-scroll `}>
+                                            <p className={`font-sf text-gray-800 `}>{comment.content} </p>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                            ))}
+                        </div>
                         
                     </div>
                     
                     
                 </div>
-                <div className="col-span-4  border-gray-300 px-[30px] shadow-[0px_0px_5px_rgba(0,0,0,0.2)]">
-                    <p className="font-sf font-[500] text-[17px]">Có thể bạn cũng thích</p>
-                    
+                <div className="col-span-4  border-gray-300 px-[30px] shadow-[0px_0px_5px_rgba(0,0,0,0.2)] pt-[25px]">
+                    <p className="font-sf font-[500] text-[17px] mb-[15px]">Có thể bạn cũng thích</p>
+                    <div className="w-full grid grid-rows-10 gap-[20px]">
+                        {recomendedProducts.map((product, index) => (
+                            <ProductR product={product} key={index}/>
+                        ))}
+                    </div>
                         
                 </div>
             </div>

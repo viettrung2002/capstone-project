@@ -1,4 +1,4 @@
-import { HiOutlineStar, HiStar, HiOutlineShoppingCart } from "react-icons/hi2";
+import {HiOutlineStar, HiStar, HiOutlineShoppingCart, HiReceiptPercent, HiMiniArrowPath} from "react-icons/hi2";
 import Image from "next/image";
 import {useState} from "react";
 import {useRouter} from "next/navigation";
@@ -158,6 +158,52 @@ export function ProductInCategory({product}: {product: Product}) {
                         <p className={`font-sf text-cl-hover-text text-[16px] font-[700] `}>${product.price }  </p>
                     </div>
                 )}
+
+            </div>
+        </div>
+    )
+}
+
+export function ProductR({product}: {product: Product}) {
+    return (
+        <div className={`row-span-1 border border-gray-200  p-[20px] flex`}>
+            <div className={`h-full aspect-square  mr-[20px] relative`}>
+                <Image src={product.image} alt={"image"} fill={true}/>
+            </div>
+            <div className={`flex-1 `}>
+                <div>
+                    <p className={`font-sf mt-[5px] text-cl-text text-[16px] font-[500] `}>{product.name}</p>
+                    <div className={`flex items-center h-[20px] text-[15px] mb-[5px]`}>
+                        {(product.star >= 0.5) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
+                        {(product.star >= 1.5) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
+                        {(product.star >= 2.5) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
+                        {(product.star >= 3.5) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
+                        {(product.star >= 4.5) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
+                        <p className={`font-sf text-gray-500 ml-[10px] text-[14px] `}>{product.star} Review</p>
+                    </div>
+
+                    {product.discount > 0 ? (
+                        <div className={`flex items-center`}>
+                            <p className={`font-sf text-cl-hover-text text-[18px] font-[600] `}>${product.price - product.price * product.discount / 100}  </p>
+                            <div className={`relative ml-[10px]`}>
+                                <p className={`font-sf text-gray-400 text-[16px] font-[400] ml-[0px]`}>${product.price}  </p>
+                                <div className={`absolute w-full border-t border-gray-400 top-1/2 `}></div>
+                            </div>
+                        </div>
+                    ): (
+                        <div className={`flex items-end`}>
+                            <p className={`font-sf text-cl-hover-text text-[20px] font-[600] `}>${product.price }  </p>
+                        </div>
+                    )}
+                </div>
+                <div className={`w-full h-[30px] flex mt-2`}>
+                    <button className={`h-full aspect-square border border-gray-200 flex justify-center items-center hover:bg-gray-700 text-gray-700 hover:text-gray-50`}>
+                        <HiMiniArrowPath className={``}/>
+                    </button>
+                    <button className={`h-full px-[10px] bg-blue-500 hover:bg-gray-700 ml-[10px] `}>
+                        <p className={`font-sf text-[14px] text-gray-50`}>Thêm vào giỏ hàng</p>
+                    </button>
+                </div>
 
             </div>
         </div>
