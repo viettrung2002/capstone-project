@@ -166,7 +166,7 @@ export function ProductInCategory({product}: {product: Product}) {
 
 export function ProductR({product}: {product: Product}) {
     return (
-        <div className={`row-span-1 border border-gray-200  p-[20px] flex`}>
+        <div className={`row-span-1 border border-gray-200  p-[20px] flex hover:shadow-md`}>
             <div className={`h-full aspect-square  mr-[20px] relative`}>
                 <Image src={product.image} alt={"image"} fill={true}/>
             </div>

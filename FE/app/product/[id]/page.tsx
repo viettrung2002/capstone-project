@@ -168,7 +168,7 @@ export default function ProductInfo () {
             id: 9,
             category: "Laptop",
             name: "Razer Blade 14",
-            image: "/products/product-9.jpg",
+            image: "/products/product-5.jpg",
             star: 4.6,
             price: 3700,
             discount: 15,
@@ -177,7 +177,7 @@ export default function ProductInfo () {
             id: 10,
             category: "Laptop",
             name: "Surface Laptop 5",
-            image: "/products/product-10.jpg",
+            image: "/products/product-8.jpg",
             star: 4.2,
             price: 2600,
             discount: 5,
@@ -491,7 +491,7 @@ export default function ProductInfo () {
                                                 year: "numeric",
                                             })}</p>
                                         </div>
-                                        <div className={`flex-1 overflow-scroll `}>
+                                        <div className={`flex-1 `}>
                                             <p className={`font-sf text-gray-800 `}>{comment.content} </p>
                                         </div>
                                     </div>
@@ -505,7 +505,7 @@ export default function ProductInfo () {
                     
                     
                 </div>
-                <div className="col-span-4  border-gray-300 px-[30px] shadow-[0px_0px_5px_rgba(0,0,0,0.2)] pt-[25px]">
+                <div className="col-span-4  border-gray-300 px-[30px] shadow-[0px_0px_5px_rgba(0,0,0,0.2)] max-h-fit pt-[25px] pb-[30px]">
                     <p className="font-sf font-[500] text-[17px] mb-[15px]">Có thể bạn cũng thích</p>
                     <div className="w-full grid grid-rows-10 gap-[20px]">
                         {recomendedProducts.map((product, index) => (
