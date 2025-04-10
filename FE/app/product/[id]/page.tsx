@@ -1,5 +1,5 @@
 'use client'
-import {useParams} from "next/navigation";
+import {useParams, useRouter} from "next/navigation";
 import {useEffect, useState} from "react";
 import Breadcrumb from "@/app/components/breadcrumb";
 import Image from "next/image";
@@ -17,6 +17,7 @@ type Product = {
 };
 export default function ProductInfo () {
     const {id}  = useParams()
+    const router = useRouter()
     const [quantity, setQuantity] = useState(0)
     const [chooseColor , setChooseColor] = useState("")
     const ratings = [
@@ -383,7 +384,7 @@ export default function ProductInfo () {
                             </div>
                             <div className={"flex flex-col justify-center"}>
                                 <p className={"font-sf text-gray-800 font-[500] text-[15px]"}>Apple Viet Nam offical </p>
-                                <button className={"w-[120px] border py-[3px] mt-[3px] rounded-[5px] bg-blue-500 text-gray-50 hover:bg-gray-700 "}>
+                                <button onClick={()=> router.push("/shop/1")} className={"w-[120px] border py-[3px] mt-[3px] rounded-[5px] bg-blue-500 text-gray-50 hover:bg-gray-700 "}>
                                     <p className={"font-sf  font-[400] text-[16px]"}>Xem shop</p>
                                 </button>
                             </div>
