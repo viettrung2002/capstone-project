@@ -430,6 +430,14 @@ export default function Shop() {
                                 ) : null}
                             </div>
                         </div>
+
+
+                        {/*San pham*/}
+                        <div className={"w-full grid grid-cols-5 gap-[15px] mt-[15px]"}>
+                            {products.map((product) => (
+                                <ProductInShop key={product.id} product={product}/>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>

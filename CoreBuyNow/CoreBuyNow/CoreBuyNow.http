@@ -1,0 +1,6 @@
+@CoreBuyNow_HostAddress = http://localhost:13832
+
+GET {{CoreBuyNow_HostAddress}}/api/account?id=5cdb8ce5-e2ef-407f-8b56-56f8ea5034b5
+Accept: application/json
+
+###
