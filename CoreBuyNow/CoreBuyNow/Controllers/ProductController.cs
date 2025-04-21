@@ -53,4 +53,7 @@ public class ProductController (IProductService productService) : ControllerBase
     [HttpGet("get/{id:guid}")]
     public async Task<IActionResult> GetProduct(Guid id) => Ok(await productService.GetProductById(id));
     
+    
+    [HttpGet("")]
+    public async Task GetProductByPage([FromQuery]int pageIndex, [FromQuery] int pageSize) => await productService.GetProductByPage(pageIndex, pageSize);
 }

@@ -1,4 +1,5 @@
-﻿using CoreBuyNow.Models.Entities;
+﻿using CoreBuyNow.Models.DTOs;
+using CoreBuyNow.Models.Entities;
 using CoreBuyNow.Repositories.Interfaces;
 using CoreBuyNow.Services.Interfaces;
 
@@ -30,4 +31,11 @@ public class ProductService(IProductRepository productRepository) : IProductServ
     {
         await productRepository.UpdateProduct(product, productId);
     }
+
+    public Task<PageResponseDto<Product>> GetProductByPage(int pageIndex, int pageSize)
+    {
+        return productRepository.GetProductByPage(pageIndex, pageSize);
+    }
+
+    
 }

@@ -19,10 +19,11 @@ public static class ApplicationServicesExtensions
         builder.Services.AddScoped<IAccountRepository, AccountRepository>(); 
         builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
         builder.Services.AddScoped<IShopRepository, ShopRepository>();
+        builder.Services.AddScoped<ICommentRepository, CommentRepository>();
         builder.Services.AddScoped<IProductRepository, ProductRepository>();
         builder.Services.AddScoped<IAccountService, AccountService>();
         builder.Services.AddScoped<IProductService, ProductService>();
-        
+        builder.Services.AddScoped<ICommentService, CommentService>();
         builder.Services.AddDbContext<AppDbContext>(options =>
         {
             var connectString = builder.Configuration.GetConnectionString("BuyNowConnectionString");

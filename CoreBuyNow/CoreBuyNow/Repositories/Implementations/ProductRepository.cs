@@ -1,4 +1,5 @@
 ﻿using CoreBuyNow.Models;
+using CoreBuyNow.Models.DTOs;
 using CoreBuyNow.Models.Entities;
 using CoreBuyNow.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -67,6 +68,23 @@ public class ProductRepository(AppDbContext dbContext, ILogger<ProductRepository
         existingProduct.IsFlashSale = product.IsFlashSale;
         dbContext.Products.Update(existingProduct);
         await dbContext.SaveChangesAsync();
+    }
+
+    public async Task<PageResponseDto<Product>> GetProductByPage(int index, int size)
+    {
+        return new PageResponseDto<Product>
+        (
+            index,
+            size,
+            await dbContext.Products.CountAsync(),
+            await dbContext.Products
+                .OrderBy(c => c.ProductName)
+                .Skip(index * size)
+                .Take(size)
+                .ToListAsync()
+        );
+
+
     }
 }
 

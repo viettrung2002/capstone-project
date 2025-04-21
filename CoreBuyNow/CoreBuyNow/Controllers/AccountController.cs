@@ -9,23 +9,25 @@ namespace CoreBuyNow.Controllers;
 [Route("/api/account")]
 public class AccountController(IAccountService accountService) : ControllerBase
 {
-    [HttpPost("register")]
-    public async Task<ActionResult> CreateAccountAsync([FromBody] AccountRegisterDto<Shop> info)
+    [HttpPost("register/shop")]
+    public async Task<ActionResult> CreateAccountAsync([FromBody] AccountRegisterDto<ShopDto> info)
     {
-        var account = new Account
-        {
-            UserName = info.UserName,
-            PassWord = info.PassWord,
-            Role = info.Role,
-        };
-        
-        await accountService.AddAccount( account: account, info: info.Info);
+        await accountService.AddAccount(info);
         return Ok( new
         {
            message = "Account created",
         });
     }
-
+    [HttpPost("register/customer")]
+    public async Task<ActionResult> CreateAccountAsync([FromBody] AccountRegisterDto<CustomerDto> info)
+    {
+        
+        await accountService.AddAccount(info);
+        return Ok( new
+        {
+            message = "Account created",
+        });
+    }
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetAccountByIdAsync(Guid id)
     {

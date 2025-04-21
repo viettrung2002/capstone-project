@@ -1,15 +1,23 @@
-﻿using CoreBuyNow.Models.Entities;
+﻿using CoreBuyNow.Models.DTOs;
+using CoreBuyNow.Models.Entities;
 using CoreBuyNow.Repositories.Interfaces;
 using CoreBuyNow.Services.Interfaces;
 
 namespace CoreBuyNow.Services.Implementations;
 
-public class AccountService (IAccountRepository accountRepository, ICustomerRepository customerRepository, IShopRepository shopRepository) : IAccountService
+public class AccountService (IAccountRepository accountRepository, ICustomerRepository customerRepository, IShopRepository shopRepository, ILogger<AccountService> logger) : IAccountService
 {
-    public async Task AddAccount<T>(Account account, T info)
+    public async Task AddAccount<T>(AccountRegisterDto<T> accountRegisterDto)
     {
+        var account = new Account
+        {
+            UserName = accountRegisterDto.UserName,
+            PassWord = accountRegisterDto.PassWord,
+            Role = accountRegisterDto.Role,
+        };
         await accountRepository.AddAccount(account);
-        if (account.Role == AccountRole.Shop && info is Shop shopInfo)
+        logger.LogInformation("AccountId_: {accountId}", account.AccountId);
+        if (account.Role == AccountRole.Shop && accountRegisterDto.Info is ShopDto shopInfo)
         {
             var shop = new Shop
             {
@@ -24,8 +32,9 @@ public class AccountService (IAccountRepository accountRepository, ICustomerRepo
             await shopRepository.CreateShop(shop);
         }
 
-        if (account.Role == AccountRole.Customer && info is Customer customerInfo)
+        if (account.Role == AccountRole.Customer && accountRegisterDto.Info is CustomerDto customerInfo)
         {
+            logger.LogInformation("AccountId: {accountId}", account.AccountId);
             var customer = new Customer
             {
                 CustomerId = Guid.NewGuid(),
