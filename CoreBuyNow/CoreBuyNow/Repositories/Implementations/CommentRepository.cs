@@ -49,17 +49,69 @@ public class CommentRepository (AppDbContext dbContext) : ICommentRepository
         await dbContext.SaveChangesAsync();
     }
 
-    public async Task<PageResponseDto<Comment>> GetComment(int pageIndex, int pageSize)
+    public async Task<PageResponseDto<CommentResponseDto>> GetComment(int pageIndex, int pageSize, Guid productId, int? star)
     {
-        return new PageResponseDto<Comment>(
+
+        
+        if (star < 0 | star > 5) throw new Exception("Star must be between 1 and 5!");
+        if (star > 0 )
+        {
+            return new PageResponseDto<CommentResponseDto>(
+                pageIndex,
+                pageSize,
+                await dbContext.Comments.CountAsync(p=>p.ProductId == productId && p.Rating == star),
+                await dbContext.Comments
+                    .Include(p => p.Customer)
+                    .Where(c => c.ProductId == productId && c.Rating == star)
+                    .Select(c=> new CommentResponseDto
+                    {
+                        CommentId = c.CommentId,
+                        CustomerName = c.Customer.CustomerName,
+                        CreateDate = c.CreatedDate,
+                        Content = c.Content,
+                        Rating = c.Rating
+                    })
+                    .OrderByDescending(c => c.CreateDate)
+                    .Skip((pageIndex - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync()
+            );
+        }  
+        return new PageResponseDto<CommentResponseDto>(
             pageIndex,
             pageSize,
-            await dbContext.Comments.CountAsync(),
+            await dbContext.Comments.CountAsync(p=>p.ProductId == productId),
             await dbContext.Comments
-                .OrderByDescending(c => c.CreatedDate)
+                .Include(p => p.Customer)
+                .Where(c => c.ProductId == productId)
+                .Select(c=> new CommentResponseDto
+                {
+                    CommentId = c.CommentId,
+                    CustomerName = c.Customer.CustomerName,
+                    CreateDate = c.CreatedDate,
+                    Content = c.Content,
+                    Rating = c.Rating
+                })
+                .OrderByDescending(c => c.CreateDate)
                 .Skip((pageIndex - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync()
         );
+    }
+
+    public async Task<Dictionary<int, int>> GetRating(Guid productId)
+    {
+        var rating = await dbContext.Comments
+            .Where(c => c.ProductId == productId)
+            .GroupBy(c => c.Rating)
+            .Select(g=>new {Star = g.Key, Count = g.Count()})
+            .ToDictionaryAsync(c => c.Star, c => c.Count);
+        
+        for (int i = 1; i <= 5; i++)
+        {
+            if (!rating.ContainsKey(i))
+                rating[i] = 0;
+        }
+        return rating;
     }
 }

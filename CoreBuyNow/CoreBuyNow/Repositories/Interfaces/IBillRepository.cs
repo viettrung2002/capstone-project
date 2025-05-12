@@ -1,0 +1,13 @@
+﻿using CoreBuyNow.Models.DTOs;
+using CoreBuyNow.Models.Entities;
+
+namespace CoreBuyNow.Repositories.Interfaces;
+
+public interface IBillRepository
+{
+    Task CreateBill(Bill bill, Guid customerId);
+    Task<PageResponseDto<BillResponseDto>> GetBills(Guid customerId, int pageIndex, int pageSize);
+    Task<PageResponseDto<BillResponseDto>> GetBills(Guid customerId, OrderStatus status, int pageIndex, int pageSize);
+    Task UpdateStatus(Guid billId);
+    Task CancelBill(Guid billId);
+}

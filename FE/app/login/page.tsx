@@ -1,9 +1,10 @@
 'use client'
 import { FaCircleUser, FaCircleChevronRight, FaGoogle, FaFacebook } from "react-icons/fa6";
-import { LuHouse } from "react-icons/lu";
+import Cookies from 'js-cookie';
 import Breadcrumb from "@/app/components/breadcrumb";
 import {useState} from "react";
 import {useRouter} from "next/navigation";
+
 export default function LoginPage() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -12,6 +13,25 @@ export default function LoginPage() {
         { name: "Login", href: "/login" },
 
     ];
+
+    async function handleLogin() {
+        try {
+            const response =  await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/account/login`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    userName: username,
+                    passWord: password}),
+            });
+            const res = await response.json();
+            Cookies.set("token", res.data.token, { expires: 7, secure: true, sameSite: 'Strict' });
+            console.log(res.data);
+        } catch (error) {
+            console.log(error);
+        }
+    }
     return (
         <div className={`flex w-full items-center justify-center  bg-gray-50 flex-col`}>
 
@@ -40,8 +60,8 @@ export default function LoginPage() {
                 <div className={`w-[400px] flex flex-col mt-[20px]`}>
                     <span className={`font-pop text-gray-700 font-[500] text-[20px]`}>PASSWORD</span>
                     <input
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                         placeholder="Enter your password"
                         className={`flex mt-[10px] items-center font-pop w-full focus:outline-none h-[45px] border-gray-200 border rounded-[4px] px-[15px]`}
                     />
@@ -50,7 +70,7 @@ export default function LoginPage() {
                     <span className={`font-pop text-blue-500 font-[300] text-[15px]`}>Forgot password?</span>
                 </div>
                 <div className={`w-[400px] h-[45px]  mt-[30px] grid grid-cols-10 gap-[10px] rounded-[4px]`}>
-                    <div className={`col-span-7 flex rounded-[4px] bg-blue-500 justify-center items-center hover:bg-gray-700 transition-all duration-200`}>
+                    <div className={`col-span-7 flex rounded-[4px] bg-blue-500 justify-center items-center hover:bg-gray-700 transition-all duration-200`} onClick={handleLogin}>
                         <span className={`text-gray-50 font-pop text-[20px] font-[600] select-none`}>Sign in</span>
                     </div>
                     <button onClick={()=> router.push("/register")} className={`col-span-3 flex rounded-[4px] bg-blue-500 justify-center items-center hover:bg-gray-700 transition-all duration-200`}>

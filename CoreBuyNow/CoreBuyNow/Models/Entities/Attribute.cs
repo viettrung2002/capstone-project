@@ -9,8 +9,8 @@ public class ProductAttribute
     [Required]
     public string AttributeName { get; set; }
     public DataType DataType { get; set; }
-    [Required]
-    public string Unit { get; set; }
+    [StringLength(50)]
+    public string? Unit { get; set; }
     public List<SubCategoryAttribute> SubCategoriesAttributes { get; set; }
 }
 

@@ -1,10 +1,25 @@
 'use client'
 import Breadcrumb from "@/app/components/breadcrumb";
 import {useEffect, useState} from "react";
-import {HiOutlineMagnifyingGlass, HiMiniMinus, HiChevronDown, HiMiniXMark, HiOutlineStar, HiStar, HiMiniArrowRight, HiChevronUp } from "react-icons/hi2";
+import {
+    HiOutlineMagnifyingGlass,
+    HiMiniMinus,
+    HiChevronDown,
+    HiMiniXMark,
+    HiOutlineStar,
+    HiStar,
+    HiMiniArrowRight,
+    HiChevronUp,
+    HiChevronLeft,
+    HiChevronRight, HiMiniEllipsisHorizontal,
+} from "react-icons/hi2";
 import { BiFilterAlt } from "react-icons/bi";
 import Image from "next/image";
 import {ProductInCategory} from "@/app/components/product";
+import Cookies from "js-cookie";
+import {IProduct} from "@/app/types/product";
+import {SubCategory} from "@/app/types/ subCategory";
+import {useParams} from "next/navigation";
 type SubCategoriesProps = {
     id: number;
     name: string;
@@ -22,41 +37,82 @@ type Official_Store  = {
     name: string;
     avatar: string;
 }
-type Product = {
-    id: number;
-    category: string;
-    name: string;
-    image: string;
-    star: number;
-    price: number;
-    discount: number
-}
+
 export default function Categories() {
+    const {id} = useParams();
     const breadcrumbs = [
         {name: "Category", href: "/categories" },
     ]
-    const subCategories: SubCategoriesProps[] = [
-        {
-            id: 1,
-            name: "Điện thoại thông minh"
-        },
-        {
-            id: 2,
-            name: "Máy tính bảng"
-        },
-        {
-            id: 3,
-            name: "Pin dự phòng"
-        },
-        {
-            id: 4,
-            name: "Bộ xạc điện thoại"
-        },
-        {
-            id: 5,
-            name: "Thẻ nhớ"
+    const [products, setProducts] = useState<(IProduct[])>([]);
+    const [subCategories, setSubCategories] = useState<(SubCategory[])>([]);
+    const [pageIndex, setPageIndex] = useState<number>(0);
+    const pageSize = 16;
+    const [productCount, setProductCount] = useState<number>(0);
+    const [sortBy, setSortBy] = useState("")
+    const [searchQuery, setSearchQuery] = useState("");
+    const [categoryName, setCategoryName] = useState("");
+    const [subCategoryId, setSubCategoryId] = useState("00000000-0000-0000-0000-000000000000");
+    const [rate, setRate] = useState<number>(0);
+    const [minPrice, setMinPrice] = useState<number | string>("");
+    const [maxPrice, setMaxPrice] = useState<number | string>("");
+    const [isMall, setIsMall] = useState(false)
+    useEffect(() => {
+        console.log(id)
+        async function GetProduct() {
+            const token = Cookies.get("token");
+            console.log("Token:", token);
+            if (!token) {
+                console.log('Không tìm thấy token. Vui lòng đăng nhập lại.');
+            }
+            try {
+                const response = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/product/search`,{
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        index: pageIndex,
+                        size:pageSize,
+                        sortBy: sortBy,
+                        keyWord: searchQuery,
+                        categoryId: id,
+                        subCategoryId: subCategoryId,
+                        minPrice: Number(minPrice),
+                        maxPrice: Number(maxPrice),
+                        rating: rate,
+                        shopType: isMall,
+                    })
+                })
+                const data = await response.json();
+                setProducts(data.data.items);
+                setProductCount(data.data.count);
+                console.log(data.data);
+            } catch (error) {
+                console.log(error)
+            }
         }
-    ];
+        GetProduct();
+    }, [pageIndex, pageSize, sortBy, searchQuery, subCategoryId,minPrice, maxPrice,rate,isMall]);
+    useEffect(() => {
+        async function GetCategory() {
+            try {
+                const res = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/product/category/a52948b6-1ba3-11f0-ad23-bcfce750d231`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    }
+                });
+                const data = await res.json();
+                setCategoryName(data.data.categoryName);
+                setSubCategories(data.data.subCategory);
+                console.log("Category",data);
+            } catch (err) {
+                console.log(err)
+            }
+        }
+        GetCategory();
+    }, []);
     const locations : Location[] = [
         { id: 1, name: "Hà Nội" },
         { id: 2, name: "Hồ Chí Minh" },
@@ -133,236 +189,17 @@ export default function Categories() {
         { id: 9, name: "Lenovo Official Store", avatar: "/store/lenovo.png" },
         { id: 10, name: "Microsoft Official Store", avatar: "/store/microsoft.png" }
     ];
-    const products: Product[] = [
-        {
-            id: 1,
-            category: "Watches",
-            name: "Xiaomi Mi Band 5",
-            image: `/products/product-1.jpg`,
-            star: 4.0,
-            price: 199.0,
-            discount: 0
-        },
-        {
-            id: 2,
-            category: "Speaker",
-            name: "Big Power Sound Speaker",
-            image: `/products/product-2.jpg`,
-            star: 5.0,
-            price: 275.0,
-            discount: 0
-        },
-        {
-            id: 3,
-            category: "Camera",
-            name: "WiFi Security Camera",
-            image: `/products/product-3.jpg`,
-            star: 5.0,
-            price: 399.0,
-            discount: 30
-        },
-        {
-            id: 4,
-            category: "Phones",
-            name: "iPhone 6x Plus",
-            image: `/products/product-4.jpg`,
-            star: 5.0,
-            price: 400.0,
-            discount: 0
-        },
-        {
-            id: 5,
-            category: "Headphones",
-            name: "Wireless Headphones",
-            image: `/products/product-5.jpg`,
-            star: 5.0,
-            price: 350.0,
-            discount:50
-        },
-        {
-            id: 6,
-            category: "Speaker",
-            name: "Mini Bluetooth Speaker",
-            image: `/products/product-6.jpg`,
-            star: 4.0,
-            price: 70.0,
-            discount: 0
-        },
-        {
-            id: 7,
-            category: "Headphones",
-            name: "PX7 Wireless Headphones",
-            image: `/products/product-7.jpg`,
-            star: 4.0,
-            price: 100.0,
-            discount:20
-        },
-        {
-            id: 8,
-            category: "Laptop",
-            name: "Apple MacBook Air",
-            image: `/products/product-8.jpg`,
-            star: 5.0,
-            price: 899.0,
-            discount: 15
-        },
-        {
-            id: 9,
-            category: "Watches",
-            name: "Xiaomi Mi Band 5",
-            image: `/products/product-1.jpg`,
-            star: 4.0,
-            price: 199.0,
-            discount: 0
-        },
-        {
-            id: 10,
-            category: "Speaker",
-            name: "Big Power Sound Speaker",
-            image: `/products/product-2.jpg`,
-            star: 5.0,
-            price: 275.0,
-            discount: 0
-        },
-        {
-            id: 11,
-            category: "Camera",
-            name: "WiFi Security Camera",
-            image: `/products/product-3.jpg`,
-            star: 5.0,
-            price: 399.0,
-            discount: 30
-        },
-        {
-            id: 12,
-            category: "Phones",
-            name: "iPhone 6x Plus",
-            image: `/products/product-4.jpg`,
-            star: 5.0,
-            price: 400.0,
-            discount: 0
-        },
-        {
-            id: 13,
-            category: "Headphones",
-            name: "Wireless Headphones",
-            image: `/products/product-5.jpg`,
-            star: 5.0,
-            price: 350.0,
-            discount:50
-        },
-        {
-            id: 14,
-            category: "Speaker",
-            name: "Mini Bluetooth Speaker",
-            image: `/products/product-6.jpg`,
-            star: 4.0,
-            price: 70.0,
-            discount: 0
-        },
-        {
-            id: 15,
-            category: "Headphones",
-            name: "PX7 Wireless Headphones",
-            image: `/products/product-7.jpg`,
-            star: 4.0,
-            price: 100.0,
-            discount:20
-        },
-        {
-            id: 16,
-            category: "Laptop",
-            name: "Apple MacBook Air",
-            image: `/products/product-8.jpg`,
-            star: 5.0,
-            price: 899.0,
-            discount: 15
-        },
-        {
-            id: 17,
-            category: "Watches",
-            name: "Xiaomi Mi Band 5",
-            image: `/products/product-1.jpg`,
-            star: 4.0,
-            price: 199.0,
-            discount: 0
-        },
-        {
-            id: 18,
-            category: "Speaker",
-            name: "Big Power Sound Speaker",
-            image: `/products/product-2.jpg`,
-            star: 5.0,
-            price: 275.0,
-            discount: 0
-        },
-        {
-            id: 19,
-            category: "Camera",
-            name: "WiFi Security Camera",
-            image: `/products/product-3.jpg`,
-            star: 5.0,
-            price: 399.0,
-            discount: 30
-        },
-        {
-            id: 20,
-            category: "Phones",
-            name: "iPhone 6x Plus",
-            image: `/products/product-4.jpg`,
-            star: 5.0,
-            price: 400.0,
-            discount: 0
-        },
-        {
-            id: 21,
-            category: "Headphones",
-            name: "Wireless Headphones",
-            image: `/products/product-5.jpg`,
-            star: 5.0,
-            price: 350.0,
-            discount:50
-        },
-        {
-            id: 22,
-            category: "Speaker",
-            name: "Mini Bluetooth Speaker",
-            image: `/products/product-6.jpg`,
-            star: 4.0,
-            price: 70.0,
-            discount: 0
-        },
-        {
-            id: 23,
-            category: "Headphones",
-            name: "PX7 Wireless Headphones",
-            image: `/products/product-7.jpg`,
-            star: 4.0,
-            price: 100.0,
-            discount:20
-        },
-        {
-            id: 24,
-            category: "Laptop",
-            name: "Apple MacBook Air",
-            image: `/products/product-8.jpg`,
-            star: 5.0,
-            price: 899.0,
-            discount: 15
-        },
-    ];
-    const [searchQuery, setSearchQuery] = useState("");
-    const [minPrice, setMinPrice] = useState<number | string>("");
-    const [maxPrice, setMaxPrice] = useState<number | string>("");
+
+
     const [showModalFilter, setShowModalFilter] = useState<boolean>(false);
     const [isOpen, setIsOpen] = useState(false);
     const [timeoutId, setTimeoutId] = useState<ReturnType<typeof setTimeout> | null>(null);
-    const [rate, setRate] = useState<number>(0);
+
     const [locationFilter, setLocationFilter] = useState<number[]>([]);
     const [brandFilter, setBrandFilter] = useState<number[]>([]);
     const [showfullLocattion, setShowfullLocattion] = useState<number>(9);
     const [showFullBrand, setShowFullBrand] = useState(9);
-    const [isMall, setIsMall] = useState(false)
+
     useEffect(() => {
         console.log(locationFilter);
     }, [locationFilter]);
@@ -379,7 +216,6 @@ export default function Categories() {
                 Banner
             </div>
             {/*Banner*/}
-
 
 
             {/*Product*/}
@@ -404,11 +240,11 @@ export default function Categories() {
                     {/*Search*/}
                     {/*Tat ca danh muc con*/}
                     <div className="flex  w-full p-[20px] px-[25px] mt-[30px] flex-col rounded-[5px] bg-white shadow-[0px_0px_5px_rgba(0,0,0,0.2)]">
-                        <p className={`font-sf font-[500] text-[17px] text-gray-800`}>Điện thoại & Phụ kiện</p>
+                        <p onClick={()=>setSubCategoryId("00000000-0000-0000-0000-000000000000")} className={`font-sf font-[500] text-[17px] text-gray-800`}>{categoryName}</p>
                         <p className={"border-b w-full border-gray-300 mt-[5px] mb-[5px]"}></p>
                         {
                             subCategories.map((subCategories) => (
-                               <p className={`font-sf font-[400] text-[15px] mt-[3px] text-gray-700 hover:text-blue-500 select-none`} key={subCategories.id}>{subCategories.name}</p>
+                               <p onClick={()=>setSubCategoryId(subCategories.subCategoryId)} className={`font-sf font-[400] text-[15px] mt-[3px] text-gray-700 hover:text-blue-500 select-none`} key={subCategories.subCategoryId}>{subCategories.subCategoryName}</p>
                             ))
                         }
                     </div>
@@ -466,7 +302,7 @@ export default function Categories() {
                     {/*Thuong hieu*/}
 
                 </div>
-                <div className={`w-[calc(77%-15px)] flex col-span-3 flex-col  `}>
+                <div className={`w-[calc(77%-15px)] flex col-span-3 flex-col`}>
                     <div className="flex flex-col  w-full mb-[30px] px-[20px] pt-[20px] pb-[25px] bg-white shadow-[0px_0px_5px_rgba(0,0,0,0.2)] rounded-[5px]">
                         <h1 className={"font-sf text-[17px] font-[500] text-gray-800"}>Tất cả sản phẩm </h1>
                         <div className={"border-b border-gray-300 mt-[5px]"}></div>
@@ -492,10 +328,10 @@ export default function Categories() {
                                         <HiChevronDown />
                                     </div>
                                     {isOpen ? (
-                                        <ul className={`absolute flex-col bg-gray-50 top-[40px] w-full items-center border border-gray-200 py-[5px] shadow rounded-[10px] font-sf font-[400] text-[15px]`}>
+                                        <ul className={`absolute flex-col bg-gray-50 z-[50] top-[40px] w-full items-center border border-gray-200 py-[5px] shadow rounded-[10px] font-sf font-[400] text-[15px]`}>
                                             <li className={`flex text-gray-700  hover:bg-gray-600 hover:text-cl-button-text select-none text-center h-[30px] items-center px-[10px] rounded-t-[4px]`}>Hàng mới</li>
-                                            <li className={`flex text-gray-700 hover:bg-gray-600 hover:text-cl-button-text select-none text-center h-[30px] items-center  px-[10px]  `}>Giá thấp đến cao</li>
-                                            <li className={`flex text-gray-700 hover:bg-gray-600 hover:text-cl-button-text text-center h-[30px] items-center   px-[10px] select-none`}>Giá cao đến thấp</li>
+                                            <li onClick={()=> setSortBy("price_asc")} className={`flex text-gray-700 hover:bg-gray-600 hover:text-cl-button-text select-none text-center h-[30px] items-center  px-[10px]  `}>Giá thấp đến cao</li>
+                                            <li onClick={()=> setSortBy("price_desc")} className={`flex text-gray-700 hover:bg-gray-600 hover:text-cl-button-text text-center h-[30px] items-center   px-[10px] select-none`}>Giá cao đến thấp</li>
                                             <li className={`flex text-gray-700 hover:bg-gray-600 hover:text-cl-button-text select-none text-center h-[30px] items-center px-[10px]  rounded-b-[4px]`}>Đánh giá</li>
 
                                         </ul>
@@ -510,7 +346,36 @@ export default function Categories() {
                         </div>
                     </div>
                     <div className={`flex-1 grid grid-cols-4 gap-[15px]`}>
-                        {products.slice(0,16).map((product) => (<ProductInCategory product={product} key={product.id} />))}
+                        {products.map((product) => (<ProductInCategory product={product} key={product.productId} />))}
+                    </div>
+
+                    <div className={` h-[40px] flex items-center justify-center mt-[20px] mb-[30px]`}>
+                        <button className={"flex w-[35px] h-[35px] border border-gray-300 rounded-full justify-center items-center text-gray-800 mr-[3px]"}>
+                            <HiChevronLeft/>
+                        </button>
+                        {Math.ceil(productCount/pageSize) <= 5 ?
+                            Array.from({length: Math.ceil(productCount/pageSize)},(_,i) => i ).map((page) =>
+                                <div key={page}>
+                                    <button onClick={()=> setPageIndex(page)} className={"flex w-[35px] h-[35px] border ml-[3px] mr-[3px] border-gray-300 rounded-full justify-center items-center text-gray-800 "}>
+                                        <p className={"font-sf"}>{page}</p>
+                                    </button>
+                                </div>) :
+                        <div className={"flex"}>
+                        {
+                            Array.from({length: 5},(_,i) => i + 1).map((page) =>
+                                <div key={page}>
+                                    <button className={"flex w-[35px] h-[35px] border ml-[3px] mr-[3px] border-gray-300 rounded-full justify-center items-center text-gray-800 "}>
+                                        <p className={"font-sf"}>{page}</p>
+                                    </button>
+                                </div>)
+                        }
+                        <div className={" flex w-[35px] h-[35px] justify-center items-center text-gray-800"}>
+                            <HiMiniEllipsisHorizontal/>
+                        </div>
+                        </div> }
+                        <button className={"flex w-[35px] h-[35px] border border-gray-300 rounded-full justify-center items-center text-gray-800 ml-[3px]"}>
+                            <HiChevronRight/>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -786,7 +651,6 @@ export default function Categories() {
                     <button className={`font-sf text-[16px] text-gray-50 bg-blue-500 hover:bg-gray-700 w-[110px] h-[40px] rounded-[5px] border border-gray-300`}>
                         <p>Xem kết quả</p>
                     </button>
-
                 </div>
             </div>
         </div>

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace CoreBuyNow.Models.Entities;
 
@@ -20,5 +21,7 @@ public class Shop
     [Required]
     public Guid AccountId { get; set; }
     [ForeignKey("AccountId")]
+    [JsonIgnore]
     public Account? Account { get; set; }     
+    public string? Avatar { get; set; }
 }

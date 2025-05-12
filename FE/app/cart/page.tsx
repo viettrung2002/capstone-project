@@ -1,0 +1,381 @@
+'use client'
+import Breadcrumb from "@/app/components/breadcrumb";
+import Image from "next/image";
+import {HiMiniMinus, HiMiniPlus, HiOutlineTrash} from "react-icons/hi2";
+import {useEffect, useState, useRef} from "react";
+import Cookies from "js-cookie";
+import {useRouter} from "next/navigation";
+import {IProductInCart} from "@/app/types/product";
+import {IShop} from "@/app/types/shop";
+
+type Product = {
+    id: number;
+    name: string;
+    image: string;
+    price: number;
+    quantity: number;
+    shop_id: number;
+
+}
+
+export  default function Cart() {
+    const router = useRouter();
+    const breadcrumbs = [
+        {name: "Shop", href: "/categories" },
+        {name: "2", href: "/categories" },
+    ]
+    const [products, setProducts] = useState<IProductInCart[]>([])
+    const [shop, setShop] = useState<IShop[]>([])
+    const [reload, setReload] = useState<boolean>(false)
+    const inputTimeoutRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+    const [localActiveItem, setLocalActiveItem] = useState<Record<string, boolean>>(
+        products.reduce((acc, p) => {
+            acc[p.itemId] = p.activate ?? false;
+            return acc;
+        }, {} as Record<string, boolean>)
+    );
+    const [localQuantity, setLocalQuantities] = useState<Record<string, string>>(products.reduce((acc,p)=>({...acc, [p.itemId]: p.quantity}),{}))
+    // const handleQuantityChange = (itemId: string, value: number) => {
+    //     const newQuantity = parseInt(value, 10);
+    //     if (!isNaN(newQuantity) && newQuantity > 0) {
+    //         // Cập nhật giá trị input ngay lập tức
+    //         setLocalQuantities((prev) => ({ ...prev, [itemId]: newQuantity }));
+    //
+    //         // Xóa timer cũ nếu có
+    //         if (inputTimeoutRef.current[itemId]) {
+    //             clearTimeout(inputTimeoutRef.current[itemId]);
+    //         }
+    //
+    //         // Tạo timer mới để gọi API
+    //         inputTimeoutRef.current[itemId] = setTimeout(async () => {
+    //             try {
+    //                 await UpdateQuantity(itemId, newQuantity);
+    //                 // Cập nhật state chính với giá trị mới
+    //                 setProduct((prev) =>
+    //                     prev.map((p) =>
+    //                         p.itemId === itemId ? { ...p, quantity: newQuantity } : p
+    //                     )
+    //                 );
+    //             } catch (error) {
+    //                 // Nếu API lỗi, revert giá trị input về giá trị cũ
+    //                 setLocalQuantities((prev) => ({
+    //                     ...prev,
+    //                     [itemId]: product.find((p) => p.itemId === itemId).quantity,
+    //                 }));
+    //             }
+    //         }, 500);
+    //     }
+    useEffect(() => {
+        localStorage.removeItem("productInBill");
+        console.log("item da duoc ative tai cart: ",localStorage.getItem("productInBill"));
+        async function GetCart () {
+            const token = Cookies.get("token");
+            console.log("Token:", token);
+            if (!token) {
+                router.push("/login")
+            }
+            try {
+                const response = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/cart`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`
+                    }
+                })
+                const data = await response.json();
+
+                const newShops: IShop[] = [];
+                console.log(data.data);
+                for (const p of data.data) {
+                    console.log(p.shopId);
+                    const ex = newShops.some(s=>s.shopId === p.shopId)
+                    console.log(!ex)
+                    if (!ex) {
+                        const shop: IShop = {
+                            shopId: p.shopId,
+                            shopName: p.shopName,
+                        }
+                        newShops.push(shop);
+                    }
+                }
+                console.log(newShops);
+                if (newShops.length >= 0) {
+                    // setShop((prev) => {
+                    //     const updatedShops = [...prev, ...newShops];
+                    //     // Loại bỏ trùng lặp nếu cần
+                    //     return Array.from(new Map(updatedShops.map((s) => [s.shopId, s])).values());
+                    // });
+                    setShop((prev) => {
+
+                        const prevIds = new Set(prev.map(s => s.shopId));
+                        const newIds = new Set(newShops.map(s => s.shopId));
+
+                        const hasChange =
+                            prev.length !== newShops.length ||
+                            [...prevIds].some(id => !newIds.has(id)) ||
+                            [...newIds].some(id => !prevIds.has(id));
+
+                        if (!hasChange) return prev;
+
+                        return Array.from(new Map(newShops.map((s) => [s.shopId, s])).values());
+                    });
+                }
+
+                console.log("------------------",shop);
+                setProducts(data.data)
+            } catch (error) {
+                console.error(error)
+            }
+        }
+        GetCart();
+    }, [reload]);
+    async function RemoveItem (itemId: string) {
+        const token = Cookies.get("token");
+        if (!token) {
+            router.push("/login")
+        }
+        try {
+            const response = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/cart/${itemId}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            const data = await response.json();
+            setReload(!reload);
+            console.log(data);
+        } catch (error) {
+            console.error(error)
+        }
+    }
+    async function UpdateQuantity (itemId: string, quantity: number) {
+        const token = Cookies.get("token");
+        if (!token) {
+            router.push("/login");
+            return false;
+        }
+        try {
+            const response = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/cart/${itemId}?quantity=${quantity}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                }
+            })
+
+            if (!response.ok) {
+                console.error("Failed to update quantity", response.status);
+                return false;
+            }
+            const data = await response.json();
+            setReload(!reload);
+
+            // setShop([]);
+            // setProduct([])
+            console.log(data);
+            return true;
+        } catch (error) {
+            console.error(error)
+            return false;
+        }
+    }
+
+    function checkActivate () {
+
+        return Object.values(localActiveItem).includes(false);
+    }
+    return (
+        <div className={"w-full flex justify-center flex-col items-center bg-gray-50"}>
+            <div className={`2xl:w-[1300px] xl:w-full h-[40px] mt-[10px]  items-center flex mb-[20px]`}>
+                <div className="flex items-center w-[250px] h-full  ">
+                    <Breadcrumb breadcrumbs={breadcrumbs} />
+
+                </div>
+            </div>
+            <div className={"w-[1300px] grid grid-cols-10 gap-5"}>
+                <div className="col-span-7">
+                    <div className={"w-full flex bg-white"}>
+                        <div className={"w-full h-[50px] border border-gray-200 grid grid-cols-25 px-[20px]"}>
+                            <div className={"col-span-1 flex pl-[10px] items-center"}>
+                                <div onClick={()=> {
+                                    if (checkActivate()){
+                                        setLocalActiveItem(products.reduce((acc,p)=>({...acc, [p.itemId]: true}),{}))
+                                    } else setLocalActiveItem(products.reduce((acc,p)=>({...acc, [p.itemId]: false}),{}))
+                                }
+                                } className={"h-[16px] w-[16px] border border-gray-200 flex items-center justify-center"}>
+                                    <div className={`w-[10px] h-[10px] ${checkActivate()? "bg-white" : "bg-gray-600"}`}>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div className={"col-span-8  flex items-center"}>
+                                <p className={"font-sf text-gray-600 text-[15px]"}>Sản phẩm</p>
+                            </div>
+                            <div className={"col-span-5 flex items-center justify-center"}>
+                                <p className={"font-sf text-gray-600 text-[15px]"}>Đơn giá</p>
+                            </div>
+                            <div className={"col-span-3 flex items-center justify-center"}>
+                                <p className={"font-sf text-gray-600 text-[15px]"}>Số lượng</p>
+                            </div>
+                            <div className={"col-span-5  flex items-center justify-center"}>
+                                <p className={"font-sf text-gray-600 text-[15px]"}>Số tiền</p>
+                            </div>
+                            <div className={"col-span-3  flex items-center justify-center"}>
+                                <p className={"font-sf text-gray-600 text-[15px]"}>Thao tác</p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div className={"w-full flex flex-col "}>
+
+                        {shop.map((shop) => (
+                            <div key={shop.shopId} className={"w-full bg-white border border-gray-200 mt-[20px]"}>
+                                <div className={"w-full h-[40px] border-b border-gray-200 grid grid-cols-25 px-[20px]"}>
+                                    {/*<div className={"col-span-1 flex pl-[10px] items-center"}>*/}
+                                    {/*    <div  className={"h-[16px] w-[16px] border border-gray-200"}>*/}
+
+                                    {/*    </div>*/}
+                                    {/*</div>*/}
+                                    <div className={"col-span-10  flex items-center"}>
+                                        <p className={"col-span-10 text-[16px] font-sf"}>{shop.shopName}</p>
+                                    </div>
+
+                                </div>
+                                <div className={"w-full px-[20px]"}>
+                                    {products.map((product) => (
+                                        product.shopId === shop.shopId ? (
+                                            <div key={product.itemId} className={"w-full border-b border-gray-200 grid grid-cols-25 py-[5px]"}>
+                                                <div className={"col-span-1 flex pl-[10px] items-center"}>
+                                                    <div onClick={()=> {
+                                                        setLocalActiveItem((prev) => ({...prev,[product.itemId]: !prev[product.itemId]}))
+                                                    }} className={"h-[16px] w-[16px] border border-gray-200 flex justify-center items-center"}>
+                                                        <div className={`h-[10px] w-[10px] ${localActiveItem[product.itemId] ? "bg-gray-600" : "bg-white" }`}></div>
+                                                    </div>
+                                                </div>
+                                                <div className={"col-span-8 flex items-center"}>
+                                                    <div className={"relative w-[65px] h-[65px] border border-gray-200 mr-[10px]"}>
+                                                        <Image src={"/products/product-4.jpg"} alt={"image"} fill={true}/>
+                                                    </div>
+                                                    <p className={"font-sf text-gray-600 text-[15px]"}>{product.productName}</p>
+                                                </div>
+                                                <div className={"col-span-5 flex items-center justify-center"}>
+                                                    <p className={"font-sf text-gray-600 text-[15px]"}>{product.price}</p>
+                                                </div>
+                                                <div className={"col-span-3 flex items-center justify-center"}>
+                                                    <div className={"w-[110px] h-[30px]  flex"}>
+                                                        <button onClick={()=> UpdateQuantity(product.itemId, product.quantity-1)} className={"h-[30px] w-[30px] border border-gray-200 flex justify-center items-center"}>
+                                                            <HiMiniMinus/>
+                                                        </button>
+                                                        <input onChange={(e) => {
+
+                                                            const newQuantity = e.target.value;
+                                                            // Xoá timer cũ nếu còn
+                                                            setLocalQuantities((prev) => ({ ...prev, [product.itemId]: newQuantity }));
+                                                            if (inputTimeoutRef.current[product.itemId]) {
+                                                                clearTimeout(inputTimeoutRef.current[product.itemId]);
+                                                            }
+
+                                                            // Tạo timer mới
+                                                            inputTimeoutRef.current[product.itemId] = setTimeout(() => {
+                                                                if (newQuantity == "" ) {
+                                                                    UpdateQuantity(product.itemId, 0)
+                                                                        .then ((ss)=> {
+                                                                            if (!ss) {
+                                                                                setLocalQuantities((prev) => ({
+                                                                                    ...prev,
+                                                                                    [product.itemId]: product.quantity.toString(),
+                                                                                }));
+                                                                            }
+                                                                        })
+                                                                } else {
+                                                                    UpdateQuantity(product.itemId, parseInt(newQuantity,10))
+                                                                        .then ((ss)=> {
+                                                                            if (!ss) {
+                                                                                setLocalQuantities((prev) => ({
+                                                                                    ...prev,
+                                                                                    [product.itemId]: product.quantity.toString(),
+                                                                                }));
+                                                                            }
+                                                                        })
+                                                                }
+
+
+                                                            }, 1000); // 500ms sau khi ngưng gõ mới gọi
+
+                                                        }} type={"number"} className={"flex text-[16px] text-gray-700 font-sf w-[50px] h-full border border-gray-200 items-center  text-center"} value={localQuantity[product.itemId] ?? product.quantity} />
+                                                        <button onClick={()=> UpdateQuantity(product.itemId, product.quantity+1)} className={"h-[30px] w-[30px] border border-gray-200 flex justify-center items-center"}>
+
+                                                            <HiMiniPlus/>
+                                                        </button>
+                                                    </div>
+
+                                                </div>
+                                                <div className={"col-span-5  flex items-center justify-center"}>
+                                                    <p className={"font-sf text-gray-600 text-[15px]"}>{product.price*product.quantity}</p>
+                                                </div>
+                                                <div className={"col-span-3  flex items-center justify-center"}>
+                                                    <button onClick={()=> RemoveItem(product.itemId)} className={"flex justify-center items-center w-[30px] h-[30px] rounded-full bg-blue-500 text-gray-50 text-[16px] hover:bg-gray-700"}>
+                                                        <HiOutlineTrash/>
+                                                    </button>
+
+                                                </div>
+                                            </div>
+                                        ) : null
+                                    ))}
+                                </div>
+
+                            </div>
+
+                        ))}
+                    </div>
+                </div>
+                <div className={"col-span-3 border-gray-200 border sticky top-[80px] p-[30px] pt-[25px] max-h-fit flex items-center flex-col bg-white"}>
+                    <p className={"font-sf text-gray-800 font-400 text-[18px]"}>TẠM TÍNH</p>
+                    <div className={"border-b border-gray-200 w-full mt-[10px]"}></div>
+                    <div className={"flex justify-between items-center mt-[20px] w-full"}>
+                        <p className={"font-sf text-gray-600 font-400 text-[16px]"}>Tổng cộng (10 sản phẩm)</p>
+                        <p className={"font-sf text-blue-600 font-400 text-[17px]"}>28900000</p>
+                    </div>
+                    <div className={"flex justify-between items-center mt-[10px] w-full"}>
+                        <p className={"font-sf text-gray-600 font-400 text-[16px]"}>Giảm giá sản phẩm</p>
+                        <p className={"font-sf text-blue-600 font-400 text-[17px]"}>28900000</p>
+                    </div>
+                    <div className={"border-b border-gray-200 w-full mt-[10px]"}></div>
+                    <div className={"flex justify-between items-center mt-[10px] w-full"}>
+                        <p className={"font-sf text-gray-600 font-400 text-[16px]"}>Tổng số tiền</p>
+                        <p className={"font-sf text-blue-600 font-[500] text-[18px]"}>100000000</p>
+                    </div>
+                    <div className={"border-b border-gray-200 w-full mt-[10px] mb-[20px]"}></div>
+
+                        <button onClick={()=> {
+                            const updatedProducts = products.map((p) => ({
+                                ...p,
+                                activate: localActiveItem[p.itemId] ?? false,
+                            }));
+
+                            console.log("product de chuyen toi bill:" ,updatedProducts);
+                            const productInBill = updatedProducts.filter(p=>p.activate).map((p)=> ({...p}))
+                            localStorage.setItem("productInBill", JSON.stringify(productInBill))
+                            router.push("/bill")
+                        }}
+                            className={"flex h-[40px]  w-full col-span-2 justify-center items-center bg-blue-500 text-gray-50"}>
+                            <p className={"font-sf text-[16px]"}>MUA HÀNG</p>
+                        </button>
+
+
+
+
+
+                </div>
+
+            </div>
+
+
+
+
+
+        </div>
+    )
+}

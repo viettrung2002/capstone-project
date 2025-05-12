@@ -46,6 +46,63 @@ namespace CoreBuyNow.Migrations
                     b.ToTable("Accounts");
                 });
 
+            modelBuilder.Entity("CoreBuyNow.Models.Entities.Admin", b =>
+                {
+                    b.Property<Guid>("AdminId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("AdminId");
+
+                    b.HasIndex("AccountId");
+
+                    b.ToTable("Admins");
+                });
+
+            modelBuilder.Entity("CoreBuyNow.Models.Entities.Bill", b =>
+                {
+                    b.Property<Guid>("BillId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("ItemInCartId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<int>("OrderStatus")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("ShippingVoucherId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("ShopVoucherId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<Guid>("VoucherId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("BillId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.ToTable("Bills");
+                });
+
             modelBuilder.Entity("CoreBuyNow.Models.Entities.Category", b =>
                 {
                     b.Property<Guid>("CategoryId")
@@ -129,6 +186,93 @@ namespace CoreBuyNow.Migrations
                     b.ToTable("Customers");
                 });
 
+            modelBuilder.Entity("CoreBuyNow.Models.Entities.CustomerInteraction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<bool>("IsPurchase")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("ProductId1")
+                        .HasColumnType("char(36)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("ProductId1");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("CustomerInteractions");
+                });
+
+            modelBuilder.Entity("CoreBuyNow.Models.Entities.ItemInBill", b =>
+                {
+                    b.Property<Guid>("ItemId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("BillId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.HasKey("ItemId");
+
+                    b.HasIndex("BillId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ItemInBills");
+                });
+
+            modelBuilder.Entity("CoreBuyNow.Models.Entities.ItemInCart", b =>
+                {
+                    b.Property<Guid>("ItemId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("ItemId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ItemInCarts");
+                });
+
             modelBuilder.Entity("CoreBuyNow.Models.Entities.Product", b =>
                 {
                     b.Property<Guid>("ProductId")
@@ -137,6 +281,9 @@ namespace CoreBuyNow.Migrations
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<int>("Discount")
+                        .HasColumnType("int");
 
                     b.Property<string>("ExtraImage")
                         .HasColumnType("longtext");
@@ -156,6 +303,9 @@ namespace CoreBuyNow.Migrations
                     b.Property<string>("ProductName")
                         .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
 
                     b.Property<Guid>("ShopId")
                         .HasColumnType("char(36)");
@@ -193,8 +343,8 @@ namespace CoreBuyNow.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Unit")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
 
                     b.HasKey("AttributeId");
 
@@ -214,6 +364,9 @@ namespace CoreBuyNow.Migrations
                         .IsRequired()
                         .HasMaxLength(2000)
                         .HasColumnType("varchar(2000)");
+
+                    b.Property<string>("Avatar")
+                        .HasColumnType("longtext");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime(6)");
@@ -273,6 +426,102 @@ namespace CoreBuyNow.Migrations
                     b.ToTable("SubCategoryAttributes");
                 });
 
+            modelBuilder.Entity("CoreBuyNow.Models.Entities.Voucher", b =>
+                {
+                    b.Property<Guid>("VoucherId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid?>("AdminId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("EndTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("IsIssued")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<decimal>("MinPrice")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<int>("PerUserQuantity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
+
+                    b.Property<Guid?>("ShopId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("StatTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("Value")
+                        .HasColumnType("int");
+
+                    b.Property<string>("VoucherName")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.HasKey("VoucherId");
+
+                    b.HasIndex("AdminId");
+
+                    b.HasIndex("ShopId");
+
+                    b.ToTable("Vouchers");
+                });
+
+            modelBuilder.Entity("CoreBuyNow.Models.Entities.VoucherWallet", b =>
+                {
+                    b.Property<Guid>("VoucherWalletId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("VoucherId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("VoucherWalletId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("VoucherId");
+
+                    b.ToTable("VoucherWallets");
+                });
+
+            modelBuilder.Entity("CoreBuyNow.Models.Entities.Admin", b =>
+                {
+                    b.HasOne("CoreBuyNow.Models.Entities.Account", "Account")
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Account");
+                });
+
+            modelBuilder.Entity("CoreBuyNow.Models.Entities.Bill", b =>
+                {
+                    b.HasOne("CoreBuyNow.Models.Entities.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+                });
+
             modelBuilder.Entity("CoreBuyNow.Models.Entities.Comment", b =>
                 {
                     b.HasOne("CoreBuyNow.Models.Entities.Customer", "Customer")
@@ -301,6 +550,63 @@ namespace CoreBuyNow.Migrations
                         .IsRequired();
 
                     b.Navigation("Account");
+                });
+
+            modelBuilder.Entity("CoreBuyNow.Models.Entities.CustomerInteraction", b =>
+                {
+                    b.HasOne("CoreBuyNow.Models.Entities.Customer", "Customer")
+                        .WithMany("Interactions")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CoreBuyNow.Models.Entities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId1")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("CoreBuyNow.Models.Entities.ItemInBill", b =>
+                {
+                    b.HasOne("CoreBuyNow.Models.Entities.Bill", "Bill")
+                        .WithMany("Items")
+                        .HasForeignKey("BillId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CoreBuyNow.Models.Entities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Bill");
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("CoreBuyNow.Models.Entities.ItemInCart", b =>
+                {
+                    b.HasOne("CoreBuyNow.Models.Entities.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CoreBuyNow.Models.Entities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("CoreBuyNow.Models.Entities.Product", b =>
@@ -363,6 +669,42 @@ namespace CoreBuyNow.Migrations
                     b.Navigation("SubCategory");
                 });
 
+            modelBuilder.Entity("CoreBuyNow.Models.Entities.Voucher", b =>
+                {
+                    b.HasOne("CoreBuyNow.Models.Entities.Admin", "Admin")
+                        .WithMany()
+                        .HasForeignKey("AdminId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("CoreBuyNow.Models.Entities.Shop", "Shop")
+                        .WithMany()
+                        .HasForeignKey("ShopId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Admin");
+
+                    b.Navigation("Shop");
+                });
+
+            modelBuilder.Entity("CoreBuyNow.Models.Entities.VoucherWallet", b =>
+                {
+                    b.HasOne("CoreBuyNow.Models.Entities.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CoreBuyNow.Models.Entities.Voucher", "Voucher")
+                        .WithMany()
+                        .HasForeignKey("VoucherId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Voucher");
+                });
+
             modelBuilder.Entity("CoreBuyNow.Models.Entities.Account", b =>
                 {
                     b.Navigation("Customer");
@@ -370,9 +712,19 @@ namespace CoreBuyNow.Migrations
                     b.Navigation("Shop");
                 });
 
+            modelBuilder.Entity("CoreBuyNow.Models.Entities.Bill", b =>
+                {
+                    b.Navigation("Items");
+                });
+
             modelBuilder.Entity("CoreBuyNow.Models.Entities.Category", b =>
                 {
                     b.Navigation("SubCategories");
+                });
+
+            modelBuilder.Entity("CoreBuyNow.Models.Entities.Customer", b =>
+                {
+                    b.Navigation("Interactions");
                 });
 
             modelBuilder.Entity("CoreBuyNow.Models.Entities.ProductAttribute", b =>

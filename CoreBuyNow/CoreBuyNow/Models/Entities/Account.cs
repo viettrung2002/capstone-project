@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace CoreBuyNow.Models.Entities;
 
@@ -14,8 +15,9 @@ public class Account
     public string PassWord { get; set; }
     [Required]
     public AccountRole Role { get; set; }
-    
-    public Shop? Shop { get; set; }      
+    [JsonIgnore]
+    public Shop? Shop { get; set; }   
+    [JsonIgnore]
     public Customer? Customer { get; set; }
 }
 

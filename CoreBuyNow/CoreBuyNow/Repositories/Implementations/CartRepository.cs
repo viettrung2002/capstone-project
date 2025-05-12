@@ -14,8 +14,22 @@ public class CartRepository (AppDbContext dbContext) : ICartRepository
         {
             item.ItemId = Guid.NewGuid();
         }
-        if (item.Quantity == 0 ) item.Quantity = 1;
-        dbContext.Add(item);
+        var item1 = dbContext.ItemInCarts.FirstOrDefault(x => x.ProductId == item.ProductId && x.CustomerId == item.CustomerId);
+        if (item1 == null)
+        {
+            if (item.Quantity == 0 ) item.Quantity = 1;
+            dbContext.Add(item);
+        }
+        else
+        {
+            if (item.Quantity == 0)
+            {
+                item1.Quantity += 1;
+            }
+            else
+                item1.Quantity += item.Quantity;
+            dbContext.Update(item1);
+        }
         await dbContext.SaveChangesAsync();
     }
 
@@ -42,8 +56,15 @@ public class CartRepository (AppDbContext dbContext) : ICartRepository
         await dbContext.SaveChangesAsync();
     }
 
-    public async Task<List<CartDto>> GetItemInCarts(Guid customerId)
+    public async Task<List<CartDto>> GetItemInCarts(string username)
     {
+
+        var customerId = dbContext.Customers
+            .Include(c => c.Account)
+            .Where(c => c.Account.UserName == username)
+            .Select(c=>c.CustomerId)
+            .FirstOrDefault();
+            
         return await dbContext.ItemInCarts
             .Include(i => i.Product)
             .ThenInclude(p => p.Shop)
@@ -58,8 +79,7 @@ public class CartRepository (AppDbContext dbContext) : ICartRepository
                 ShopName = i.Product.Shop.ShopName,
                 Price = i.Product.Price,
                 ProductImage = i.Product.MainImage,
-                VoucherId = i.VoucherId,
-                ShippingVoucherId = i.ShippingVoucherId
+                
             })
             .ToListAsync();
     }

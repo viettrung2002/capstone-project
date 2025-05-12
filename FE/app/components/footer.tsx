@@ -6,7 +6,7 @@ import Image from "next/image";
 export default function Footer() {
     const [email, setEmail] = useState<string>('');
     return(
-        <div className="footer bg-gray-800 w-full h-[650px] flex justify-center">
+        <div className="footer bg-gray-800 w-full h-[650px] flex justify-center mt-[20px]">
             <div className="flex items-center w-[1400px] h-full flex-col ">
                 <div className={`flex w-full h-[130px] border-b border-gray-500 items-center justify-between mb-[20px]`}>
                     <div className={`h-full w-[250px] border-r border-gray-500`}>
@@ -73,31 +73,31 @@ export default function Footer() {
                         <div className={`w-[50px] mt-[5px] border border-blue-500`}></div>
                         <div className={`grid grid-cols-3 grid-rows-3 w-6/10 mt-[20px] aspect-[16/10]`}>
                             <div className={`col-span-1 bg-gray-200 h-[25px] aspect-[16/9] rounded-[5px] relative `}>
-                                <Image src={`/logo/ghtk.png`} alt={"image"}  objectFit={"contain"} layout="fill" />
+                                <Image src={`/logo/ghtk.png`} alt={"image"}  fill={true} style={{objectFit: "contain"}} />
                             </div>
                             <div className={`col-span-1 bg-gray-200 h-[25px] aspect-[16/9] rounded-[5px] relative `}>
-                                <Image src={`/logo/aha.png`} alt={"image"} objectFit={"contain"} layout="fill" />
+                                <Image src={`/logo/aha.png`} alt={"image"} fill={true} style={{objectFit: "contain"}} />
                             </div>
                             <div className={`col-span-1 bg-gray-200 h-[25px] aspect-[16/9] rounded-[5px] relative `}>
-                                <Image src={`/logo/ghn.png`} alt={"image"} objectFit={"contain"} layout="fill" />
+                                <Image src={`/logo/ghn.png`} alt={"image"} fill={true} style={{objectFit: "contain"}} />
                             </div>
                             <div className={`col-span-1 bg-gray-200 h-[25px] aspect-[16/9] rounded-[5px] relative `}>
-                                <Image src={`/logo/grab.png`} alt={"image"} objectFit={"contain"} layout="fill" />
+                                <Image src={`/logo/grab.png`} alt={"image"} fill={true} style={{objectFit: "contain"}} />
                             </div>
                             <div className={`col-span-1 bg-gray-200 h-[25px] aspect-[16/9] rounded-[5px] relative `}>
-                                <Image src={`/logo/jt.png`} alt={"image"} objectFit={"contain"} layout="fill" />
+                                <Image src={`/logo/jt.png`} alt={"image"} fill={true} style={{objectFit: "contain"}} />
                             </div>
                             <div className={`col-span-1 bg-gray-200 h-[25px] aspect-[16/9] rounded-[5px] relative `}>
-                                <Image src={`/logo/ninjavan.png`} alt={"image"} objectFit={"contain"} layout="fill" />
+                                <Image src={`/logo/ninjavan.png`} alt={"image"} fill={true} style={{objectFit: "contain"}} />
                             </div>
                             <div className={`col-span-1 bg-gray-200 h-[25px] aspect-[16/9] rounded-[5px] relative `}>
-                                <Image src={`/logo/spx.png`} alt={"image"} objectFit={"contain"} layout="fill" />
+                                <Image src={`/logo/spx.png`} alt={"image"} fill={true} style={{objectFit: "contain"}} />
                             </div>
                             <div className={`col-span-1 bg-gray-200 h-[25px] aspect-[16/9] rounded-[5px] relative  `}>
-                                <Image src={`/logo/vnp.png`} alt={"image"} objectFit={"contain"} layout="fill" />
+                                <Image src={`/logo/vnp.png`} alt={"image"} fill={true} style={{objectFit: "contain"}} />
                             </div>
                             <div className={`col-span-1 bg-gray-200 h-[25px] aspect-[16/9] rounded-[5px] relative `}>
-                                <Image src={`/logo/vtp.png`} alt={"image"} objectFit={"contain"} layout="fill" />
+                                <Image src={`/logo/vtp.png`} alt={"image"} fill={true} style={{objectFit: "contain"}} />
                             </div>
                         </div>
 

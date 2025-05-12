@@ -1,5 +1,7 @@
-﻿using CoreBuyNow.Models.Entities;
+﻿using CoreBuyNow.Models.DTOs;
+using CoreBuyNow.Models.Entities;
 using CoreBuyNow.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CoreBuyNow.Controllers;
@@ -16,6 +18,7 @@ public class ProductController (IProductService productService) : ControllerBase
     }
 
     [HttpPost("add")]
+    [Authorize(Roles = "Shop")]
     public async Task<IActionResult> AddProduct(Product product)
     {
         await productService.AddProduct(product);
@@ -23,6 +26,7 @@ public class ProductController (IProductService productService) : ControllerBase
     }
 
     [HttpPut("update/{id:guid}")]
+    [Authorize(Roles = "Shop")]
     public async Task<IActionResult> UpdateProduct(Product product, Guid id)
     {
         await productService.UpdateProduct(product,id);
@@ -33,6 +37,7 @@ public class ProductController (IProductService productService) : ControllerBase
     }
 
     [HttpDelete("delete/{id:guid}")]
+    [Authorize(Roles = "Shop")]
     public async Task<IActionResult> DeleteProduct(Guid id)
     {
         try
@@ -51,9 +56,56 @@ public class ProductController (IProductService productService) : ControllerBase
     }
     
     [HttpGet("get/{id:guid}")]
+    [Authorize(Roles = "Customer")]
     public async Task<IActionResult> GetProduct(Guid id) => Ok(await productService.GetProductById(id));
     
+    [HttpPost("search")]
     
-    [HttpGet("")]
-    public async Task GetProductByPage([FromQuery]int pageIndex, [FromQuery] int pageSize) => await productService.GetProductByPage(pageIndex, pageSize);
+    public async Task<IActionResult> GetProduct(ProductFilterDto filter)
+    {
+        try
+        {
+            return Ok(new
+            {
+                data = await productService.GetProductByPage(filter)
+            });
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    [HttpGet("category/{id:guid}")]
+    
+    public async Task<IActionResult> GetSubCategory(Guid id)
+    {
+        try
+        {
+            return Ok(new
+            {
+                data = await productService.GetSubCategory(id),
+            });
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+    [HttpGet("categories")]
+    
+    public async Task<IActionResult> GetSubCategory()
+    {
+        try
+        {
+            return Ok(new
+            {
+                data = await productService.GetSubCategories(),
+            });
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
 }

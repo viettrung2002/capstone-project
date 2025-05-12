@@ -8,4 +8,5 @@ public interface ICustomerRepository
     Task<Customer?> GetCustomerById(Guid id);
     Task EditCustomer(Customer customer, Guid id);
     Task DeleteCustomer(Guid id); 
+    Task<Customer> GetCustomerByAccountId(Guid accountId);
 }

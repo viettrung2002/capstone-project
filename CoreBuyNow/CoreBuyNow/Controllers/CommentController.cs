@@ -1,5 +1,6 @@
 ﻿using CoreBuyNow.Models.Entities;
 using CoreBuyNow.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CoreBuyNow.Controllers;
@@ -8,17 +9,29 @@ namespace CoreBuyNow.Controllers;
 public class CommentController (ICommentService service) : ControllerBase
 {
     [HttpGet]
-    public async Task<IActionResult> GetCommentsByPage([FromQuery] int pageIndex, [FromQuery] int pageSize)
+    public async Task<IActionResult> GetCommentsByPage([FromQuery] int pageIndex, [FromQuery] int pageSize,
+        Guid productId, int? star)
     {
-        var comments = await service.GetCommentsByPage(pageIndex, pageSize);
-        return Ok(comments);
+        try
+        {
+            var comments = await service.GetCommentsByPage(pageIndex, pageSize, productId, star);
+            return Ok(comments);
+
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
     }
 
+
     [HttpPost("create")]
+    [Authorize(Roles = "Customer")]
     public async Task<IActionResult> CreateComment(Comment comment)
     {
         try
         {
+            comment.CustomerId = Guid.Parse(User.FindFirst("id")?.Value);
             await service.AddComment(comment);
             return Ok(new
             {
@@ -32,10 +45,12 @@ public class CommentController (ICommentService service) : ControllerBase
     }
 
     [HttpPut("update/{id:guid}")]
+    [Authorize(Roles = "Customer")]
     public async Task<IActionResult> UpdateComment(Comment comment, Guid id)
     {
         try
         {
+            comment.CustomerId = Guid.Parse(User.FindFirst("id")?.Value);
             await service.UpdateComment(comment, id);
             return Ok(new
             {
@@ -57,6 +72,22 @@ public class CommentController (ICommentService service) : ControllerBase
             return Ok(new
             {
                 message = "Comment has been deleted!",
+            });
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    [HttpGet("star/{id:guid}")]
+    public async Task<IActionResult> GetStarComments(Guid id)
+    {
+        try
+        {
+            return Ok( new
+            {
+                data = await service.GetRating(id)
             });
         }
         catch (Exception e)

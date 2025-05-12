@@ -1,6 +1,8 @@
 ﻿using CoreBuyNow.Models;
+using CoreBuyNow.Models.DTOs;
 using CoreBuyNow.Models.Entities;
 using CoreBuyNow.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace CoreBuyNow.Repositories.Implementations;
 
@@ -38,8 +40,35 @@ public class ShopRepository (AppDbContext dbContext) : IShopRepository
         dbContext.Shops.Remove(existingShop);
         await dbContext.SaveChangesAsync();
     }
-    public async Task<Shop?> GetShopById(Guid id)
+    public async Task<ShopResponseDto?> GetShopById(Guid id)
     {
-        return await dbContext.Shops.FindAsync(id);
+        var ratingCount = dbContext.Comments.Include(p=>p.Product).Count(c => c.Product.ShopId == id);
+        var rating = dbContext.Comments.Include(p=>p.Product).Where(c => c.Product.ShopId == id).Sum(c=>c.Rating);
+        var categories = dbContext.Products
+            .Include(p=>p.SubCategory)
+            .Include(p=>p.Shop)
+            .Where(p => p.Shop.ShopId == id)
+            .Select(p=>p.SubCategory)
+            .Distinct()
+            .ToList();
+            
+        return await dbContext.Shops
+            .Where(s => s.ShopId == id)
+            .Select(s => new ShopResponseDto
+            {
+                ShopId = s.ShopId,
+                ShopName = s.ShopName,
+                Avatar = s.Avatar,
+                Address = s.Address,
+                ProductCount = s.ProductCount,
+                CreatedDate = s.CreatedDate,
+                IsOfficial = s.IsOfficial,
+                Rating = (double)rating/ratingCount,
+                RatingCount = ratingCount,
+                Follower = 1000,
+                Categories = categories,
+            })
+            .FirstOrDefaultAsync();
+
     }
 }

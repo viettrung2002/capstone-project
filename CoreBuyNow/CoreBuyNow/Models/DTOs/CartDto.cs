@@ -15,4 +15,5 @@ public class CartDto
     public string ProductImage { get; set; }
     public Guid VoucherId { get; set; }
     public Guid ShippingVoucherId { get; set; }
+    public Guid CustomerId { get; set; }
 }

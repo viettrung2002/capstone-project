@@ -22,8 +22,13 @@ public class CommentService (ICommentRepository commentRepository) : ICommentSer
         await commentRepository.DeleteComment(commentId);
     }
 
-    public async Task<PageResponseDto<Comment>> GetCommentsByPage(int pageIndex, int pageSize)
+    public async Task<PageResponseDto<CommentResponseDto>> GetCommentsByPage(int pageIndex, int pageSize, Guid productId, int? star)
     {
-        return await commentRepository.GetComment(pageIndex, pageSize);
+        return await commentRepository.GetComment(pageIndex, pageSize, productId, star);
+    }
+
+    public async Task<Dictionary<int, int>> GetRating(Guid productId)
+    {
+        return await commentRepository.GetRating(productId);
     }
 }

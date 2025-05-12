@@ -74,7 +74,7 @@ export default function Navbar() {
                             </div>
                             <span className={`text-[15px]  font-pop mt-[2px] ml-[7px] group-hover:text-gray-50 `}>Account</span>
                         </button>
-                        <button onClick={()=> router.push("/cart/1")} className={`flex col-span-2 w-[45px] h-[45px] rounded-full border border-gray-300 justify-center items-center transition duration-300 text-gray-700 hover:bg-blue-500 hover:text-gray-50`}>
+                        <button onClick={()=> router.push("/cart")} className={`flex col-span-2 w-[45px] h-[45px] rounded-full border border-gray-300 justify-center items-center transition duration-300 text-gray-700 hover:bg-blue-500 hover:text-gray-50`}>
 
                             <HiOutlineShoppingCart className={` text-[20px]`}/>
                         </button>

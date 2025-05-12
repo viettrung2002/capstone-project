@@ -2,26 +2,45 @@ import {HiOutlineStar, HiStar, HiOutlineShoppingCart, HiReceiptPercent, HiMiniAr
 import Image from "next/image";
 import {useState} from "react";
 import {useRouter} from "next/navigation";
-type Product = {
-    id: number;
-    category: string;
-    name: string;
-    image: string;
-    star: number;
-    price: number;
-    discount: number;
+import type {IProduct} from "@/app/types/product";
+import Cookies from "js-cookie";
+import type {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
+
+async function AddToCart( productId: string , router: AppRouterInstance ) {
+    const token = Cookies.get("token");
+    if (!token) {
+        router.push("/login");
+    }
+    try {
+        const response = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/cart`,{
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                productId: productId,
+            })
+        })
+        const data = await response.json();
+        console.log(data);
+    } catch (error) {
+        console.log(error)
+    }
 }
-export default function Product({product}: {product: Product}) {
+
+export default function Product({product}: {product: IProduct}) {
     const router = useRouter();
 
     return (
-        <div onClick={()=>router.push(`/product/${product.id}`)} className={` col-span-1 aspect-[68/100] rounded-[5px] bg-white shadow p-[8px]`}>
+        <div onClick={()=>router.push(`/product/${product.productId}`)} className={` col-span-1 aspect-[68/100] rounded-[5px] bg-white shadow p-[8px]`}>
             <div
 
                 className={`bg-gray-50 group relative w-full aspect-square rounded-[4px] flex items-center justify-center p-[20px] hover:p-[0px] transition-all duration-200 ease-in-out overflow-hidden`}>
-                <Image src={product.image} alt={"product_image"} width={1000} height={1000} className={"object-contain"}/>
+                <Image src={"/products/product-1.jpg"} alt={"product_image"} width={1000} height={1000} className={"object-contain"}/>
 
-                    <button className={`absolute w-[130px] h-[45px] hover:bg-gray-700 bg-blue-500 rounded-[4px] bottom-[30px] flex items-center justify-center transition-all duration-200 translate-y-[75px] opacity-0 ease-in-out group-hover:opacity-100 group-hover:translate-y-0 `}>
+                    <button onClick={() => AddToCart(product.productId, router )}
+                        className={`absolute w-[130px] h-[45px] hover:bg-gray-700 bg-blue-500 rounded-[4px] bottom-[30px] flex items-center justify-center transition-all duration-200 translate-y-[75px] opacity-0 ease-in-out group-hover:opacity-100 group-hover:translate-y-0 `}>
                         <HiOutlineShoppingCart className={`text-cl-button-text text-[20px]`}/>
                         <p className={`ml-[5px] text-cl-button-text font-sf  `}>Add to cart</p>
                     </button>
@@ -31,18 +50,17 @@ export default function Product({product}: {product: Product}) {
                         <p className={`font-sf font-[500] text-[15px]`}>-{product.discount}%</p>
                     </div>) : null}
 
-
             </div>
             <div className={`pl-[20px] pt-[10px] flex flex-col justify-between`}>
-                <p className={`font-sf text-[15px] text-gray-500 `}>{product.category}</p>
-                <p className={`font-sf mt-[5px] text-cl-text text-[19px] font-[500] `}>{product.name}</p>
+                <p className={`font-sf text-[15px] text-gray-500 `}>{product.subCategoryName}</p>
+                <p className={`font-sf mt-[5px] text-cl-text text-[19px] font-[500] `}>{product.productName}</p>
                 <div className={`flex items-center h-[30px] `}>
-                    {(product.star >= 1) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
-                    {(product.star >= 2) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
-                    {(product.star >= 3) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
-                    {(product.star >= 4) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
-                    {(product.star >= 5) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
-                    <p className={`font-sf text-gray-500 ml-[10px] `}>{product.star} Review</p>
+                    {(product.rating >= 1) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
+                    {(product.rating >= 2) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
+                    {(product.rating >= 3) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
+                    {(product.rating >= 4) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
+                    {(product.rating >= 5) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
+                    <p className={`font-sf text-gray-500 ml-[10px] `}>{product.reviewCount} Review</p>
                 </div>
 
                 {product.discount > 0 ? (
@@ -64,13 +82,15 @@ export default function Product({product}: {product: Product}) {
     )
 }
 
-export function ProductSale({product}: {product: Product}) {
+export function ProductSale({product}: {product: IProduct}) {
+    const router = useRouter();
     return(
-        <div className={`col-span-1 aspect-[70/100] rounded-[4px] bg-white shadow p-[6px] relative `}>
-            <div className={`bg-gray-50 group relative w-full aspect-square rounded-[3px] flex items-center justify-center p-[20px] hover:p-[0px] transition-all duration-200 ease-in-out overflow-hidden`}>
-                <Image src={product.image} alt={"product_image"} width={1000} height={1000} className={"object-contain"}/>
 
-                <button className={`absolute w-[40px] h-[40px] hover:bg-gray-700 bg-blue-500 rounded-full bottom-[20px] flex items-center justify-center transition-all duration-200 translate-y-[75px] opacity-0 ease-in-out group-hover:opacity-100 group-hover:translate-y-0 `}>
+        <div onClick={()=>router.push(`/product/${product.productId}`)} className={`col-span-1 aspect-[70/100] rounded-[4px] bg-white border border-gray-200 p-[6px] relative `}>
+            <div className={`bg-gray-50 group relative w-full aspect-square rounded-[3px] flex items-center justify-center p-[20px] hover:p-[0px] transition-all duration-200 ease-in-out overflow-hidden`}>
+                <Image src={"/products/product-1.jpg"} alt={"product_image"} width={1000} height={1000} className={"object-contain"}/>
+
+                <button onClick={() => AddToCart(product.productId, router )} className={`absolute w-[40px] h-[40px] hover:bg-gray-700 bg-blue-500 rounded-full bottom-[20px] flex items-center justify-center transition-all duration-200 translate-y-[75px] opacity-0 ease-in-out group-hover:opacity-100 group-hover:translate-y-0 `}>
                     <HiOutlineShoppingCart className={`text-cl-button-text text-[20px]`}/>
                 </button>
                 {product.discount > 0 ? (
@@ -79,7 +99,7 @@ export function ProductSale({product}: {product: Product}) {
                     </div>) : null}
             </div>
             <div className={` pt-[10px] flex flex-col justify-between items-center `}>
-                <p className={`font-sf text-cl-text text-[15px] font-[600] `}>{product.name}</p>
+                <p className={`font-sf text-cl-text text-[15px] font-[600] `}>{product.productName}</p>
                 {product.discount > 0 ? (
                     <div className={`flex-col flex items-center`}>
                         <p className={`font-sf text-cl-hover-text text-[18px] font-[600] `}>${product.price - product.price * product.discount / 100}  </p>
@@ -99,30 +119,31 @@ export function ProductSale({product}: {product: Product}) {
     )
 }
 
-export function MiniProduct({product}: {product: Product}) {
+export function MiniProduct({product}: {product: IProduct}) {
+    const router = useRouter();
     return(
-        <div className={`w-full h-[70px] p-[0px] flex items-center hover:bg-gray-200 rounded-full group ease-in-out transition-colors duration-200 `}>
+        <div onClick={()=>router.push(`/product/${product.productId}`)} className={`w-full h-[70px] p-[0px] flex items-center hover:bg-gray-200 rounded-full group ease-in-out transition-colors duration-200 `}>
             <div className={`w-[60px] h-[60px]  rounded-full overflow-hidden ml-[6px]`}>
-                <Image src={product.image} alt={"image"} width={1000} height={1000} className={"object-contain"}/>
+                <Image src={"/products/product-1.jpg"} alt={"image"} width={1000} height={1000} className={"object-contain"}/>
             </div>
             <div className={`flex-1 h-[60px] flex flex-col justify-between ml-[20px] pt-[5px] pb-[5px] select-none`}>
-                <p className={`font-sf text-[15px] text-gray-800 group-hover:text-cl-hover-text`}>{product.name}</p>
+                <p className={`font-sf text-[15px] text-gray-800 group-hover:text-cl-hover-text`}>{product.productName}</p>
                 <p className={`font-sf text-[15px] text-gray-400`}>{product.price}$</p>
             </div>
         </div>
     )
 }
 
-export function ProductInCategory({product}: {product: Product}) {
-
+export function ProductInCategory({product}: {product: IProduct}) {
+    const router = useRouter();
     return (
-        <div className={` col-span-1 aspect-[68/100] rounded-[5px] bg-white shadow p-[7px] `}>
+        <div onClick={()=>router.push(`/product/${product.productId}`)} className={` col-span-1 aspect-[68/100] rounded-[5px] bg-white shadow p-[7px] `}>
             <div
 
                 className={`bg-gray-50 group relative w-full aspect-square rounded-[4px] flex items-center justify-center p-[20px] hover:p-[0px] transition-all duration-200 ease-in-out overflow-hidden`}>
-                <Image src={product.image} alt={"product_image"} width={1000} height={1000} className={"object-contain"}/>
+                <Image src={"/products/product-1.jpg"} alt={"product_image"} width={1000} height={1000} className={"object-contain"}/>
 
-                <button className={`absolute w-[130px] h-[45px] hover:bg-gray-700 bg-blue-500 rounded-[4px] bottom-[30px] flex items-center justify-center transition-all duration-200 translate-y-[75px] opacity-0 ease-in-out group-hover:opacity-100 group-hover:translate-y-0 `}>
+                <button onClick={() => AddToCart(product.productId, router )} className={`absolute w-[130px] h-[45px] hover:bg-gray-700 bg-blue-500 rounded-[4px] bottom-[30px] flex items-center justify-center transition-all duration-200 translate-y-[75px] opacity-0 ease-in-out group-hover:opacity-100 group-hover:translate-y-0 `}>
                     <HiOutlineShoppingCart className={`text-cl-button-text text-[20px]`}/>
                     <p className={`ml-[5px] text-cl-button-text font-sf  `}>Add to cart</p>
                 </button>
@@ -135,15 +156,15 @@ export function ProductInCategory({product}: {product: Product}) {
 
             </div>
             <div className={`pl-[10px] pt-[10px] flex flex-col justify-between`}>
-                <p className={`font-sf text-[14px] text-gray-500 `}>{product.category}</p>
-                <p className={`font-sf mt-[3px] text-cl-text text-[16px] font-[600] `}>{product.name}</p>
+                <p className={`font-sf text-[14px] text-gray-500 `}>{product.subCategoryName}</p>
+                <p className={`font-sf mt-[3px] text-cl-text text-[16px] font-[600] `}>{product.productName}</p>
                 <div className={`flex items-center h-[30px] text-[13px]`}>
-                    {(product.star >= 1) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
-                    {(product.star >= 2) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
-                    {(product.star >= 3) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
-                    {(product.star >= 4) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
-                    {(product.star >= 5) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
-                    <p className={`font-sf text-gray-500 ml-[10px] tex `}>{product.star} Review</p>
+                    {(product.rating >= 1) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
+                    {(product.rating >= 2) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
+                    {(product.rating >= 3) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
+                    {(product.rating >= 4) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
+                    {(product.rating >= 5) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
+                    <p className={`font-sf text-gray-500 ml-[10px] tex `}>{product.reviewCount} Review</p>
                 </div>
 
                 {product.discount > 0 ? (
@@ -165,22 +186,23 @@ export function ProductInCategory({product}: {product: Product}) {
     )
 }
 
-export function ProductR({product}: {product: Product}) {
+export function ProductR({product}: {product: IProduct}) {
+    const router = useRouter();
     return (
-        <div className={`row-span-1 border border-gray-200  p-[20px] flex hover:shadow-md`}>
+        <div onClick={()=>router.push(`/product/${product.productId}`)} className={`row-span-1 border border-gray-200  p-[20px] flex hover:shadow-md`}>
             <div className={`h-full aspect-square  mr-[20px] relative`}>
-                <Image src={product.image} alt={"image"} fill={true}/>
+                <Image src={"/products/product-1.jpg"} alt={"image"} fill={true}/>
             </div>
             <div className={`flex-1 `}>
                 <div>
-                    <p className={`font-sf mt-[5px] text-cl-text text-[16px] font-[500] `}>{product.name}</p>
+                    <p className={`font-sf mt-[5px] text-cl-text text-[16px] font-[500] `}>{product.productName}</p>
                     <div className={`flex items-center h-[20px] text-[15px] mb-[5px]`}>
-                        {(product.star >= 0.5) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
-                        {(product.star >= 1.5) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
-                        {(product.star >= 2.5) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
-                        {(product.star >= 3.5) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
-                        {(product.star >= 4.5) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
-                        <p className={`font-sf text-gray-500 ml-[10px] text-[14px] `}>{product.star} Review</p>
+                        {(product.rating >= 0.5) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
+                        {(product.rating >= 1.5) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
+                        {(product.rating >= 2.5) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
+                        {(product.rating >= 3.5) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
+                        {(product.rating >= 4.5) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
+                        <p className={`font-sf text-gray-500 ml-[10px] text-[14px] `}>{product.reviewCount} Review</p>
                     </div>
 
                     {product.discount > 0 ? (
@@ -201,7 +223,7 @@ export function ProductR({product}: {product: Product}) {
                     <button className={`h-full aspect-square border border-gray-200 flex justify-center items-center hover:bg-gray-700 text-gray-700 hover:text-gray-50`}>
                         <HiMiniArrowPath className={``}/>
                     </button>
-                    <button className={`h-full px-[10px] bg-blue-500 hover:bg-gray-700 ml-[10px] `}>
+                    <button onClick={() => AddToCart(product.productId, router )} className={`h-full px-[10px] bg-blue-500 hover:bg-gray-700 ml-[10px] `}>
                         <p className={`font-sf text-[14px] text-gray-50`}>Thêm vào giỏ hàng</p>
                     </button>
                 </div>
@@ -211,16 +233,16 @@ export function ProductR({product}: {product: Product}) {
     )
 }
 
-export function ProductInShop({product}: {product: Product}) {
-
+export function ProductInShop({product}: {product: IProduct}) {
+    const router = useRouter();
     return (
-        <div className={` col-span-1 aspect-[68/100] rounded-[5px] bg-white border border-gray-200 p-[7px] `}>
+        <div onClick={()=>router.push(`/product/${product.productId}`)} className={` col-span-1 aspect-[68/100] rounded-[5px] bg-white border border-gray-200 p-[7px] `}>
             <div
 
                 className={`bg-gray-50 group relative w-full aspect-square rounded-[4px] flex items-center justify-center p-[20px] hover:p-[0px] transition-all duration-200 ease-in-out overflow-hidden`}>
-                <Image src={product.image} alt={"product_image"} width={1000} height={1000} className={"object-contain"}/>
+                <Image src={"/products/product-1.jpg"} alt={"product_image"} width={1000} height={1000} className={"object-contain"}/>
 
-                <button className={`absolute w-[130px] h-[45px] hover:bg-gray-700 bg-blue-500 rounded-[4px] bottom-[30px] flex items-center justify-center transition-all duration-200 translate-y-[75px] opacity-0 ease-in-out group-hover:opacity-100 group-hover:translate-y-0 `}>
+                <button onClick={() => AddToCart(product.productId, router )} className={`absolute w-[130px] h-[45px] hover:bg-gray-700 bg-blue-500 rounded-[4px] bottom-[30px] flex items-center justify-center transition-all duration-200 translate-y-[75px] opacity-0 ease-in-out group-hover:opacity-100 group-hover:translate-y-0 `}>
                     <HiOutlineShoppingCart className={`text-cl-button-text text-[20px]`}/>
                     <p className={`ml-[5px] text-cl-button-text font-sf  `}>Add to cart</p>
                 </button>
@@ -233,15 +255,15 @@ export function ProductInShop({product}: {product: Product}) {
 
             </div>
             <div className={`pl-[10px] pt-[10px] flex flex-col justify-between`}>
-                <p className={`font-sf text-[13px] text-gray-500 `}>{product.category}</p>
-                <p className={`font-sf mt-[3px] text-cl-text text-[15px] font-[600] line-clamp-1`}>{product.name}</p>
+                <p className={`font-sf text-[13px] text-gray-500 `}>{product.subCategoryName}</p>
+                <p className={`font-sf mt-[3px] text-cl-text text-[15px] font-[600] line-clamp-1`}>{product.productName}</p>
                 <div className={`flex items-center h-[20px] text-[12px] `}>
-                    {(product.star >= 1) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
-                    {(product.star >= 2) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
-                    {(product.star >= 3) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
-                    {(product.star >= 4) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
-                    {(product.star >= 5) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
-                    <p className={`font-sf text-gray-500 ml-[10px] tex `}>{product.star} Review</p>
+                    {(product.rating >= 1) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
+                    {(product.rating >= 2) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
+                    {(product.rating >= 3) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
+                    {(product.rating >= 4) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
+                    {(product.rating >= 5) ? (<HiStar className={`text-yellow-400`}/>) : <HiOutlineStar className={`text-yellow-400`}/>}
+                    <p className={`font-sf text-gray-500 ml-[10px] tex `}>{product.reviewCount} Review</p>
                 </div>
 
                 {product.discount > 0 ? (
@@ -257,7 +279,6 @@ export function ProductInShop({product}: {product: Product}) {
                         <p className={`font-sf text-cl-hover-text text-[16px] font-[700] `}>${product.price }  </p>
                     </div>
                 )}
-
             </div>
         </div>
     )

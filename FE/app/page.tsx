@@ -8,30 +8,22 @@ import {ProductSale, MiniProduct} from "@/app/components/product";
 import {useState, useEffect} from "react";
 import Image from "next/image";
 import {useRouter} from "next/navigation";
+import {IProduct} from "@/app/types/product";
+import {ICategory} from "@/app/types/ subCategory";
+import Cookies from "js-cookie";
 type Slide = {
     id: number;
     text: string;
     bgURL: string;
 };
-type CategoryFeature = {
-    id: number;
-    category: string[];
-    image: string;
-}
-type Product = {
-    id: number;
-    category: string;
-    name: string;
-    image: string;
-    star: number;
-    price: number;
-    discount: number
-}
+
+
 type OfficialShop = {
     id: number;
     name: string;
     image: string;
 }
+
 export default function Home() {
     const [isOpen, setIsOpen] = useState(false);
     const [timeoutId, setTimeoutId] = useState<ReturnType<typeof setTimeout> | null>(null);
@@ -39,89 +31,82 @@ export default function Home() {
     const [transformSale, setTransformSale] = useState(0);
     const [transformOfficialShop, setTransformOfficialShop] = useState(0);
     const [timeLeft, setTimeLeft] = useState(3600);
+    const [trendingProducts, setTrendingProducts] = useState<IProduct[]>([]);
+    const [flashSaleProducts, setFlashSaleProducts] = useState<IProduct[]>([]);
+    const [category, setCategory] = useState<ICategory[]>([]);
     const router = useRouter();
-    const categoryFeatures: CategoryFeature[] = [
-        {id: 1, category: ['TV Audio', 'Phone', 'Smart Television', 'Audios', 'Headphones'], image: '/features_categories/fetured-item-1.png'},
-        {id: 2, category: ['Desktop & Laptop', 'Phone', 'Smart Television', 'Audios', 'Headphones'], image: '/features_categories/fetured-item-2.png'},
-        {id: 3, category: ['Cctv Camera', 'Phone', 'Smart Television', 'Audios', 'Headphones'], image: '/features_categories/fetured-item-3.png'},
-        {id: 4, category: ['Dslr Camera', 'Phone', 'Smart Television', 'Audios', 'Headphones'], image: '/features_categories/fetured-item-4.png'},
-        {id: 5, category: ['Smart Phones', 'Phone', 'Smart Television', 'Audios', 'Headphones'], image: '/features_categories/fetured-item-5.png'},
-        {id: 6, category: ['Game Console', 'Phone', 'Smart Television', 'Audios', 'Headphones'], image: '/features_categories/fetured-item-6.png'},
-    ]
-    const products: Product[] = [
-        {
-            id: 1,
-            category: "Watches",
-            name: "Xiaomi Mi Band 5",
-            image: `/products/product-1.jpg`,
-            star: 4.0,
-            price: 199.0,
-            discount: 0
-        },
-        {
-            id: 2,
-            category: "Speaker",
-            name: "Big Power Sound Speaker",
-            image: `/products/product-2.jpg`,
-            star: 5.0,
-            price: 275.0,
-            discount: 0
-        },
-        {
-            id: 3,
-            category: "Camera",
-            name: "WiFi Security Camera",
-            image: `/products/product-3.jpg`,
-            star: 5.0,
-            price: 399.0,
-            discount: 30
-        },
-        {
-            id: 4,
-            category: "Phones",
-            name: "iPhone 6x Plus",
-            image: `/products/product-4.jpg`,
-            star: 5.0,
-            price: 400.0,
-            discount: 0
-        },
-        {
-            id: 5,
-            category: "Headphones",
-            name: "Wireless Headphones",
-            image: `/products/product-5.jpg`,
-            star: 5.0,
-            price: 350.0,
-            discount:50
-        },
-        {
-            id: 6,
-            category: "Speaker",
-            name: "Mini Bluetooth Speaker",
-            image: `/products/product-6.jpg`,
-            star: 4.0,
-            price: 70.0,
-            discount: 0
-        },
-        {
-            id: 7,
-            category: "Headphones",
-            name: "PX7 Wireless Headphones",
-            image: `/products/product-7.jpg`,
-            star: 4.0,
-            price: 100.0,
-            discount:20
-        },
-        {
-            id: 8,
-            category: "Laptop",
-            name: "Apple MacBook Air",
-            image: `/products/product-8.jpg`,
-            star: 5.0,
-            price: 899.0,
-            discount: 15
-        },
-    ];
+
+    useEffect(() => {
+        async function GetProduct() {
+
+            try {
+                const response = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/product/search`,{
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        index: 0,
+                        size:8,
+                        isHome: true,
+
+                    })
+                })
+                const data = await response.json();
+                console.log(data.data);
+                setTrendingProducts(data.data.items);
+
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        GetProduct();
+        async function GetProductFlashSale() {
+
+            try {
+                const response = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/product/search`,{
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        index: 0,
+                        size:8,
+                        isFlashSale: true,
+                        isHome: true,
+                    })
+                })
+                const data = await response.json();
+                console.log(data.data);
+                setFlashSaleProducts(data.data.items);
+
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        GetProductFlashSale();
+
+        async function GetCategoryFeature() {
+
+            try {
+                const response = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/product/categories`,{
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                })
+                const data = await response.json();
+                console.log("Category",data.data);
+                setCategory(data.data);
+
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        GetCategoryFeature();
+
+
+    }, []);
     const slides: Slide[] = [
         { id: 1, text: 'Slide 1', bgURL: '/banner/slider-bg1.jpg' },
         { id: 2, text: 'Slide 2', bgURL: '/banner/slider-bg2.jpg' }
@@ -163,7 +148,7 @@ export default function Home() {
     };
     return (
         <div className="Home bg-gray-50  flex flex-col items-center">
-            <div className="h-[60px] w-full border-b border-gray-300 flex flex-row items-center justify-center">
+            <div className="h-[60px] w-full bg-white border-b border-gray-300 flex flex-row items-center justify-center">
                 <div className="flex flex-row 2xl:w-[1300px] xl:w-[1280px]  h-full">
                     <div className="flex flex-row w-[200px] h-full border-r border-gray-300 items-center relative"
                          onMouseLeave={() => {
@@ -180,11 +165,12 @@ export default function Home() {
                              setIsOpen(true);
                          }}>
                         <HiOutlineBars3 className="text-[18px] mb-[2px]" />
-                        <p className={`font-sf text-cl-text text-[15px] ml-[10px] font-[500] select-none`}>Categories</p>
+                        <p className={`font-sf text-cl-text text-[15px] ml-[10px] font-[500] select-none`}>Danh mục</p>
                         {isOpen?
                             (
                                 <ul className={`bg-gray-50 absolute top-[62px] border border-gray-200 w-[200px] pl-[30px] pt-[10px] pb-[10px] text-cl-text z-30`}>
                                     <li onClick={()=> router.push("/categories")} className={`flex items-center w-full h-[35px] font-sf font-[400] text-[15px] hover:text-cl-hover-text `}>Smartphone</li>
+
                                     <li className={`flex items-center w-full h-[35px] font-sf font-[400] text-[15px] hover:text-cl-hover-text `}>Laptop</li>
                                     <li className={`flex items-center w-full h-[35px] font-sf font-[400] text-[15px] hover:text-cl-hover-text `}>Watch</li>
                                     <li className={`flex items-center w-full h-[35px] font-sf font-[400] text-[15px] hover:text-cl-hover-text `}>Television</li>
@@ -197,10 +183,10 @@ export default function Home() {
 
                     </div>
                     <div className=" w-[700px] flex flex-row text-cl-text">
-                        <p className={`select-none flex items-center h-full font-sf font-[500] text-[15px]  hover:text-cl-hover-text ml-[30px]`}>Home</p>
-                        <p className={`select-none flex items-center h-full font-sf font-[500] text-[15px]  hover:text-cl-hover-text ml-[30px]`}>Vouchers</p>
+                        <p className={`select-none flex items-center h-full font-sf font-[500] text-[15px]  hover:text-cl-hover-text ml-[30px]`}>Trang chủ</p>
+                        <p className={`select-none flex items-center h-full font-sf font-[500] text-[15px]  hover:text-cl-hover-text ml-[30px]`}>Mã giảm giá</p>
                         <p className={`select-none flex items-center h-full font-sf font-[500] text-[15px]  hover:text-cl-hover-text ml-[30px]`}>Top Products</p>
-                        <p className={`select-none flex items-center h-full font-sf font-[500] text-[15px]  hover:text-cl-hover-text ml-[30px]`}>Seller Channel</p>
+                        <p className={`select-none flex items-center h-full font-sf font-[500] text-[15px]  hover:text-cl-hover-text ml-[30px]`}>Kênh người bán</p>
 
                     </div>
 
@@ -262,143 +248,142 @@ export default function Home() {
             </div>
             {/*Banner*/}
             {/*Categories*/}
-            <div className="2xl:w-[1300px] xl:w-[1280px]  flex items-center justify-center mt-[100px]">
-                <div className={`w-[600px] flex flex-col items-center`}>
-                    <p className={`font-sf font-[500] text-[30px] text-cl-text`}>Featured Categories</p>
-                    <div className={`border-b border-[2px] border-blue-600 w-[50px] mt-[4px]`}></div>
-                    <p className={`text-center font-sf font-[400] text-gray-500 mt-[20px]`}>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form.</p>
+            <div className="2xl:w-[1300px] xl:w-[1280px]  items-center justify-center mt-[30px] bg-white pt-[20px] p-[30px]">
+                <div className={` flex flex-col `}>
+                    <p className={`font-sf font-[400] text-[25px] text-cl-text`}>DANH MỤC</p>
+                    {/*<div className={`border-b border-[2px] border-blue-600 w-[50px] mt-[4px]`}></div>*/}
                 </div>
+                <div className={`grid grid-cols-6 gap-[10px] w-full mt-[10px]`}>
+                    {category.map((category) => (
+                        <FeatureCategories category={category} key={category.categoryId}/>
+                    ))}
 
+                </div>
             </div>
-            <div className={`grid gap-[20px] grid-cols-3 2xl:w-[1300px] xl:w-[1280px] mt-[30px]`}>
-                {categoryFeatures.map((category) => (
-                    <FeatureCategories category={category} key={category.id} />
-                ))}
 
-            </div>
             {/*Categories*/}
-            {/*Flash Sale*/}
-            <div className="2xl:w-[1300px] xl:w-[1280px]  flex items-center justify-center mt-[100px]">
-                <div className={`w-[600px] flex flex-col items-center`}>
-                    <p className={`font-sf font-[500] text-[30px] text-cl-text`}>Flash sale</p>
-                    <div className={`border-b border-[2px] border-blue-600 w-[50px] mt-[4px]`}></div>
-                    <p className={`text-center font-sf font-[400] text-gray-500 mt-[20px]`}>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form.</p>
-                </div>
-            </div>
+            {flashSaleProducts.length == 0 ? null :
+            <div className={"2xl:w-[1300px] xl:w-[1280px] bg-white pb-[30px] pt-[20px] mt-[30px] flex flex-col "}>
 
-            <div className={` 2xl:w-[1300px] xl:w-[1280px] mt-[30px] relative  `}>
-                <div className={`h-[50px] w-full pr-[60px] pl-[60px] mb-[20px]  flex items-center justify-between`}>
-                    <div className={`w-[200px] h-[50px] flex shadow rounded-[4px] pl-[25px] bg-white items-center`}>
-                        <p className={`font-[500] font-sf text-[14px] text-gray-500`}>End in:</p>
-                        <p className={`font-[500] font-sf text-[17px] text-gray-800 ml-[10px]`}>{formatTime(timeLeft)}</p>
+                <div className={` 2xl:w-[1300px] xl:w-[1280px] relative  `}>
+                    <div className={`h-[50px] w-full pr-[60px] pl-[30px] mb-[20px]  flex items-center justify-between`}>
+                        <div className={`flex items-center`}>
+                            <p className={`font-sf font-[400] text-[25px] text-cl-text mr-[20px]`}>FLASH SALE</p>
+                            <div className={`w-[180px] h-[40px] flex border border-gray-200 rounded-[4px] pl-[25px] bg-white items-center`}>
+                                <p className={`font-[500] font-sf text-[14px] text-gray-500`}>End in:</p>
+                                <p className={`font-[500] font-sf text-[17px] text-gray-800 ml-[10px]`}>{formatTime(timeLeft)}</p>
+                            </div>
+                        </div>
+
+                        <button className={`flex items-center text-gray-800 hover:text-blue-600`}>
+                            <p className={`font-[400] font-sf text-[16px] `}>Xem tất cả</p>
+                            <HiArrowRight className={`text-[20px] ml-[6px] mb-[1px]`}/>
+                        </button>
+
                     </div>
-                    <button className={`flex items-center text-gray-800 hover:text-blue-600`}>
-                        <p className={`font-[400] font-sf text-[16px] `}>See more</p>
-                        <HiArrowRight className={`text-[20px] ml-[6px] mb-[1px]`}/>
-                    </button>
 
 
-                </div>
+                    <div className={`flex h-full w-full justify-center items-center  relative`}>
+                        <button onClick={()=> {
+                            if (transformSale >= 1)
+                                setTransformSale(transformSale - 1)
+                        }} className={`absolute left-[-20px] w-[40px] h-[40px] rounded-full bg-white shadow-[0px_3px_7px_rgba(0,0,0,0.2)] flex items-center justify-center hover:bg-blue-500 hover:text-gray-50 transition-all duration-200 z-20`}>
+                            <HiArrowLeft className={`text-[20px]`} />
+                        </button>
+                        <button onClick={()=> {
+                            if (transformSale >= 0)
+                                setTransformSale(transformSale + 1)
+                        }} className={`absolute right-[-20px] w-[40px] h-[40px] rounded-full bg-white shadow-[0px_3px_7px_rgba(0,0,0,0.2)] flex items-center justify-center hover:bg-blue-500 hover:text-gray-50 transition-all duration-200 z-20`}>
+                            <HiArrowRight className={`text-[20px]`} />
+                        </button>
+                        <div className={` w-[calc(100%-60px)] relative overflow-hidden `}>
+                            <div
+                                className={`w-full grid gap-[10px] grid-cols-6 py-[10px] px-[5px] relative items-center transition-transform `}
+                                style={{ transform: `translateX(-${transformSale * 50}%)` }}>
 
+                                {flashSaleProducts.map((product) => (
+                                    <ProductSale product={product} key={product.productId} />
+                                ))}
 
-                <div className={`flex h-full w-full justify-center items-center  relative`}>
-                    <button onClick={()=> {
-                        if (transformSale >= 1)
-                            setTransformSale(transformSale - 1)
-                    }} className={`absolute left-0 w-[40px] h-[40px] rounded-full bg-white shadow-[0px_3px_7px_rgba(0,0,0,0.2)] flex items-center justify-center hover:bg-blue-500 hover:text-gray-50 transition-all duration-200 z-20`}>
-                        <HiArrowLeft className={`text-[20px]`} />
-                    </button>
-                    <button onClick={()=> {
-                        if (transformSale >= 0)
-                            setTransformSale(transformSale + 1)
-                    }} className={`absolute right-0 w-[40px] h-[40px] rounded-full bg-white shadow-[0px_3px_7px_rgba(0,0,0,0.2)] flex items-center justify-center hover:bg-blue-500 hover:text-gray-50 transition-all duration-200 z-20`}>
-                        <HiArrowRight className={`text-[20px]`} />
-                    </button>
-                    <div className={` w-[calc(100%-100px)] relative overflow-hidden `}>
-                        <div
-                            className={`w-full grid gap-[10px] grid-cols-6 flex py-[10px] px-[5px] relative items-center transition-transform `}
-                            style={{ transform: `translateX(-${transformSale * 50}%)` }}>
-
-                            {products.slice(0,6).map((product) => (
-                                <ProductSale product={product} key={product.id} />
-                            ))}
-
+                            </div>
                         </div>
                     </div>
+
+
+
                 </div>
+            </div>}
+            {/*Flash Sale*/}
 
-
-
-            </div>
             {/*Flash Sale*/}
             {/*Trending*/}
             <div className="2xl:w-[1300px] xl:w-[1280px]  flex items-center justify-center mt-[70px]">
                 <div className={`w-[600px] flex flex-col items-center`}>
-                    <p className={`font-sf font-[500] text-[30px] text-cl-text`}>Trending products</p>
+                    <p className={`font-sf font-[500] text-[30px] text-cl-text`}>Sản phẩm được yêu thích</p>
                     <div className={`border-b border-[2px] border-blue-600 w-[50px] mt-[4px]`}></div>
-                    <p className={`text-center font-sf font-[400] text-gray-500 mt-[20px]`}>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form.</p>
+                    {/*<p className={`text-center font-sf font-[400] text-gray-500 mt-[20px]`}>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form.</p>*/}
                 </div>
 
             </div>
             <div className={`grid gap-[30px] grid-cols-4 2xl:w-[1300px] xl:w-[1280px] mt-[30px]`}>
-                {products.map((product) => (
-                    <Product product={product} key={product.id} />
+                {trendingProducts.map((product) => (
+                    <Product product={product} key={product.productId} />
                 ))}
 
             </div>
             {/*Trending*/}
 
-            <div className={`2xl:w-[1300px] xl:w-[1280px] h-[380px] bg-white mt-[30px] grid grid-cols-3 gap-[30px] mb-[50px] shadow-[0px_0px_5px_rgba(0,0,0,0.2)] rounded-[5px]`}>
-                <div className={`col-span-1 p-[30px] `}>
-                    <div>
-                        <p className={`font-sf font-[600] text-[18px] text-gray-800 ml-[6px]`}>Best sellers</p>
-                        <div className={`flex`}>
-                            <div className={`border-t border-blue-500 w-[110px] `}></div>
-                            <div className={`flex-1 border-t border-gray-300`}></div>
-                        </div>
-                    </div>
-                    <div className={` h-[250px] flex flex-col justify-between mt-[20px]`}>
-                        {products.slice(0,3).map((product) => (
-                            <MiniProduct product={product} key={product.id} />
-                        ))}
-                    </div>
-                </div>
-                <div className={`col-span-1 p-[30px]`}>
-                    <div>
-                        <p className={`font-sf text-[18px] font-[600] text-gray-800 ml-[6px]`}>New arrivals</p>
-                        <div className={`flex`}>
-                            <div className={`border-t border-blue-500 w-[120px] `}></div>
-                            <div className={`flex-1 border-t border-gray-300`}></div>
-                        </div>
-                    </div>
-                    <div className={` h-[250px] flex flex-col justify-between mt-[20px]`}>
-                        {products.slice(0,3).map((product) => (
-                            <MiniProduct product={product} key={product.id} />
-                        ))}
-                    </div>
-                </div>
-                <div className={`col-span-1 p-[30px]`}>
-                    <div>
-                        <p className={`font-sf text-[18px] font-[600] text-gray-800 ml-[6px]`}>Top rated</p>
-                        <div className={`flex`}>
-                            <div className={`border-t border-blue-500 w-[100px] `}></div>
-                            <div className={`flex-1 border-t border-gray-300`}></div>
-                        </div>
-                    </div>
-                    <div className={` h-[250px] flex flex-col justify-between mt-[20px]`}>
-                        {products.slice(0,3).map((product) => (
-                            <MiniProduct product={product} key={product.id} />
-                        ))}
-                    </div>
-                </div>
-            </div>
+            {/*<div className={`2xl:w-[1300px] xl:w-[1280px] h-[380px] bg-white mt-[30px] grid grid-cols-3 gap-[30px] mb-[50px] shadow-[0px_0px_5px_rgba(0,0,0,0.2)] rounded-[5px]`}>*/}
+            {/*    <div className={`col-span-1 p-[30px] `}>*/}
+            {/*        <div>*/}
+            {/*            <p className={`font-sf font-[600] text-[18px] text-gray-800 ml-[6px]`}>Best sellers</p>*/}
+            {/*            <div className={`flex`}>*/}
+            {/*                <div className={`border-t border-blue-500 w-[110px] `}></div>*/}
+            {/*                <div className={`flex-1 border-t border-gray-300`}></div>*/}
+            {/*            </div>*/}
+            {/*        </div>*/}
+            {/*        <div className={` h-[250px] flex flex-col justify-between mt-[20px]`}>*/}
+            {/*            {products.slice(0,3).map((product) => (*/}
+            {/*                <MiniProduct product={product} key={product.id} />*/}
+            {/*            ))}*/}
+            {/*        </div>*/}
+            {/*    </div>*/}
+            {/*    <div className={`col-span-1 p-[30px]`}>*/}
+            {/*        <div>*/}
+            {/*            <p className={`font-sf text-[18px] font-[600] text-gray-800 ml-[6px]`}>New arrivals</p>*/}
+            {/*            <div className={`flex`}>*/}
+            {/*                <div className={`border-t border-blue-500 w-[120px] `}></div>*/}
+            {/*                <div className={`flex-1 border-t border-gray-300`}></div>*/}
+            {/*            </div>*/}
+            {/*        </div>*/}
+            {/*        <div className={` h-[250px] flex flex-col justify-between mt-[20px]`}>*/}
+            {/*            {products.slice(0,3).map((product) => (*/}
+            {/*                <MiniProduct product={product} key={product.id} />*/}
+            {/*            ))}*/}
+            {/*        </div>*/}
+            {/*    </div>*/}
+            {/*    <div className={`col-span-1 p-[30px]`}>*/}
+            {/*        <div>*/}
+            {/*            <p className={`font-sf text-[18px] font-[600] text-gray-800 ml-[6px]`}>Top rated</p>*/}
+            {/*            <div className={`flex`}>*/}
+            {/*                <div className={`border-t border-blue-500 w-[100px] `}></div>*/}
+            {/*                <div className={`flex-1 border-t border-gray-300`}></div>*/}
+            {/*            </div>*/}
+            {/*        </div>*/}
+            {/*        <div className={` h-[250px] flex flex-col justify-between mt-[20px]`}>*/}
+            {/*            {products.slice(0,3).map((product) => (*/}
+            {/*                <MiniProduct product={product} key={product.id} />*/}
+            {/*            ))}*/}
+            {/*        </div>*/}
+            {/*    </div>*/}
+            {/*</div>*/}
 
             {/*Mall*/}
             <div className="2xl:w-[1300px] xl:w-[1280px]  flex items-center justify-center mt-[50px]">
                 <div className={`w-[600px] flex flex-col items-center`}>
-                    <p className={`font-sf font-[500] text-[30px] text-cl-text`}>MALL</p>
+                    <p className={`font-sf font-[500] text-[30px] text-cl-text`}>Shop chính hãng</p>
                     <div className={`border-b border-[2px] border-blue-600 w-[50px] mt-[4px]`}></div>
-                    <p className={`text-center font-sf font-[400] text-gray-500 mt-[20px]`}>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form.</p>
+                    {/*<p className={`text-center font-sf font-[400] text-gray-500 mt-[20px]`}>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form.</p>*/}
                 </div>
             </div>
             <div className={` 2xl:w-[1300px] xl:w-[1280px] mt-[30px] relative `}>

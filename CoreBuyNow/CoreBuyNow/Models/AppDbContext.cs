@@ -33,12 +33,36 @@ public class AppDbContext : DbContext
                 v => JsonSerializer.Serialize(v, SJsonOptions),
                 v => JsonSerializer.Deserialize<Dictionary<string, string>>(v, SJsonOptions) ??
                      new Dictionary<string, string>());
+        modelBuilder.Entity<Voucher>(entity =>
+        {
+            entity.HasOne(b => b.Admin)
+                .WithMany()
+                .HasForeignKey(b => b.AdminId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(b => b.Shop)
+                .WithMany()
+                .HasForeignKey(b => b.ShopId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+        
+        modelBuilder.Entity<CustomerInteraction>()
+            .HasIndex(ui => ui.UserId);
+        modelBuilder.Entity<CustomerInteraction>()
+            .HasIndex(ui => ui.ProductId);
+        
     }
     public DbSet<Account> Accounts { get; set; }
     public DbSet<Shop> Shops { get; set; }
     public DbSet<Customer> Customers { get; set; }
     public DbSet<Comment> Comments { get; set; }
     public DbSet<ItemInCart> ItemInCarts { get; set; }
+    public DbSet<ItemInBill> ItemInBills { get; set; }
+    public DbSet<Bill> Bills { get; set; }
+    public DbSet<VoucherWallet> VoucherWallets { get; set; }
+    public DbSet<Admin> Admins { get; set; }
+    public DbSet<CustomerInteraction> CustomerInteractions { get; set; }
+    public DbSet<Voucher> Vouchers { get; set; }
     public DbSet<Product> Products { get; set; }
     public DbSet<Category> Categories { get; set; }
     public DbSet<SubCategory> SubCategories { get; set; }

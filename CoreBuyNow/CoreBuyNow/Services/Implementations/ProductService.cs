@@ -22,7 +22,7 @@ public class ProductService(IProductRepository productRepository) : IProductServ
         await productRepository.DeleteProduct(productId);
     }
 
-    public async Task<Product?> GetProductById(Guid productId)
+    public async Task<ProductInfoResponseDto> GetProductById(Guid productId)
     {
         return await productRepository.GetProductById(productId);
     }
@@ -32,10 +32,18 @@ public class ProductService(IProductRepository productRepository) : IProductServ
         await productRepository.UpdateProduct(product, productId);
     }
 
-    public Task<PageResponseDto<Product>> GetProductByPage(int pageIndex, int pageSize)
+    public Task<PageResponseDto<ProductResponseDto>> GetProductByPage(ProductFilterDto filterDto)
     {
-        return productRepository.GetProductByPage(pageIndex, pageSize);
+        return productRepository.GetProductByPage(filterDto);
     }
 
-    
+    public async Task<CategoryResDto> GetSubCategory (Guid categoryId)
+    {
+        return await productRepository.GetSubCategory(categoryId);
+    }
+
+    public async Task<List<CategoryResDto>> GetSubCategories()
+    {
+        return await productRepository.GetSubCategories();
+    }
 }

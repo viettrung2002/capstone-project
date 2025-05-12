@@ -52,4 +52,54 @@ public class AccountService (IAccountRepository accountRepository, ICustomerRepo
     {
         return await accountRepository.GetAccountById(id);
     }
+
+    public async Task<AccountResponseDto<object>> Login(string username, string password)
+    {
+        var role = accountRepository.GetRole(username);
+        switch (role)
+        {
+            case AccountRole.Customer:
+            {
+                var response = await accountRepository.CustomerLogin(username, password);
+                return new AccountResponseDto<object>
+                {
+                    Role = response.Role,
+                    Token = response.Token,
+                    Info = response.Info 
+                };
+            }
+            case AccountRole.Shop:
+            {
+                var response = await accountRepository.Login(username, password);
+                return new AccountResponseDto<object>
+                {
+                    Role = response.Role,
+                    Token = response.Token,
+                    Info = response.Info 
+                };
+            }
+            case AccountRole.Admin:
+            {
+                var response = await accountRepository.AdminLogin(username, password);
+                return new AccountResponseDto<object>
+                {
+                    Role = response.Role,
+                    Token = response.Token,
+                    Info = response.Info 
+                };
+            }
+            default:
+                throw new Exception($"Invalid role: {role}");
+        }
+    }
+
+    public async Task<Customer> GetCustomer(Guid customerId)
+    {
+        return await customerRepository.GetCustomerById(customerId);
+    }
+
+    public async Task<ShopResponseDto> GetShop(Guid shopId)
+    {
+        return await shopRepository.GetShopById(shopId);
+    }
 }

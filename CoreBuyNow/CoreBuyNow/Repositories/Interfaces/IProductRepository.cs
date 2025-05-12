@@ -9,7 +9,9 @@ public interface IProductRepository
     Task<List<ProductAttribute>> GetSubCategoryAttributes(Guid subCategoryId);
     Task UpdateProduct(Product product, Guid productId);
     Task DeleteProduct(Guid productId);
-    Task<Product?> GetProductById(Guid productId);
+    Task<ProductInfoResponseDto?> GetProductById(Guid productId);
     
-    Task<PageResponseDto<Product>> GetProductByPage(int pageIndex, int pageSize);
+    Task<PageResponseDto<ProductResponseDto>> GetProductByPage(ProductFilterDto filter);
+    Task<CategoryResDto> GetSubCategory (Guid categoryId);
+    Task<List<CategoryResDto>> GetSubCategories();
 }

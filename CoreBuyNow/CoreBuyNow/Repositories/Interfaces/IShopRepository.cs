@@ -1,11 +1,12 @@
-﻿using CoreBuyNow.Models.Entities;
+﻿using CoreBuyNow.Models.DTOs;
+using CoreBuyNow.Models.Entities;
 
 namespace CoreBuyNow.Repositories.Interfaces;
 
 public interface IShopRepository
 {
     Task CreateShop(Shop shop);
-    Task<Shop?> GetShopById(Guid shopId);
+    Task<ShopResponseDto?> GetShopById(Guid shopId);
     Task UpdateShop(Shop shop, Guid shopId);
     Task DeleteShop(Guid shopId);
 }

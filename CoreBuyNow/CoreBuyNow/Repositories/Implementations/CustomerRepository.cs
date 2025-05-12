@@ -1,6 +1,7 @@
 ﻿using CoreBuyNow.Models;
 using CoreBuyNow.Models.Entities;
 using CoreBuyNow.Repositories.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CoreBuyNow.Repositories.Implementations;
 
@@ -42,5 +43,10 @@ public class CustomerRepository (AppDbContext dbContext) : ICustomerRepository
     public async Task<Customer?> GetCustomerById(Guid id)
     {
         return await dbContext.Customers.FindAsync(id);
+    }
+    
+    public async Task<Customer> GetCustomerByAccountId(Guid accountId)
+    {
+        return await dbContext.Customers.FindAsync(accountId);
     }
 }
