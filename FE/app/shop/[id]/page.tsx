@@ -1,261 +1,92 @@
 'use client'
 import {useParams} from "next/navigation";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import Breadcrumb from "@/app/components/breadcrumb";
 import {HiChevronDown, HiStar} from "react-icons/hi2";
 import { ProductInShop} from "@/app/components/product";
 import { PiListBulletsBold } from "react-icons/pi";
+import {SubCategory} from "@/app/types/ subCategory";
+import {IShopInShop} from "@/app/types/shop";
+import {useRouter} from "next/navigation";
+import Cookies from "js-cookie";
+import {IProduct} from "@/app/types/product";
 
-type Product = {
-    id: number;
-    category: string;
-    name: string;
-    image: string;
-    star: number;
-    price: number;
-    discount: number;
-}
+
 export default function Shop() {
     const {id}  = useParams()
     const breadcrumbs = [
         {name: "Shop", href: "/categories" },
         {name: "2", href: "/categories" },
     ]
+    const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
     const [timeoutId, setTimeoutId] = useState<ReturnType<typeof setTimeout> | null>(null);
     const [openCateMore, setOpenCateMore] = useState<boolean>(false)
     const [catActive, setCateActive] = useState<string>("")
     const [selectedFilter, setSelectedFilter] = useState<string>("popular")
-    const categories = [
-        { id: "1", name: "Điện thoại di động" },
-        { id: 2, name: "Máy tính bảng" },
-        { id: 3, name: "Laptop" },
-        { id: 4, name: "Máy tính để bàn" },
-        { id: 5, name: "Smartwatch" },
-        { id: 6, name: "Tai nghe" },
-        { id: 7, name: "Loa" },
-        { id: 8, name: "Thiết bị mạng" },
-        { id: 9, name: "Ổ cứng" },
-        { id: 10, name: "Thiết bị chơi game" }
-    ];
-    const products: Product[] = [
-        {
-            id: 1,
-            category: "Watches",
-            name: "Xiaomi Mi Band 5",
-            image: `/products/product-1.jpg`,
-            star: 4.0,
-            price: 199.0,
-            discount: 0
-        },
-        {
-            id: 2,
-            category: "Speaker",
-            name: "Big Power Sound Speaker",
-            image: `/products/product-2.jpg`,
-            star: 5.0,
-            price: 275.0,
-            discount: 0
-        },
-        {
-            id: 3,
-            category: "Camera",
-            name: "WiFi Security Camera",
-            image: `/products/product-3.jpg`,
-            star: 5.0,
-            price: 399.0,
-            discount: 30
-        },
-        {
-            id: 4,
-            category: "Phones",
-            name: "iPhone 6x Plus",
-            image: `/products/product-4.jpg`,
-            star: 5.0,
-            price: 400.0,
-            discount: 0
-        },
-        {
-            id: 5,
-            category: "Headphones",
-            name: "Wireless Headphones",
-            image: `/products/product-5.jpg`,
-            star: 5.0,
-            price: 350.0,
-            discount:50
-        },
-        {
-            id: 6,
-            category: "Speaker",
-            name: "Mini Bluetooth Speaker",
-            image: `/products/product-6.jpg`,
-            star: 4.0,
-            price: 70.0,
-            discount: 0
-        },
-        {
-            id: 7,
-            category: "Headphones",
-            name: "PX7 Wireless Headphones",
-            image: `/products/product-7.jpg`,
-            star: 4.0,
-            price: 100.0,
-            discount:20
-        },
-        {
-            id: 8,
-            category: "Laptop",
-            name: "Apple MacBook Air",
-            image: `/products/product-8.jpg`,
-            star: 5.0,
-            price: 899.0,
-            discount: 15
-        },
-        {
-            id: 9,
-            category: "Watches",
-            name: "Xiaomi Mi Band 5",
-            image: `/products/product-1.jpg`,
-            star: 4.0,
-            price: 199.0,
-            discount: 0
-        },
-        {
-            id: 10,
-            category: "Speaker",
-            name: "Big Power Sound Speaker",
-            image: `/products/product-2.jpg`,
-            star: 5.0,
-            price: 275.0,
-            discount: 0
-        },
-        {
-            id: 11,
-            category: "Camera",
-            name: "WiFi Security Camera",
-            image: `/products/product-3.jpg`,
-            star: 5.0,
-            price: 399.0,
-            discount: 30
-        },
-        {
-            id: 12,
-            category: "Phones",
-            name: "iPhone 6x Plus",
-            image: `/products/product-4.jpg`,
-            star: 5.0,
-            price: 400.0,
-            discount: 0
-        },
-        {
-            id: 13,
-            category: "Headphones",
-            name: "Wireless Headphones",
-            image: `/products/product-5.jpg`,
-            star: 5.0,
-            price: 350.0,
-            discount:50
-        },
-        {
-            id: 14,
-            category: "Speaker",
-            name: "Mini Bluetooth Speaker",
-            image: `/products/product-6.jpg`,
-            star: 4.0,
-            price: 70.0,
-            discount: 0
-        },
-        {
-            id: 15,
-            category: "Headphones",
-            name: "PX7 Wireless Headphones",
-            image: `/products/product-7.jpg`,
-            star: 4.0,
-            price: 100.0,
-            discount:20
-        },
-        {
-            id: 16,
-            category: "Laptop",
-            name: "Apple MacBook Air",
-            image: `/products/product-8.jpg`,
-            star: 5.0,
-            price: 899.0,
-            discount: 15
-        },
-        {
-            id: 17,
-            category: "Watches",
-            name: "Xiaomi Mi Band 5",
-            image: `/products/product-1.jpg`,
-            star: 4.0,
-            price: 199.0,
-            discount: 0
-        },
-        {
-            id: 18,
-            category: "Speaker",
-            name: "Big Power Sound Speaker",
-            image: `/products/product-2.jpg`,
-            star: 5.0,
-            price: 275.0,
-            discount: 0
-        },
-        {
-            id: 19,
-            category: "Camera",
-            name: "WiFi Security Camera",
-            image: `/products/product-3.jpg`,
-            star: 5.0,
-            price: 399.0,
-            discount: 30
-        },
-        {
-            id: 20,
-            category: "Phones",
-            name: "iPhone 6x Plus",
-            image: `/products/product-4.jpg`,
-            star: 5.0,
-            price: 400.0,
-            discount: 0
-        },
-        {
-            id: 21,
-            category: "Headphones",
-            name: "Wireless Headphones",
-            image: `/products/product-5.jpg`,
-            star: 5.0,
-            price: 350.0,
-            discount:50
-        },
-        {
-            id: 22,
-            category: "Speaker",
-            name: "Mini Bluetooth Speaker",
-            image: `/products/product-6.jpg`,
-            star: 4.0,
-            price: 70.0,
-            discount: 0
-        },
-        {
-            id: 23,
-            category: "Headphones",
-            name: "PX7 Wireless Headphones",
-            image: `/products/product-7.jpg`,
-            star: 4.0,
-            price: 100.0,
-            discount:20
-        },
-        {
-            id: 24,
-            category: "Laptop",
-            name: "Apple MacBook Air",
-            image: `/products/product-8.jpg`,
-            star: 5.0,
-            price: 899.0,
-            discount: 15
-        },
-    ];
+    const [categories, setCategories] = useState<SubCategory[]>([])
+    const [shop, setShop] = useState<IShopInShop>()
+
+    const [pageIndex, setPageIndex] = useState<number>(0);
+    const pageSize = 16;
+    const [sortBy, setSortBy] = useState("")
+    const [searchQuery, setSearchQuery] = useState("");
+    const [subCategoryId, setSubCategoryId] = useState("00000000-0000-0000-0000-000000000000");
+    const [products, setProducts] = useState<IProduct[]>([]);
+    useEffect(() => {
+        const getCategories = async () => {
+            try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/account/shop/${id}`);
+
+                const data = await response.json();
+                console.log(data);
+                setShop(data.data)
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        getCategories();
+
+
+    },[])
+    useEffect(() => {
+        console.log(id)
+        async function GetProduct() {
+            const token = Cookies.get("token");
+            console.log("Token:", token);
+            if (!token) {
+                router.push("/login");
+                return;
+            }
+            try {
+                const response = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/product/search`,{
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        index: pageIndex,
+                        shopId: id,
+                        size:pageSize,
+                        sortBy: sortBy,
+                        keyWord: searchQuery,
+                        subCategoryId: subCategoryId,
+                        // minPrice: Number(minPrice),
+                        // maxPrice: Number(maxPrice),
+                        // rating: rate,
+                        // shopType: isMall,
+                    })
+                })
+                const data = await response.json();
+                console.log(data.data.items);
+                setProducts(data.data.items);
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        GetProduct();
+    }, [pageIndex, pageSize, sortBy, searchQuery, subCategoryId]);
     return (
         <div className="w-full flex  flex-col items-center">
             <div className={`2xl:w-[1300px] xl:w-full h-[40px] mt-[10px]  items-center flex mb-[20px]`}>
@@ -274,10 +105,10 @@ export default function Shop() {
                                 </div>
                                 {/*Ten shop*/}
                                 <div className="px-[20px]">
-                                    <h1 className={"font-sf font-[500] text-[18px] text-gray-800"}>Apple official store</h1>
+                                    <h1 className={"font-sf font-[500] text-[18px] text-gray-800"}>{shop?.shopName}</h1>
                                     <div className="flex items-center">
                                         <HiStar className={"text-yellow-500 leading-5  mr-[5px]"}/>
-                                        <p className={"font-sf font-[400] text-[15px] text-gray-700  leading-5"}>4.5/5</p>
+                                        <p className={"font-sf font-[400] text-[15px] text-gray-700  leading-5"}>{shop?.rating}/5</p>
                                     </div>
 
                                 </div>
@@ -287,72 +118,93 @@ export default function Shop() {
                                     </button>
                                 </div>
 
-
                             </div>
                             <div className=" h-[70px] border-l border-gray-300 flex px-[30px]">
                                 <div className="w-[220px] h-full grid grid-rows-2 gap-[5px]">
                                     <div className={"row-span-1  flex items-center"}>
                                         <p className={"font-sf text-gray-800 text-[15px]"}>Sản phẩm: </p>
-                                        <p className={"font-sf text-blue-500 text-[15px] ml-[5px]"}>3400</p>
+                                        <p className={"font-sf text-blue-500 text-[15px] ml-[5px]"}>{shop?.productCount}</p>
                                     </div>
                                     <div className={"row-span-1  flex items-center"}>
                                         <p className={"font-sf text-gray-800 text-[15px]"}>Đánh giá: </p>
-                                        <p className={"font-sf text-blue-500 text-[15px] ml-[5px]"}>4.8 (12120 đánh giá)</p>
+                                        <p className={"font-sf text-blue-500 text-[15px] ml-[5px]"}>{shop?.rating} ({shop?.ratingCount} đánh giá)</p>
                                     </div>
                                 </div>
-                                <div className="w-[160px] h-full grid grid-rows-2 gap-[5px]">
+                                <div className=" h-full grid grid-rows-2 gap-[5px]">
                                     <div className={"row-span-1  flex items-center"}>
                                         <p className={"font-sf text-gray-800 text-[15px]"}>Người theo dõi: </p>
-                                        <p className={"font-sf text-blue-500 text-[15px] ml-[5px]"}>5300</p>
+                                        <p className={"font-sf text-blue-500 text-[15px] ml-[5px]"}>{shop?.follower}</p>
                                     </div>
                                     <div className={"row-span-1  flex items-center"}>
                                         <p className={"font-sf text-gray-800 text-[15px]"}>Tham gia: </p>
-                                        <p className={"font-sf text-blue-500 text-[15px] ml-[5px]"}>1 năm trước</p>
+                                        <p className={"font-sf text-blue-500 text-[15px] ml-[5px]"}>{shop? new Date(shop.createdDate).toLocaleString("vi-VN", {
+                                            hour: "2-digit",
+                                            minute: "2-digit",
+                                            day: "2-digit",
+                                            month: "2-digit",
+                                            year: "numeric",
+                                        }): null}</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div className={"h-[35px] w-full mt-[30px] grid grid-cols-6 gap-[15px]"}>
                             <div onClick={()=> setCateActive("")} className={`${catActive == "" ? "border-b border-blue-700" : null} col-span-1 justify-center items-center flex`}>
-                                <p className={"font-sf text-gray-800 text-[15px]"}>Tất cả</p>
+                                <p onClick={()=> setSubCategoryId("00000000-0000-0000-0000-0000000000000")} className={"font-sf text-gray-800 text-[15px]"}>Tất cả</p>
                             </div>
-                            {categories.length == 5 ?
-                                categories.slice(0,5).map(category => (
+                            {shop?
+                                <div>
+                                    {shop.categories.length == 5 ?
+                                        shop.categories.slice(0,5).map(category => (
 
-                                    <div key={category.id} className={`${catActive == category.id.toString()? "border-b border-blue-700" : null } col-span-1 justify-center items-center flex`} onClick={()=> setCateActive(category.id.toString())}>
-                                        <p className={"font-sf text-gray-800 text-[15px] select-none"}>{category.name}</p>
-                                    </div>
-                                    )
-                                ) : categories.length > 5 ?
+                                                <div key={category.subCategoryId} className={`${catActive == category.subCategoryId.toString()? "border-b border-blue-700" : null } col-span-1 justify-center items-center flex`} onClick={()=> {
+                                                    setCateActive(category.subCategoryId.toString())
+                                                    setSubCategoryId(category.subCategoryId)
+                                                }}>
+                                                    <p className={"font-sf text-gray-800 text-[15px] select-none"}>{category.subCategoryName}</p>
+                                                </div>
+                                            )
+                                        ) : shop.categories.length > 5 ?
 
-                                categories.slice(0,4).map((category) => (
-                                    <div key={category.id} className={`${catActive == category.id.toString()? "border-b border-blue-700" : null } col-span-1 justify-center items-center flex`} onClick={()=> setCateActive(category.id.toString())}>
-                                        <p className={"font-sf text-gray-800 text-[15px] select-none"}>{category.name}</p>
-                                    </div>
-                                    )
-                                ) :
-                                    categories.map((category) => (
-                                        <div key={category.id} className={`${catActive == category.id.toString()? "border-b border-blue-700" : null } col-span-1 justify-center items-center flex`} onClick={()=> setCateActive(category.id.toString())}>
-                                            <p className={"font-sf text-gray-800 text-[15px] select-none"}>{category.name}</p>
-                                        </div>
-                                        )
-                                    )
+                                            shop.categories.slice(0,4).map((category) => (
+                                                    <div key={category.subCategoryId} className={`${catActive == category.subCategoryId.toString()? "border-b border-blue-700" : null } col-span-1 justify-center items-center flex`} onClick={()=> {
+                                                        setCateActive(category.subCategoryId.toString());
+                                                        setSubCategoryId(category.subCategoryId)
+                                                    }}>
+                                                        <p className={"font-sf text-gray-800 text-[15px] select-none"}>{category.subCategoryName}</p>
+                                                    </div>
+                                                )
+                                            ) :
+                                            shop.categories.map((category) => (
+                                                    <div key={category.subCategoryId} className={`${catActive == category.subCategoryId.toString()? "border-b border-blue-700" : null } col-span-1 justify-center items-center flex`} onClick={()=> {
+                                                        setCateActive(category.subCategoryId.toString());
+                                                        setSubCategoryId(category.subCategoryId)
+                                                    }}>
+                                                        <p className={"font-sf text-gray-800 text-[15px] select-none"}>{category.subCategoryName}</p>
+                                                    </div>
+                                                )
+                                            )
 
+                                    }
+                                    {shop.categories.length > 5 ?
+                                        <div onClick={()=> setOpenCateMore(!openCateMore)} className={"col-span-1 justify-center items-center flex relative"}>
+                                            <p className={` text-gray-800 font-sf text-[15px] mr-[5px] select-none`}>Thêm</p>
+                                            <HiChevronDown />
+                                            {openCateMore ? (
+                                                <ul className={`absolute flex-col bg-gray-50 top-[40px] w-full overflow-hidden items-center border border-gray-200 shadow rounded-[4px]`}>
+
+                                                    {categories.slice(6,).map((category) => (
+                                                        <li onClick={()=> {
+                                                            setSubCategoryId(category.subCategoryId);
+                                                        }} key={category.subCategoryId} className={`flex text-gray-800 hover:bg-gray-600 hover:text-cl-button-text font-sf text-[15px] select-none h-[30px] items-center justify-center `}>{category.subCategoryName}</li>
+                                                    ))}
+
+                                                </ul>
+                                            ) : null }
+                                        </div> : null}
+                                </div> : null
                             }
-                            {categories.length > 5 ?
-                            <div onClick={()=> setOpenCateMore(!openCateMore)} className={"col-span-1 justify-center items-center flex relative"}>
-                                <p className={` text-gray-800 font-sf text-[15px] mr-[5px] select-none`}>Thêm</p>
-                                <HiChevronDown />
-                                {openCateMore ? (
-                                    <ul className={`absolute flex-col bg-gray-50 top-[40px] w-full overflow-hidden items-center border border-gray-200 shadow rounded-[4px]`}>
 
-                                        {categories.slice(6,).map((category) => (
-                                            <li key={category.id} className={`flex text-gray-800 hover:bg-gray-600 hover:text-cl-button-text font-sf text-[15px] select-none h-[30px] items-center justify-center `}>{category.name}</li>
-                                        ))}
-
-                                    </ul>
-                                    ) : null }
-                            </div> : null}
                         </div>
                     </div>
                 </div>
@@ -364,7 +216,7 @@ export default function Shop() {
                     <p className={'font-sf text-gray-800 text-[16px] mb-[10px] mt-[20px]'}>SẢN PHẨM MỚI</p>
                     <div className={"grid grid-cols-6 gap-[15px]"}>
                         {products.slice(0,6).map((product) => (
-                            <ProductInShop key={product.id} product={product}/>
+                            <ProductInShop key={product.productId} product={product}/>
                         ))}
                     </div>
                 </div>
@@ -372,7 +224,7 @@ export default function Shop() {
                     <p className={'font-sf text-gray-800 text-[16px] mt-[30px] mb-[10px]'}>SẢN PHẨM BÁN CHẠY</p>
                     <div className={"grid grid-cols-6 gap-[15px]"}>
                         {products.slice(4,10).map((product) => (
-                            <ProductInShop key={product.id} product={product}/>
+                            <ProductInShop key={product.productId} product={product}/>
                         ))}
                     </div>
                 </div>
@@ -386,8 +238,8 @@ export default function Shop() {
                         </div>
 
                         <div className={"border-b border-gray-200 mt-[10px] mb-[20px]"}></div>
-                        {categories.map((category) => (
-                            <p onClick={()=>setCateActive(category.id.toString())} key={category.id} className={`${catActive == category.id.toString()  ? "text-blue-500 ml-[3px]":"text-gray-600 hover:text-blue-500 hover:ml-[3px] "} font-sf text-[15px]  select-none transition-all duration-200 leading-[25px]`}>{category.name}</p>
+                        {shop?.categories.map((category) => (
+                            <p onClick={()=>setCateActive(category.subCategoryId.toString())} key={category.subCategoryId} className={`${catActive == category.subCategoryId.toString()  ? "text-blue-500 ml-[3px]":"text-gray-600 hover:text-blue-500 hover:ml-[3px] "} font-sf text-[15px]  select-none transition-all duration-200 leading-[25px]`}>{category.subCategoryName}</p>
                         ))}
                     </div>
                     <div className={"col-span-4 "}>
@@ -424,8 +276,8 @@ export default function Shop() {
 
                                 {isOpen ? (
                                     <ul className={`absolute w-full flex-col bg-gray-50 top-[35px]  items-center border border-gray-200 `}>
-                                        <li className={`flex text-gray-700 font-sf text-[15px] hover:bg-gray-600 hover:text-cl-button-text select-none text-center h-[30px] items-center justify-center `}>Giá: Thấp đến Cao</li>
-                                        <li className={`flex text-gray-700 font-sf text-[15px] hover:bg-gray-600 hover:text-cl-button-text select-none text-center h-[30px] items-center justify-center `}>Giá: Cao đến Thấp</li>
+                                        <li onClick={()=> setSortBy("price_asc")} className={`flex text-gray-700 font-sf text-[15px] hover:bg-gray-600 hover:text-cl-button-text select-none text-center h-[30px] items-center justify-center `}>Giá: Thấp đến Cao</li>
+                                        <li onClick={()=> setSortBy("price_desc")} className={`flex text-gray-700 font-sf text-[15px] hover:bg-gray-600 hover:text-cl-button-text select-none text-center h-[30px] items-center justify-center `}>Giá: Cao đến Thấp</li>
                                     </ul>
                                 ) : null}
                             </div>
@@ -435,7 +287,7 @@ export default function Shop() {
                         {/*San pham*/}
                         <div className={"w-full grid grid-cols-5 gap-[15px] mt-[15px]"}>
                             {products.map((product) => (
-                                <ProductInShop key={product.id} product={product}/>
+                                <ProductInShop key={product.productId} product={product}/>
                             ))}
                         </div>
                     </div>

@@ -9,4 +9,8 @@ public interface IShopRepository
     Task<ShopResponseDto?> GetShopById(Guid shopId);
     Task UpdateShop(Shop shop, Guid shopId);
     Task DeleteShop(Guid shopId);
+
+    Task<List<Shop>> GetOfficialShop();
+
+    Task<List<SubCategory?>> GetSubCategoryInShop(Guid shopId);
 }

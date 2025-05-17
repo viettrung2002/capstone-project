@@ -12,7 +12,7 @@ export default function FeatureCategories({category}:{category: ICategory}) {
                 <Image src={"/products/product-2.jpg"} alt={"image"} width={200} height={200} className={"object-contain"} />
             </div>
             <div className={"h-[50px] flex  justify-center mt-[20px]"}>
-                <p className={`font-sf text-center font-[400] text-[18px] text-gray-800 `}>{category.categoryName}</p>
+                <p className={`font-sf text-center font-[400] text-[15px] text-gray-800 `}>{category.categoryName}</p>
             </div>
 
         </div>

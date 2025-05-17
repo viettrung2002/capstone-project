@@ -15,4 +15,6 @@ public class ProductFilterDto
     public string? SortBy { get; set; }
     public bool? IsHome { get; set; }
     public bool? IsFlashSale { get; set; }
+
+    public Guid? ShopId {set; get;}
 }

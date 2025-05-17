@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CoreBuyNow.Controllers;
 [Route("api/voucher")]
 [ApiController]
-public class VoucherController (IVoucherService voucherService) : ControllerBase
+public class VoucherController (IVoucherService voucherService, ILogger<VoucherController> logger) : ControllerBase
 {
     [HttpPost]
     [Authorize(Roles = "Shop,Admin")]
@@ -14,6 +14,23 @@ public class VoucherController (IVoucherService voucherService) : ControllerBase
     {
         try
         {
+            var id = User.FindFirst("id")?.Value;
+            logger.LogInformation("ID: {id}", id);
+            var role = User.FindFirst("http://schemas.microsoft.com/ws/2008/06/identity/claims/role")?.Value;
+            logger.LogInformation("Role: {role}", role);
+
+            if (role == "Shop")
+            {
+                voucher.ShopId = Guid.Parse(id);
+                logger.LogInformation("SHOPID: {id}", voucher.ShopId);
+                voucher.AdminId = null;
+            }
+            else
+            {
+                voucher.AdminId = Guid.Parse(id);
+                voucher.ShopId = null;
+            }
+               
             await voucherService.CreateVoucher(voucher);
             return Ok(new
             {

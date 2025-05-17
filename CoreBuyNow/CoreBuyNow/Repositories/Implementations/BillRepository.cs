@@ -109,8 +109,9 @@ public class BillRepository (AppDbContext dbContext, ILogger<BillRepository> log
                 .Take(pageSize)
                 .Select(b => new BillResponseDto
                 {
-                    ShopName = b.Items[0].Product.Shop.ShopName,
-                    ShopId = b.Items[0].Product.Shop.ShopId,
+                    BillId = b.BillId,
+                    ShopName = b.Items.Select(i => i.Product.Shop.ShopName).FirstOrDefault(),
+                    ShopId = b.Items.Select(i => i.Product.Shop.ShopId).FirstOrDefault(),
                     OrderStatus = b.OrderStatus,
                     TotalPrice = b.TotalPrice,
                     Items = b.Items
@@ -136,6 +137,7 @@ public class BillRepository (AppDbContext dbContext, ILogger<BillRepository> log
                 .Take(pageSize)
                 .Select(b => new BillResponseDto
                 {
+                    BillId = b.BillId,
                     ShopName = b.Items[0].Product.Shop.ShopName,
                     ShopId = b.Items[0].Product.Shop.ShopId,
                     OrderStatus = b.OrderStatus,

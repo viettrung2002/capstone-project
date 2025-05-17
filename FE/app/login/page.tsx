@@ -25,11 +25,32 @@ export default function LoginPage() {
                     userName: username,
                     passWord: password}),
             });
-            const res = await response.json();
-            Cookies.set("token", res.data.token, { expires: 7, secure: true, sameSite: 'Strict' });
-            console.log(res.data);
+
+            if (response.ok) {
+                const res = await response.json();
+                const status = response.status;
+                Cookies.set("token", res.data.token, { expires: 7, secure: true, sameSite: 'Strict' });
+                if (res.data.role == "Customer") {
+                    Cookies.set("id", res.data.info.customerId, { expires: 7, secure: true, sameSite: 'Strict' });
+                    Cookies.set("role", res.data.role, { expires: 7, secure: true, sameSite: 'Strict' });
+                }
+                if (res.data.role == "Shop") {
+                    Cookies.set("id", res.data.info.shopId, { expires: 7, secure: true, sameSite: 'Strict' });
+                    Cookies.set("role", res.data.role, { expires: 7, secure: true, sameSite: 'Strict' });
+                }
+                router.push("/");
+                console.log(res);
+                console.log(status);
+            } else {
+                const status = response.status;
+                if (status != 200) {
+                    console.log("Sai ten dang nhap hoac mat khau");
+                }
+            }
+
+
         } catch (error) {
-            console.log(error);
+            console.log("Loi",error);
         }
     }
     return (

@@ -46,6 +46,7 @@ export interface IProductInCart {
 
 export interface IProductInBill {
     productId: string;
+    productName: string;
     unitPrice: number;
     quantity: number;
 

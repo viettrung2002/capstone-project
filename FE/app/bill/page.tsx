@@ -24,6 +24,7 @@ export default function Bill() {
     const [shippingVoucher, setShippingVoucher] = useState<IVoucher>()
     const [selectedShopVoucher, setSelectedShopVoucher] = useState<IVoucher[]>([])
     const [openNotification, setOpenNotification] = useState<boolean>(false)
+    const [paymentMethod, setPaymentMethod] = useState(0)
     const [shopVoucher, setShopVoucher] = useState<IVoucher>()
     // useEffect(() => {
     //     const timer = setTimeout(() => {
@@ -152,6 +153,7 @@ export default function Bill() {
             for (const p of productsInBill) {
                 productInBill.push( {
                     productId: p.productId,
+                    productName: p.productName,
                     unitPrice: p.price,
                     quantity: p.quantity,
                 });
@@ -313,7 +315,7 @@ export default function Bill() {
                             <div onClick={()=> {
                                 fetchVoucherData();
                                 setShowVoucher(!showVoucher)
-                            }} className={"flex items-center justify-center border border-gray-200"}>
+                            }} className={"flex items-center justify-center border-gray-200"}>
                                 <p className={"text-blue-500  text-[15px] font-sf ml-[5px]"}>Chọn Voucher</p>
                             </div>
                         </div>
@@ -323,14 +325,14 @@ export default function Bill() {
                             <p className="text-gray-800 text-[16px] font-sf w-full ">Phương thức thanh toán</p>
                             <div className={"flex items-center justify-between w-full mt-[10px]"}>
                                 <div className={"flex items-center justify-center"}>
-                                    <button className={"w-[16px] h-[16px] border border-gray-400 rounded-full mr-[5px] flex justify-center items-center"}>
-                                        <div className={"w-[10px] h-[10px]  rounded-full"}></div>
+                                    <button onClick={()=>setPaymentMethod(0)} className={`w-[16px] h-[16px] border border-gray-400 rounded-full mr-[5px] flex items-center justify-center ${paymentMethod == 0 ? "bg-gray-400" : "bg-white"}`}>
+                                        {/*<div className={` ${paymentMethod == 0 ? "bg-gray-400" : "bg-white"}  w-[10px] h-[10px] rounded-full`}></div>*/}
                                     </button>
                                     <p className="text-gray-800 text-[15px] font-sf ">Thanh toán khi nhận hàng</p>
                                 </div>
                                 <div className={"flex items-center justify-center"}>
-                                    <button className={"w-[16px] h-[16px] border border-gray-400 rounded-full mr-[5px] flex justify-center items-center"}>
-                                        <div className={"w-[10px] h-[10px]  rounded-full"}></div>
+                                    <button onClick={()=>setPaymentMethod(1)} className={`w-[16px] h-[16px] border border-gray-400 rounded-full mr-[5px] flex justify-center items-center ${paymentMethod == 1 ? "bg-gray-400" : "bg-white"}`}>
+
                                     </button>
                                     <p className="text-gray-800 text-[15px] font-sf ">Ví BuyNow</p>
                                 </div>

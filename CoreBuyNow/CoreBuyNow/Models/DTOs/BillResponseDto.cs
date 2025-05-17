@@ -4,6 +4,7 @@ namespace CoreBuyNow.Models.DTOs;
 
 public class BillResponseDto
 {
+    public Guid BillId { set; get; }
     public string? ShopName { get; set; }
     public Guid ShopId { get; set; }
     public OrderStatus OrderStatus { get; set; }

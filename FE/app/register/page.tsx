@@ -21,7 +21,6 @@ export default function RegisterPage() {
                 <div className="flex items-center w-[250px] h-full ">
                     <Breadcrumb breadcrumbs={breadcrumbs} />
                 </div>
-
             </div>
             <div className={`w-[500px] h-[680px] rounded-[5px] shadow-[0px_0px_5px_rgba(0,0,0,0.2)] flex flex-col items-center bg-white mb-[40px]`}>
                 <div className={`h-[120px] w-[400px] flex justify-center items-center pt-[20px] text-gray-700 border-b border-gray-200`}>

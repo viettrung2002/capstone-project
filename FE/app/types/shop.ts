@@ -1,3 +1,5 @@
+import {SubCategory} from "@/app/types/ subCategory";
+
 export interface IShop {
     shopId: string;
     shopName: string;
@@ -10,4 +12,18 @@ export interface IShopInBill {
     voucherId: string;
     totalPrice: number;
     note: string;
+}
+
+export interface IShopInShop {
+    shopId: string,
+    shopName: string,
+    avatar: string,
+    address: string,
+    productCount: number,
+    createdDate: string,
+    isOfficial: boolean,
+    rating: number,
+    ratingCount: number,
+    follower: number,
+    categories: SubCategory[],
 }

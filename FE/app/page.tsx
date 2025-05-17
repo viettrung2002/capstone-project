@@ -47,7 +47,7 @@ export default function Home() {
                     },
                     body: JSON.stringify({
                         index: 0,
-                        size:8,
+                        size:10,
                         isHome: true,
 
                     })
@@ -104,7 +104,6 @@ export default function Home() {
             }
         }
         GetCategoryFeature();
-
 
     }, []);
     const slides: Slide[] = [
@@ -250,10 +249,10 @@ export default function Home() {
             {/*Categories*/}
             <div className="2xl:w-[1300px] xl:w-[1280px]  items-center justify-center mt-[30px] bg-white pt-[20px] p-[30px]">
                 <div className={` flex flex-col `}>
-                    <p className={`font-sf font-[400] text-[25px] text-cl-text`}>DANH MỤC</p>
+                    <p className={`font-sf font-[400] text-[20px] text-cl-text`}>DANH MỤC</p>
                     {/*<div className={`border-b border-[2px] border-blue-600 w-[50px] mt-[4px]`}></div>*/}
                 </div>
-                <div className={`grid grid-cols-6 gap-[10px] w-full mt-[10px]`}>
+                <div className={`grid grid-cols-8 gap-[10px] w-full mt-[10px]`}>
                     {category.map((category) => (
                         <FeatureCategories category={category} key={category.categoryId}/>
                     ))}
@@ -268,7 +267,7 @@ export default function Home() {
                 <div className={` 2xl:w-[1300px] xl:w-[1280px] relative  `}>
                     <div className={`h-[50px] w-full pr-[60px] pl-[30px] mb-[20px]  flex items-center justify-between`}>
                         <div className={`flex items-center`}>
-                            <p className={`font-sf font-[400] text-[25px] text-cl-text mr-[20px]`}>FLASH SALE</p>
+                            <p className={`font-sf font-[400] text-[20px] text-cl-text mr-[20px]`}>FLASH SALE</p>
                             <div className={`w-[180px] h-[40px] flex border border-gray-200 rounded-[4px] pl-[25px] bg-white items-center`}>
                                 <p className={`font-[500] font-sf text-[14px] text-gray-500`}>End in:</p>
                                 <p className={`font-[500] font-sf text-[17px] text-gray-800 ml-[10px]`}>{formatTime(timeLeft)}</p>
@@ -317,20 +316,23 @@ export default function Home() {
 
             {/*Flash Sale*/}
             {/*Trending*/}
-            <div className="2xl:w-[1300px] xl:w-[1280px]  flex items-center justify-center mt-[70px]">
-                <div className={`w-[600px] flex flex-col items-center`}>
-                    <p className={`font-sf font-[500] text-[30px] text-cl-text`}>Sản phẩm được yêu thích</p>
-                    <div className={`border-b border-[2px] border-blue-600 w-[50px] mt-[4px]`}></div>
-                    {/*<p className={`text-center font-sf font-[400] text-gray-500 mt-[20px]`}>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form.</p>*/}
+
+            <div className="2xl:w-[1300px] xl:w-[1280px]  flex items-center justify-center mt-[30px] flex-col bg-white pb-[30px] pt-[20px] px-[30px]">
+                <div className="w-full flex items-center justify-center">
+                    <div className={`w-full flex flex-col`}>
+                        <p className={`font-sf font-[400] text-[20px] text-cl-text mr-[20px]`}>SẢN PHẨM ĐƯỢC YÊU THÍCH</p>
+                        {/*<p className={`text-center font-sf font-[400] text-gray-500 mt-[20px]`}>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form.</p>*/}
+                    </div>
+
                 </div>
+                <div className={`grid gap-[20px] grid-cols-5 w-full mt-[10px]`}>
+                    {trendingProducts.map((product) => (
+                        <Product product={product} key={product.productId} />
+                    ))}
 
+                </div>
             </div>
-            <div className={`grid gap-[30px] grid-cols-4 2xl:w-[1300px] xl:w-[1280px] mt-[30px]`}>
-                {trendingProducts.map((product) => (
-                    <Product product={product} key={product.productId} />
-                ))}
-
-            </div>
+            
             {/*Trending*/}
 
             {/*<div className={`2xl:w-[1300px] xl:w-[1280px] h-[380px] bg-white mt-[30px] grid grid-cols-3 gap-[30px] mb-[50px] shadow-[0px_0px_5px_rgba(0,0,0,0.2)] rounded-[5px]`}>*/}

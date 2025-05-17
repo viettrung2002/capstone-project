@@ -376,7 +376,7 @@ export default function ProductInfo () {
                             </div>
                             <div className={"flex flex-col justify-center"}>
                                 <p className={"font-sf text-gray-800 font-[500] text-[15px]"}>{ product != undefined ? product.shopName : null}</p>
-                                <button onClick={()=> router.push("/shop/1")} className={"w-[120px] border py-[3px] mt-[3px] rounded-[5px] bg-blue-500 text-gray-50 hover:bg-gray-700 "}>
+                                <button onClick={()=> router.push(`/shop/${product?.shopId}`)} className={"w-[120px] border py-[3px] mt-[3px] rounded-[5px] bg-blue-500 text-gray-50 hover:bg-gray-700 "}>
                                     <p className={"font-sf  font-[400] text-[16px]"}>Xem shop</p>
                                 </button>
                             </div>

@@ -51,7 +51,6 @@ public class ShopRepository (AppDbContext dbContext) : IShopRepository
             .Select(p=>p.SubCategory)
             .Distinct()
             .ToList();
-            
         return await dbContext.Shops
             .Where(s => s.ShopId == id)
             .Select(s => new ShopResponseDto
@@ -63,7 +62,7 @@ public class ShopRepository (AppDbContext dbContext) : IShopRepository
                 ProductCount = s.ProductCount,
                 CreatedDate = s.CreatedDate,
                 IsOfficial = s.IsOfficial,
-                Rating = (double)rating/ratingCount,
+                Rating = ratingCount > 0 ? (double)rating/ratingCount : 0,
                 RatingCount = ratingCount,
                 Follower = 1000,
                 Categories = categories,
@@ -71,4 +70,25 @@ public class ShopRepository (AppDbContext dbContext) : IShopRepository
             .FirstOrDefaultAsync();
 
     }
+
+    public async Task<List<Shop>> GetOfficialShop () {
+        return await dbContext.Shops
+            .Where(s=>s.IsOfficial == true)
+            .ToListAsync();
+    }
+
+    public async Task<List<SubCategory?>> GetSubCategoryInShop (Guid shopId) {
+        return await dbContext.Products
+                .Include(p=>p.Shop)
+                .Include(p=>p.SubCategory)
+                .Where(p=>p.Shop.ShopId == shopId && p.SubCategory != null)
+                .Select(p=>p.SubCategory)
+                .Distinct()
+                .ToListAsync();
+    }
+
+    // public async Task<List<SubCategory>> GetSubCategoryInShop(Guid shopId)
+    // {
+    //     throw new NotImplementedException();
+    // }
 }

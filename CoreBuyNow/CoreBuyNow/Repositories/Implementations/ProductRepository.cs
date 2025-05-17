@@ -119,9 +119,14 @@ public class ProductRepository(AppDbContext dbContext, ILogger<ProductRepository
         var query = dbContext.Products.AsQueryable();
         logger.LogInformation("SubCategoryId1 {id}", filter.SubCategoryId);
 
-        if (filter.CategoryId != Guid.Empty && filter.SubCategoryId != null)
-            query = query.Include(p=>p.SubCategory).Where(p=>p.SubCategory.CategoryId == filter.CategoryId);
+        if (filter.CategoryId != Guid.Empty && filter.CategoryId != null && filter.SubCategoryId != null)
         
+            query = query.Include(p=>p.SubCategory).Where(p=>p.SubCategory.CategoryId == filter.CategoryId);
+
+        if (filter.ShopId != Guid.Empty && filter.ShopId != null) {
+            logger.LogInformation("ID Shop Nhan Duoc : {id}", filter.ShopId);
+            query = query.Where(p=>p.ShopId == filter.ShopId);
+        }
         // Lọc khoảng giá
         if (filter.MinPrice.HasValue)
             query = query.Where(p => p.Price >= filter.MinPrice.Value);

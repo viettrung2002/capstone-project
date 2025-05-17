@@ -234,6 +234,9 @@ namespace CoreBuyNow.Migrations
                     b.Property<Guid>("ProductId")
                         .HasColumnType("char(36)");
 
+                    b.Property<string>("ProductName")
+                        .HasColumnType("longtext");
+
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 

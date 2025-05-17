@@ -20,6 +20,8 @@ import Cookies from "js-cookie";
 import {IProduct} from "@/app/types/product";
 import {SubCategory} from "@/app/types/ subCategory";
 import {useParams} from "next/navigation";
+import {useRouter} from "next/navigation";
+import {IShop} from "@/app/types/shop";
 type SubCategoriesProps = {
     id: number;
     name: string;
@@ -40,6 +42,7 @@ type Official_Store  = {
 
 export default function Categories() {
     const {id} = useParams();
+    const router = useRouter();
     const breadcrumbs = [
         {name: "Category", href: "/categories" },
     ]
@@ -56,13 +59,15 @@ export default function Categories() {
     const [minPrice, setMinPrice] = useState<number | string>("");
     const [maxPrice, setMaxPrice] = useState<number | string>("");
     const [isMall, setIsMall] = useState(false)
+    const [officialShop, setOfficialShop] = useState<IShop[]>([]);
     useEffect(() => {
         console.log(id)
         async function GetProduct() {
             const token = Cookies.get("token");
             console.log("Token:", token);
             if (!token) {
-                console.log('Không tìm thấy token. Vui lòng đăng nhập lại.');
+                router.push("/login");
+                return;
             }
             try {
                 const response = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/product/search`,{
@@ -97,7 +102,7 @@ export default function Categories() {
     useEffect(() => {
         async function GetCategory() {
             try {
-                const res = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/product/category/a52948b6-1ba3-11f0-ad23-bcfce750d231`, {
+                const res = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/product/category/${id}`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -112,6 +117,24 @@ export default function Categories() {
             }
         }
         GetCategory();
+
+        async function GetOfficialShop() {
+            try {
+                const res = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/shop`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    }
+                });
+                const data = await res.json();
+                console.log("Shop",data);
+                setOfficialShop(data.data);
+
+            } catch (err) {
+                console.log(err)
+            }
+        }
+        GetOfficialShop()
     }, []);
     const locations : Location[] = [
         { id: 1, name: "Hà Nội" },
@@ -222,7 +245,7 @@ export default function Categories() {
             <div className="flex gap-[30px] w-[1300px] ">
                 <div className={`w-[calc(23%-15px)] flex flex-col`}>
                     {/*Search*/}
-                    <div className="flex w-full p-[20px] px-[25px] pb-[25px] mt-[0px] flex-col rounded-[5px] bg-white shadow-[0px_0px_5px_rgba(0,0,0,0.2)] ">
+                    <div className="flex w-full p-[20px] px-[25px] pb-[25px] mt-[0px] flex-col border border-gray-200 bg-white ">
                         <p className={`font-sf font-[500] text-[17px] text-gray-800`}>Tìm kiếm sản phẩm</p>
                         <p className={"border-b w-full border-gray-300 mt-[5px]"}></p>
                         <div className={`w-full h-[45px] flex mt-[20px] `}>
@@ -239,7 +262,7 @@ export default function Categories() {
                     </div>
                     {/*Search*/}
                     {/*Tat ca danh muc con*/}
-                    <div className="flex  w-full p-[20px] px-[25px] mt-[30px] flex-col rounded-[5px] bg-white shadow-[0px_0px_5px_rgba(0,0,0,0.2)]">
+                    <div className="flex  w-full p-[20px] px-[25px] mt-[30px] flex-col bg-white border border-gray-200">
                         <p onClick={()=>setSubCategoryId("00000000-0000-0000-0000-000000000000")} className={`font-sf font-[500] text-[17px] text-gray-800`}>{categoryName}</p>
                         <p className={"border-b w-full border-gray-300 mt-[5px] mb-[5px]"}></p>
                         {
@@ -274,36 +297,35 @@ export default function Categories() {
                     {/*/!*Khoang Gia*!/*/}
                     {/*Noi ban*/}
 
-                    <div className={"flex flex-col w-full px-[20px] mt-[30px] py-[20px] shadow-[0px_0px_5px_rgba(0,0,0,0.2)] rounded-[5px] bg-white"}>
-                        <p className={`font-sf font-[500] text-[17px] text-gray-800`}>
-                            Cửa hàng chính hãng
-                        </p>
-                        <p className={"border-b w-full border-gray-300 mt-[5px]"}></p>
-                        <div className="grid grid-cols-2 w-full gap-[25px] mt-[20px] ">
+
+
                             {
-                                officialStores.map((officialStore) => (
-                                    <div key={officialStore.id} className={" col-span-1  rounded-[10px] overflow-hidden p-[10px] border border-gray-200"}>
-                                        <div className={"w-full aspect-square relative rounded-[8px] overflow-hidden "}>
-                                            <Image src={officialStore.avatar} alt={"logo"} layout="fill" />
+                                officialShop.map((officialStore) => (
+                                    <div key={officialStore.shopId} className={" col-span-1 overflow-hidden p-[7px] border border-gray-200 mt-[20px]  flex bg-white"}>
+                                        <div className={"h-[100px] aspect-square bg-gray-50 relative p-[10px]"}>
+                                            <div className={"relative w-[100%] h-[100%]"}>
+                                                <Image src={"/logo/dell.png"} alt={"logo"} fill={true}></Image>
+                                            </div>
+                                        </div>
+                                        <div className={"h-full flex flex-col justify-between py-[5px]"}>
+                                            <p className={"ml-[10px]  font-sf font-[500] text-[15px] text-gray-800 mt-[0px]"}>{officialStore.shopName}</p>
+                                            <button className={" ml-[10px] w-[100px] flex justify-center items-center bg-blue-500 text-gray-50 py-[3px] hover:bg-gray-700 font-sf"}>Xem thêm</button>
                                         </div>
                                     </div>
 
                                 ))
                             }
-                        </div>
-                    </div>
 
                     {/*Noi ban*/}
                     {/*Thuong hieu*/}
-                    <div className="flex  w-full h-[200px] border p-[20px] mt-[30px] ">
+                    {/* <div className="flex  w-full h-[200px] border p-[20px] mt-[30px] ">
 
-                    </div>
+                    </div> */}
 
                     {/*Thuong hieu*/}
-
                 </div>
                 <div className={`w-[calc(77%-15px)] flex col-span-3 flex-col`}>
-                    <div className="flex flex-col  w-full mb-[30px] px-[20px] pt-[20px] pb-[25px] bg-white shadow-[0px_0px_5px_rgba(0,0,0,0.2)] rounded-[5px]">
+                    <div className="flex flex-col  w-full mb-[30px] px-[20px] pt-[20px] pb-[25px] bg-white border border-gray-200">
                         <h1 className={"font-sf text-[17px] font-[500] text-gray-800"}>Tất cả sản phẩm </h1>
                         <div className={"border-b border-gray-300 mt-[5px]"}></div>
                         <div className={"w-full flex justify-between"}>
@@ -323,7 +345,7 @@ export default function Categories() {
                                         }
                                         setIsOpen(true);
                                     }} className={"w-[160px] h-[40px] rounded-[4px] relative"}>
-                                    <div className="flex flex-row w-full border  h-full items-center justify-between p-[10px]  rounded-[10px] border-gray-300 ">
+                                    <div className="flex flex-row w-full border  h-full items-center justify-between p-[10px]  rounded-[10px] border-gray-200 ">
                                         <p className={` text-gray-800 font-sf font-[400] text-[15px] mt-[1px]`}>Phổ biến</p>
                                         <HiChevronDown />
                                     </div>
@@ -345,7 +367,7 @@ export default function Categories() {
                             </button>
                         </div>
                     </div>
-                    <div className={`flex-1 grid grid-cols-4 gap-[15px]`}>
+                    <div className={`flex-1 grid grid-cols-4 gap-[20px]`}>
                         {products.map((product) => (<ProductInCategory product={product} key={product.productId} />))}
                     </div>
 
