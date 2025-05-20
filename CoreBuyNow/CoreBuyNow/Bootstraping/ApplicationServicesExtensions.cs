@@ -59,8 +59,10 @@ public static class ApplicationServicesExtensions
         builder.Services.AddScoped<IProductRepository, ProductRepository>();
         builder.Services.AddScoped<IBillRepository, BillRepository>();
         builder.Services.AddScoped<IVoucherRepository, VoucherRepository>();
+        builder.Services.AddScoped<IWalletRepository, WalletRepository>();
         
         builder.Services.AddScoped<IShopService, ShopService>();
+        builder.Services.AddScoped<IWalletService, WalletService>();
         builder.Services.AddScoped<IAccountService, AccountService>();
         builder.Services.AddScoped<IProductService, ProductService>();
         builder.Services.AddScoped<ICustomerService, CustomerService>();

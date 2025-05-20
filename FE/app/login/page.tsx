@@ -33,12 +33,14 @@ export default function LoginPage() {
                 if (res.data.role == "Customer") {
                     Cookies.set("id", res.data.info.customerId, { expires: 7, secure: true, sameSite: 'Strict' });
                     Cookies.set("role", res.data.role, { expires: 7, secure: true, sameSite: 'Strict' });
+                    router.push("/");
                 }
                 if (res.data.role == "Shop") {
                     Cookies.set("id", res.data.info.shopId, { expires: 7, secure: true, sameSite: 'Strict' });
                     Cookies.set("role", res.data.role, { expires: 7, secure: true, sameSite: 'Strict' });
+                    router.push(`/seller/${res.data.info.shopId}`);
                 }
-                router.push("/");
+
                 console.log(res);
                 console.log(status);
             } else {

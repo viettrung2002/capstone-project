@@ -1,17 +1,17 @@
 'use client'
 import {useEffect, useState} from "react";
 import Image from "next/image";
-import { HiChevronDown, HiOutlineShoppingCart, HiOutlineMagnifyingGlass, HiOutlineUser, HiOutlineHome } from "react-icons/hi2";
+import {  HiOutlineShoppingCart, HiOutlineMagnifyingGlass, HiOutlineUser, HiOutlineHome } from "react-icons/hi2";
 import {useRouter , usePathname} from "next/navigation";
-import {jwtDecode} from "jwt-decode";
+
 import Cookies from "js-cookie";
 import {ICustomer} from "@/app/types/account";
 export default function Navbar() {
-    const [isOpen, setIsOpen] = useState(false);
+
     const [timeoutId, setTimeoutId] = useState<ReturnType<typeof setTimeout> | null>(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [isOpenAccount, setIsOpenAccount] = useState(false);
-    const [isLogin, setIsLogin] = useState(false);
+
     const router = useRouter();
     const [customer, setCustomer] = useState<ICustomer>();
     const pathname = usePathname();

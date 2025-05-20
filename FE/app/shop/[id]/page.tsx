@@ -46,8 +46,6 @@ export default function Shop() {
             }
         }
         getCategories();
-
-
     },[])
     useEffect(() => {
         console.log(id)
@@ -150,7 +148,7 @@ export default function Shop() {
                         </div>
                         <div className={"h-[35px] w-full mt-[30px] grid grid-cols-6 gap-[15px]"}>
                             <div onClick={()=> setCateActive("")} className={`${catActive == "" ? "border-b border-blue-700" : null} col-span-1 justify-center items-center flex`}>
-                                <p onClick={()=> setSubCategoryId("00000000-0000-0000-0000-0000000000000")} className={"font-sf text-gray-800 text-[15px]"}>Tất cả</p>
+                                <p onClick={()=> setSubCategoryId("00000000-0000-0000-0000-000000000000")} className={"font-sf text-gray-800 text-[15px]"}>Tất cả</p>
                             </div>
                             {shop?
                                 <div>

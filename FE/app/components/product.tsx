@@ -1,4 +1,6 @@
 import {HiOutlineStar, HiStar, HiOutlineShoppingCart, HiReceiptPercent, HiMiniArrowPath} from "react-icons/hi2";
+
+import {TbEdit, TbTrash} from "react-icons/tb";
 import Image from "next/image";
 import {useState} from "react";
 import {useRouter} from "next/navigation";
@@ -279,6 +281,35 @@ export function ProductInShop({product}: {product: IProduct}) {
                     </div>
                 )}
             </div>
+        </div>
+    )
+}
+
+export function ProductInSeller ({product, onDelete}: {product: IProduct; onDelete: (id: string) => void}) {
+    return (
+        <div className={"col-span-1 h-[125px] bg-white box-content  flex rounded-[8px] shadow-md"}>
+            <div className={"h-full aspect-square  p-[10px]"}>
+                <div className={"w-full h-full flex items-center bg-gray-200 rounded-[5px] justify-center"}>
+
+                </div>
+            </div>
+            <div className={"flex w-[calc(100%-125px)] flex-col  flex-1 font-sf  pr-[10px] py-[10px]"}>
+                <p className={"h-[25px] w-full text-gray-800 text-[15px] font-[500] whitespace-nowrap overflow-ellipsis overflow-hidden"}>{product.productName}</p>
+                <p className={"h-[25px] text-gray-900 font-[700]"}>{product.price}</p>
+                <div className={"flex h-[20px]"}>
+                    <p className={"text-[13px] text-gray-600 mr-[5px]"}>Còn lại:</p>
+                    <p className={"text-[13px] text-gray-700"}>23 sản phẩm</p>
+                </div>
+                <div className={"h-[32px] w-full flex mt-[3px]"}>
+                    <button className={"h-full aspect-square items-center justify-center flex bg-gray-200 text-gray-800 mr-[5px] rounded-full text-[18px]"}>
+                        <TbEdit/>
+                    </button>
+                    <button onClick={()=> onDelete(product.productId)} className={"h-full aspect-square bg-gray-200 rounded-full items-center justify-center flex text-gray-800 text-[18px]"}>
+                        <TbTrash/>
+                    </button>
+                </div>
+            </div>
+
         </div>
     )
 }

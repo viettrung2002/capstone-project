@@ -31,4 +31,9 @@ public class BillService (IBillRepository billRepository) : IBillService
     {
         await billRepository.CancelBill(billId);
     }
+
+    public async Task<PageResponseDto<BillResponseDto>> GetBillWithShopId(Guid shopId, OrderStatus? status, int pageIndex, int pageSize)
+    {
+        return await billRepository.GetBillWithShopId(shopId, status, pageIndex, pageSize);
+    }
 }

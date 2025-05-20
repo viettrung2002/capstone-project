@@ -227,7 +227,7 @@ export default function Categories() {
         console.log(locationFilter);
     }, [locationFilter]);
     return (
-        <div className={`w-full h-full flex items-center relative justify-center flex-col bg-gray-50`}>
+        <div className={`w-full h-full flex items-center relative justify-center flex-col bg-gray-200`}>
 
             <div className={`w-[1300px] h-[40px] mt-[10px] px-[10px] items-center flex `}>
                 <div className="flex items-center w-[250px] h-full  ">
@@ -245,7 +245,7 @@ export default function Categories() {
             <div className="flex gap-[30px] w-[1300px] ">
                 <div className={`w-[calc(23%-15px)] flex flex-col`}>
                     {/*Search*/}
-                    <div className="flex w-full p-[20px] px-[25px] pb-[25px] mt-[0px] flex-col border border-gray-200 bg-white ">
+                    <div className="flex w-full p-[20px] px-[25px] pb-[25px] mt-[0px] flex-col rounded-[4px] shadow-md bg-white ">
                         <p className={`font-sf font-[500] text-[17px] text-gray-800`}>Tìm kiếm sản phẩm</p>
                         <p className={"border-b w-full border-gray-300 mt-[5px]"}></p>
                         <div className={`w-full h-[45px] flex mt-[20px] `}>
@@ -262,7 +262,7 @@ export default function Categories() {
                     </div>
                     {/*Search*/}
                     {/*Tat ca danh muc con*/}
-                    <div className="flex  w-full p-[20px] px-[25px] mt-[30px] flex-col bg-white border border-gray-200">
+                    <div className="flex  w-full p-[20px] px-[25px] mt-[30px] flex-col bg-white rounded-[4px] shadow-md">
                         <p onClick={()=>setSubCategoryId("00000000-0000-0000-0000-000000000000")} className={`font-sf font-[500] text-[17px] text-gray-800`}>{categoryName}</p>
                         <p className={"border-b w-full border-gray-300 mt-[5px] mb-[5px]"}></p>
                         {
@@ -325,7 +325,7 @@ export default function Categories() {
                     {/*Thuong hieu*/}
                 </div>
                 <div className={`w-[calc(77%-15px)] flex col-span-3 flex-col`}>
-                    <div className="flex flex-col  w-full mb-[30px] px-[20px] pt-[20px] pb-[25px] bg-white border border-gray-200">
+                    <div className="flex flex-col  w-full mb-[30px] px-[20px] pt-[20px] pb-[25px] bg-white rounded-[4px] shadow-md">
                         <h1 className={"font-sf text-[17px] font-[500] text-gray-800"}>Tất cả sản phẩm </h1>
                         <div className={"border-b border-gray-300 mt-[5px]"}></div>
                         <div className={"w-full flex justify-between"}>

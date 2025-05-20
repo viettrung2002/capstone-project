@@ -9,3 +9,10 @@ export interface ICategory {
     categoryName: string;
     subCategory: SubCategory[];
 }
+
+export interface ISubCategoryAttribure {
+    attributeId: string;
+    attributeName: string;
+    dataType: string;
+    unit: string;
+}

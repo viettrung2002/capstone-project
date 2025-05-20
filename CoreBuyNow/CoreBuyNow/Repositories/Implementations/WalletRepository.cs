@@ -1,0 +1,132 @@
+﻿using CoreBuyNow.Models;
+using CoreBuyNow.Models.Entities;
+using CoreBuyNow.Repositories.Interfaces;
+using LinqToDB;
+using Microsoft.EntityFrameworkCore;
+
+namespace CoreBuyNow.Repositories.Implementations;
+
+public class WalletRepository(AppDbContext dbContext) : IWalletRepository
+{
+    public async Task CreateWallet(Guid userId)
+    {
+        var wallet = new Wallet
+        {
+            WalletId = Guid.NewGuid(),
+            UserId = userId,
+            Balance = 0,
+            UpdateDate = DateTime.Now,
+        };
+        dbContext.Wallets.Add(wallet);
+        await dbContext.SaveChangesAsync();
+    }
+
+    public async Task DeleteWallet(Guid userId)
+    {
+        var wallet = dbContext.Wallets.FirstOrDefault(w => w.UserId == userId);
+        if (wallet != null)
+            dbContext.Wallets.Remove(wallet);
+        else 
+            throw new Exception("Wallet not found");
+        await dbContext.SaveChangesAsync();
+    }
+
+    public async Task<Wallet> GetWallet(Guid userId)
+    {
+        var wallet = await dbContext.Wallets.FirstOrDefaultAsync(w=>w.UserId == userId);
+        if (wallet != null) 
+            return wallet;
+        throw new Exception("Wallet not found");
+    }
+
+    public async Task TransferMoney(decimal amount, string description, Guid userId, Guid recipientId)
+    {
+        var wallet = dbContext.Wallets.FirstOrDefault(w => w.WalletId == userId);
+        if (wallet == null) 
+            throw new Exception("Wallet not found");
+        if (wallet.Balance < amount) 
+            throw new Exception("Insufficient balance");
+        wallet.Balance -= amount;
+        var depositTransaction = new Transaction
+        {
+            TransactionId = Guid.NewGuid(),
+            WalletId = userId,
+            TransactionType = TransactionType.Deposit,
+            Amount = amount,
+            BalanceAfter = wallet.Balance,
+            Description = description,
+            CreateDate = DateTime.Now,
+        };
+        var wallet2 = dbContext.Wallets.FirstOrDefault(w => w.WalletId == recipientId);
+        if (wallet2 == null) throw new Exception("Wallet not found");
+        var withdrawTransaction = new Transaction
+        {
+            TransactionId = Guid.NewGuid(),
+            WalletId = recipientId,
+            TransactionType = TransactionType.Withdraw,
+            Amount = amount,
+            BalanceAfter = wallet2.Balance + amount,
+            Description = description,
+            CreateDate = DateTime.Now
+        };
+        dbContext.Transactions.Add(depositTransaction);
+        dbContext.Transactions.Add(withdrawTransaction);
+        await dbContext.SaveChangesAsync();
+
+    }
+
+    public async Task Pay(Guid billId, Guid customerId)
+    {
+        var bill = await dbContext.Bills.FirstOrDefaultAsync(b => b.BillId == billId);
+        var wallet = await dbContext.Wallets.FirstOrDefaultAsync(w => w.UserId == customerId);
+        if (bill == null ) throw new Exception("Bill not found");
+        if (wallet == null) throw new Exception("Wallet not found");
+        if (wallet.Balance < bill.TotalPrice) throw new Exception("Insufficient balance");
+        wallet.Balance -= bill.TotalPrice;
+        var depositTransaction = new Transaction
+        {
+            TransactionId = Guid.NewGuid(),
+            WalletId = wallet.WalletId,
+            TransactionType = TransactionType.Deposit,
+            Amount = bill.TotalPrice,
+            BalanceAfter = wallet.Balance,
+            CreateDate = DateTime.Now,
+        };
+         var shopId = await dbContext.Bills
+             .Include(b=>b.Items)
+             .ThenInclude(i=>i.Product)
+             .ThenInclude(p=>p.Shop)
+             .Select(b => b.Items
+                 .Select(i=>i.Product.Shop.ShopId)
+                 .FirstOrDefault())
+             .FirstOrDefaultAsync();
+             
+             
+        var shopWallet = await dbContext.Wallets.FirstOrDefaultAsync(w => w.WalletId == shopId);
+        if (shopWallet == null) throw new Exception("Shop Wallet not found");
+        shopWallet.Balance += bill.TotalPrice;
+        
+        var wTransaction = new Transaction
+        {
+            TransactionId = Guid.NewGuid(),
+            WalletId = shopWallet.WalletId,
+            TransactionType = TransactionType.Withdraw,
+            Amount = bill.TotalPrice,
+            BalanceAfter = shopWallet.Balance,
+            CreateDate = DateTime.Now,
+        };
+        
+        dbContext.Transactions.Add(depositTransaction);
+        dbContext.Wallets.Update(wallet);
+        dbContext.Wallets.Update(shopWallet);
+        await dbContext.SaveChangesAsync();
+    }
+    
+    public async Task<List<Transaction>> GetTransactions(Guid userId)
+    {
+        return await dbContext.Transactions
+            .Where(t => t.WalletId == userId)
+            .OrderByDescending(t => t.CreateDate)
+            .ToListAsync();
+    }
+}

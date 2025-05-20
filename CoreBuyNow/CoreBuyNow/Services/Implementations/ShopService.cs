@@ -14,5 +14,23 @@ public class ShopService (IShopRepository shopRepository) : IShopService
         return await shopRepository.GetSubCategoryInShop(shopId);
     }
 
-    
+    public async Task<decimal> TongDoanhThu(Guid shopId, DateTime? startDate, DateTime? endDate)
+    {
+        return await shopRepository.TongDoanhThu(shopId, startDate, endDate);
+    }
+
+    public async Task<int> SoLuongDaBan(Guid shopId, DateTime? startDate, DateTime? endDate)
+    {
+        return await shopRepository.SoLuongDaBan(shopId, startDate, endDate);
+    }
+
+    public async Task<double> TiLeHoanThanh(Guid shopId, DateTime? startDate, DateTime? endDate)
+    {
+        return await shopRepository.TiLeHoanThanh(shopId, startDate, endDate);
+    }
+
+    public async Task<List<Product>> TopSanPham(Guid shopId, bool sort)
+    {
+        return await shopRepository.TopSanPham(shopId, sort);
+    }
 }

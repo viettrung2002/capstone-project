@@ -1,10 +1,9 @@
 'use client'
 import { HiOutlineBars3, HiArrowLeft, HiArrowRight} from "react-icons/hi2";
-import { CiFacebook } from "react-icons/ci";
 import { FaFacebookF, FaInstagram } from "react-icons/fa6";
 import FeatureCategories from "@/app/components/feature_category";
 import Product from "@/app/components/product";
-import {ProductSale, MiniProduct} from "@/app/components/product";
+import {ProductSale} from "@/app/components/product";
 import {useState, useEffect} from "react";
 import Image from "next/image";
 import {useRouter} from "next/navigation";
@@ -35,8 +34,15 @@ export default function Home() {
     const [flashSaleProducts, setFlashSaleProducts] = useState<IProduct[]>([]);
     const [category, setCategory] = useState<ICategory[]>([]);
     const router = useRouter();
-
+    const token = Cookies.get("token");
+    const role = Cookies.get("role");
+    const id = Cookies.get("id");
     useEffect(() => {
+
+        if (token != null && role == "Shop") {
+            router.push(`/seller/${id}`);
+            return
+        }
         async function GetProduct() {
 
             try {
@@ -146,7 +152,7 @@ export default function Home() {
         return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
     };
     return (
-        <div className="Home bg-gray-50  flex flex-col items-center">
+        <div className="Home bg-gray-200  flex flex-col items-center">
             <div className="h-[60px] w-full bg-white border-b border-gray-300 flex flex-row items-center justify-center">
                 <div className="flex flex-row 2xl:w-[1300px] xl:w-[1280px]  h-full">
                     <div className="flex flex-row w-[200px] h-full border-r border-gray-300 items-center relative"
@@ -185,7 +191,11 @@ export default function Home() {
                         <p className={`select-none flex items-center h-full font-sf font-[500] text-[15px]  hover:text-cl-hover-text ml-[30px]`}>Trang chủ</p>
                         <p className={`select-none flex items-center h-full font-sf font-[500] text-[15px]  hover:text-cl-hover-text ml-[30px]`}>Mã giảm giá</p>
                         <p className={`select-none flex items-center h-full font-sf font-[500] text-[15px]  hover:text-cl-hover-text ml-[30px]`}>Top Products</p>
-                        <p className={`select-none flex items-center h-full font-sf font-[500] text-[15px]  hover:text-cl-hover-text ml-[30px]`}>Kênh người bán</p>
+                        <p onClick={()=> {
+                            const role = Cookies.get("role");
+                            const id = Cookies.get("id");
+                            if (role == "shop") router.push(`/seller/${id}`);
+                        }} className={`select-none flex items-center h-full font-sf font-[500] text-[15px]  hover:text-cl-hover-text ml-[30px]`}>Kênh người bán</p>
 
                     </div>
 
@@ -247,7 +257,7 @@ export default function Home() {
             </div>
             {/*Banner*/}
             {/*Categories*/}
-            <div className="2xl:w-[1300px] xl:w-[1280px]  items-center justify-center mt-[30px] bg-white pt-[20px] p-[30px]">
+            <div className="2xl:w-[1300px] xl:w-[1280px]  items-center justify-center mt-[30px]  pt-[20px] p-[30px]">
                 <div className={` flex flex-col `}>
                     <p className={`font-sf font-[400] text-[20px] text-cl-text`}>DANH MỤC</p>
                     {/*<div className={`border-b border-[2px] border-blue-600 w-[50px] mt-[4px]`}></div>*/}
@@ -317,7 +327,7 @@ export default function Home() {
             {/*Flash Sale*/}
             {/*Trending*/}
 
-            <div className="2xl:w-[1300px] xl:w-[1280px]  flex items-center justify-center mt-[30px] flex-col bg-white pb-[30px] pt-[20px] px-[30px]">
+            <div className="2xl:w-[1300px] xl:w-[1280px]  flex items-center justify-center mt-[30px] flex-col  pb-[30px] pt-[20px] px-[30px]">
                 <div className="w-full flex items-center justify-center">
                     <div className={`w-full flex flex-col`}>
                         <p className={`font-sf font-[400] text-[20px] text-cl-text mr-[20px]`}>SẢN PHẨM ĐƯỢC YÊU THÍCH</p>

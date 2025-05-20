@@ -87,6 +87,68 @@ public class ShopRepository (AppDbContext dbContext) : IShopRepository
                 .ToListAsync();
     }
 
+    public async Task<decimal> TongDoanhThu(Guid shopId, DateTime? startDate, DateTime? endDate)
+    {
+        var query = dbContext.Bills.AsQueryable();
+        if (startDate.HasValue & endDate.HasValue)
+        {
+            query = query.Where(b=>b.CreateDate >= startDate && b.CreateDate <= endDate);
+        }
+        var doanhThu = await query.Where(b => b.ShopId == shopId && b.OrderStatus == OrderStatus.Completed)
+                                .Select(b=>b.TotalPrice)
+                                .SumAsync();
+        return doanhThu;
+    }
+
+    public async Task<int> SoLuongDaBan(Guid shopId, DateTime? startDate, DateTime? endDate)
+    {
+        var query = dbContext.Bills.AsQueryable();
+        if (startDate.HasValue && endDate.HasValue)
+        {
+            query = query.Where(b => b.CreateDate >= startDate && b.CreateDate <= endDate);
+        }
+        var soLuongDaBan = await query
+            .Include(b => b.Items)
+            .Where(b => b.ShopId == shopId && b.OrderStatus == OrderStatus.Completed)
+            .SelectMany(b => b.Items)
+            .SumAsync(p => p.Quantity);
+        return soLuongDaBan;
+    }
+    public async Task<double> TiLeHoanThanh(Guid shopId, DateTime? startDate, DateTime? endDate)
+    {
+        var query = dbContext.Bills.AsQueryable();
+        if (startDate.HasValue && endDate.HasValue)
+        {
+            query = query.Where(b => b.CreateDate >= startDate && b.CreateDate <= endDate);
+        }
+        var soLuongDaHoanThanh = await query
+            .Where(b => b.ShopId == shopId && b.OrderStatus == OrderStatus.Completed)
+            .CountAsync();
+        var soLuongDaHuy = await query
+            .Where(b => b.ShopId == shopId && b.OrderStatus == OrderStatus.Cancelled)
+            .CountAsync();
+        return (double)soLuongDaHoanThanh/(soLuongDaHoanThanh+soLuongDaHuy);
+
+    }
+
+    public async Task<List<Product>> TopSanPham(Guid shopId, bool sort)
+    {
+        if (sort)
+        {
+            return await dbContext.Products
+                .Where(p => p.ShopId == shopId)
+                .OrderByDescending(p=>p.Sold)
+                .Take(5)
+                .ToListAsync();
+        }
+        return await dbContext.Products
+            .Where(p => p.ShopId == shopId)
+            .OrderBy(p=>p.Sold)
+            .Take(5)
+            .ToListAsync();
+        
+    }
+
     // public async Task<List<SubCategory>> GetSubCategoryInShop(Guid shopId)
     // {
     //     throw new NotImplementedException();

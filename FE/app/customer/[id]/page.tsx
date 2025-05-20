@@ -6,7 +6,7 @@ import {
     HiOutlinePencilSquare,
     HiOutlinePercentBadge,
     HiOutlineTicket,
-    HiOutlineUser
+    HiOutlineUser, HiOutlineWallet
 } from "react-icons/hi2";
 import {useEffect, useState} from "react";
 import Cookies from "js-cookie";
@@ -23,6 +23,10 @@ export default function CustomerPage() {
     const [gender, setGender] = useState(true);
     const [showDate, setShowDate] = useState(0);
     const [bills, setBills] = useState<Bill[]>([]);
+
+    const [day, setDay] = useState<number>(0);
+    const [month, setMonth] = useState<number>(0);
+    const [year, setYear] = useState<number>(0);
 
     // TAB ĐỔI MẬT KHẨU
     const [oldPassword, setOldPassword] = useState("");
@@ -84,6 +88,10 @@ export default function CustomerPage() {
         }
         GetBill();
     }, []);
+
+    function formatVND(amount: number): string {
+        return amount.toLocaleString('vi-VN') ;
+    }
     return(
         <div className={`w-full flex items-center justify-center bg-gray-50`}>
             <div className={`w-[1300px] grid grid-cols-4 gap-[20px] mt-[20px]`}>
@@ -133,6 +141,12 @@ export default function CustomerPage() {
                         </div>
                         <p className={` ${activeTab == 5 ? "text-blue-500" : "text-gray-800"} flex font-sf text-[16px] `}>Kho Voucher </p>
                     </div>
+                    <div onClick={()=> setActiveTab(6)} className={"flex h-[35px] pl-[15px] items-center"}>
+                        <div className={"w-[25px] text-[20px]"}>
+                            <HiOutlineWallet/>
+                        </div>
+                        <p className={` ${activeTab == 6 ? "text-blue-500" : "text-gray-800"} flex font-sf text-[16px] select-none`}>Ví BuyNow </p>
+                    </div>
 
 
 
@@ -181,7 +195,7 @@ export default function CustomerPage() {
                                     <p className={"font-sf text-blue-500 text-[15px] underline"}>Thay Đổi</p>
                                 </div>
                                 <div className={"h-[40px] w-full mt-[15px] flex items-center"}>
-                                    <p className={"font-sf text-gray-800 text-[16px] mr-[15px]"}>0934413090</p>
+                                    <p className={"font-sf text-gray-800 text-[16px] mr-[15px]"}>{customer?.phoneNumber ? customer.phoneNumber : "Không có"}</p>
                                     <p className={"font-sf text-blue-500 text-[15px] underline"}>Thay Đổi</p>
                                 </div>
                                 <div className={"h-[40px] w-full mt-[15px] flex items-center"}>
@@ -198,12 +212,12 @@ export default function CustomerPage() {
                                 </div>
                                 <div className={"h-[40px] w-full mt-[20px] flex items-center"}>
                                     <div className={"flex h-full w-[100px] border border-gray-200 px-[15px] items-center justify-between relative"}>
-                                        <p className={"font-sf text-[16px] text-gray-800"}>Ngày</p>
+                                        <p className={"font-sf text-[16px] text-gray-800"}>{day == 0 ? "Ngày" : day}</p>
                                         <HiOutlineChevronDown onClick={()=> setShowDate(showDate == 0 ? 1 : 0)} className={"text-[16px] text-gray-800"}/>
                                         {showDate == 1 ?
                                             <div className={"absolute w-[100px] h-[130px] left-[-1px] border border-gray-200 bottom-[-131px] bg-white overflow-y-auto"}>
                                                 {Array.from({ length: 30 }).map((_, index) => (
-                                                    <div key={index} className=" px-[15px] py-[2px] bg-white border-gray-100 border-b font-sf text-[15px]">
+                                                    <div key={index} onClick={()=> setDay(index + 1)} className=" px-[15px] py-[2px] bg-white border-gray-100 border-b font-sf text-[15px]">
                                                         {index + 1}
                                                     </div>
                                                 ))}
@@ -212,12 +226,12 @@ export default function CustomerPage() {
                                     </div>
 
                                     <div className={"flex h-full w-[130px] border border-gray-200 px-[15px] items-center justify-between relative ml-[10px]"}>
-                                        <p className={"font-sf text-[16px] text-gray-800"}>Tháng</p>
+                                        <p className={"font-sf text-[16px] text-gray-800"}>{month == 0 ? "Tháng" : month}</p>
                                         <HiOutlineChevronDown onClick={()=> setShowDate(showDate == 0 ? 2 : 0)} className={"text-[16px] text-gray-800"}/>
                                         {showDate == 2 ?
                                             <div className={"absolute w-[130px] h-[130px] left-[-1px] border border-gray-200 bottom-[-131px] bg-white overflow-y-auto"}>
                                                 {Array.from({ length: 12 }).map((_, index) => (
-                                                    <div key={index} className=" px-[15px] py-[2px] bg-white border-gray-100 border-b font-sf text-[15px]">
+                                                    <div key={index} onClick={()=>setMonth(index+1)} className=" px-[15px] py-[2px] bg-white border-gray-100 border-b font-sf text-[15px]">
                                                         Tháng {index + 1}
                                                     </div>
                                                 ))}
@@ -225,12 +239,12 @@ export default function CustomerPage() {
                                             : null}
                                     </div>
                                     <div className={"flex h-full w-[100px] border border-gray-200 px-[15px] items-center justify-between relative ml-[10px]"}>
-                                        <p className={"font-sf text-[16px] text-gray-800"}>Năm</p>
+                                        <p className={"font-sf text-[16px] text-gray-800"}>{year == 0 ? "Năm" : year}</p>
                                         <HiOutlineChevronDown onClick={()=> setShowDate(showDate == 0 ? 3 : 0)} className={"text-[16px] text-gray-800"}/>
                                         {showDate == 3 ?
                                             <div className={"absolute w-[100px] h-[130px] left-[-1px] border border-gray-200 bottom-[-131px] bg-white overflow-y-auto"}>
                                                 {Array.from({ length: 80 }).map((_, index) => (
-                                                    <div key={index} className=" px-[15px] py-[2px] bg-white border-gray-100 border-b font-sf text-[15px]">
+                                                    <div key={index} onClick={()=> setYear(2025-index)} className=" px-[15px] py-[2px] bg-white border-gray-100 border-b font-sf text-[15px]">
                                                         {2025 - index}
                                                     </div>
                                                 ))}
@@ -376,7 +390,6 @@ export default function CustomerPage() {
                                             </button>
                                         </div>
                                     </div>
-
                                     {
                                         bill.items.map((item)=>
                                             <div key={item.itemId} className={"w-full py-[10px] border-gray-200 flex"}>
@@ -414,6 +427,41 @@ export default function CustomerPage() {
 
                 </div>
                 {/*ĐƠN MUA*/}
+
+                {/*VÍ*/}
+                <div className={`${activeTab == 6 ? "block" : "hidden"} col-span-3  pb-[20px]`}>
+                    <div className={"w-full h-full border bg-white border-t border-x border-gray-100 p-[20px] flex flex-col justify-between"}>
+                        <div className={"h-[40px] w-full"}>
+                            <button className={"px-[20px] h-full bg-gray-700 font-sf text-gray-50 text-[15px]"}>
+                                Lịch Sử Giao Dịch
+                            </button>
+                        </div>
+
+                        <div>
+                            <div className={"h-[20px] w-full font-sf text-gray-700 text-[15px] flex items-center justify-center"}>
+                                Số Dư Ví
+                            </div>
+                            <div className={"h-[70px] flex w-full font-sf text-blue-600 text-[40px] justify-center items-center"}>
+                                <p className={"font-[700]"}>{formatVND(50000000)}</p>
+                                <p className={"font-sf text-gray-700 text-[20px]"}>đ</p>
+                            </div>
+                        </div>
+
+
+                        <div className={"h-[40px] w-full flex items-center justify-center"}>
+                            <button className={"px-[20px] h-full bg-gray-700 font-sf text-gray-50 text-[15px] mr-[10px]"}>
+                                Nạp Tiền
+                            </button>
+
+                            <button className={"px-[20px] h-full bg-gray-700 font-sf text-gray-50 text-[15px] ml-[10px]"}>
+                                Rút Tiền
+                            </button>
+                        </div>
+
+
+                    </div>
+                </div>
+                {/*VÍ*/}
             </div>
         </div>
     )

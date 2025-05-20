@@ -36,6 +36,8 @@ public class BillRepository (AppDbContext dbContext, ILogger<BillRepository> log
             {
                 item.UnitPrice = product.Price;
                 // bill.TotalPrice += product.Price - (product.Price * product.Discount / 100) * item.Quantity;
+
+                bill.ShopId = product.ShopId;
             }
         }
 
@@ -175,5 +177,57 @@ public class BillRepository (AppDbContext dbContext, ILogger<BillRepository> log
         bill.OrderStatus = OrderStatus.Cancelled;
         dbContext.Update(bill);
         await dbContext.SaveChangesAsync();
+    }
+
+    public async Task<PageResponseDto<BillResponseDto>> GetBillWithShopId(Guid shopId, OrderStatus? status, int pageIndex, int pageSize)
+    {
+        if (!status.HasValue)
+        {
+            return new PageResponseDto<BillResponseDto>
+            (
+                pageIndex,
+                pageSize,
+                await dbContext.Bills.CountAsync(
+                    b=>b.ShopId == shopId),
+                await dbContext.Bills
+                    .Include(b => b.Items)!
+                    .Where(b => b.ShopId == shopId)
+                    .OrderByDescending(b => b.CreateDate)
+                    .Skip((pageIndex - 1) * pageSize)
+                    .Take(pageSize)
+                    .Select(b => new BillResponseDto
+                    {
+                        BillId = b.BillId,
+                        OrderStatus = b.OrderStatus,
+                        TotalPrice = b.TotalPrice,
+                        Items = b.Items
+                    })
+                    .ToListAsync()
+            );
+        }
+        else
+        {
+            return new PageResponseDto<BillResponseDto>
+            (
+                pageIndex,
+                pageSize,
+                await dbContext.Bills.CountAsync(
+                    b=>b.ShopId == shopId && b.OrderStatus == status),
+                await dbContext.Bills
+                    .Include(b => b.Items)!
+                    .Where(b => b.ShopId == shopId && b.OrderStatus == status)
+                    .OrderByDescending(b => b.CreateDate)
+                    .Skip((pageIndex - 1) * pageSize)
+                    .Take(pageSize)
+                    .Select(b => new BillResponseDto
+                    {
+                        BillId = b.BillId,
+                        OrderStatus = b.OrderStatus,
+                        TotalPrice = b.TotalPrice,
+                        Items = b.Items
+                    })
+                    .ToListAsync()
+            );
+        }
     }
 }

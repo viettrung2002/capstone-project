@@ -152,7 +152,7 @@ public class ProductRepository(AppDbContext dbContext, ILogger<ProductRepository
         // Lọc theo loại shop
         // if (!string.IsNullOrEmpty(filter.ShopType))
         //     query = query.Where(p => p.ShopType == filter.ShopType);
-
+  
         // Sắp xếp
         query = filter.SortBy switch
         {

@@ -89,5 +89,32 @@ public class BillController(IBillService billService, ILogger<BillController> lo
             return BadRequest(e.Message);
         }
     }
+
+    [HttpGet("shop")]
+    [Authorize(Roles = "Shop")]
+    public async Task<IActionResult> GetBillInShop([FromQuery] OrderStatus? orderStatus, int pageIndex = 1, int pageSize = 10)
+    {
+        try
+        {
+            if (orderStatus.HasValue)
+            {
+                return Ok(new
+                {
+                    data = await billService.GetBillWithShopId(Guid.Parse(User.FindFirst("id")?.Value), orderStatus, pageIndex, pageSize)
+                });
+            }
+
+            return Ok(new
+            {
+                data = await billService.GetBillWithShopId(Guid.Parse(User.FindFirst("id")?.Value), null, pageIndex,
+                    pageSize)
+            });
+
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
     
 }

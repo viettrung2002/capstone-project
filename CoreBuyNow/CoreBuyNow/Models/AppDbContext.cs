@@ -62,6 +62,9 @@ public class AppDbContext : DbContext
     public DbSet<VoucherWallet> VoucherWallets { get; set; }
     public DbSet<Admin> Admins { get; set; }
     public DbSet<CustomerInteraction> CustomerInteractions { get; set; }
+    
+    public DbSet<Wallet> Wallets { get; set; }
+    public DbSet<Transaction> Transactions { get; set; }
     public DbSet<Voucher> Vouchers { get; set; }
     public DbSet<Product> Products { get; set; }
     public DbSet<Category> Categories { get; set; }

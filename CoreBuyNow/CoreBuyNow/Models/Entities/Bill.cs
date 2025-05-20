@@ -10,6 +10,9 @@ public class Bill
     [Required]
     public Guid CustomerId { get; set; }
     public Customer? Customer { get; set; }
+    
+    public Guid ShopId { get; set; }
+    public Shop? Shop { get; set; }
     public OrderStatus OrderStatus { get; set; } = OrderStatus.Pending;
     [Required]
     public decimal TotalPrice { get; set; }
@@ -19,8 +22,8 @@ public class Bill
     public Guid ShippingVoucherId { get; set;}
     public Guid ShopVoucherId { get; set; }
     public Guid VoucherId { get; set; }
-    public List<ItemInBill>? Items { get; set; }
-    
+    public List<ItemInBill> Items { get; set; } = [];
+
 }
 
 public enum OrderStatus

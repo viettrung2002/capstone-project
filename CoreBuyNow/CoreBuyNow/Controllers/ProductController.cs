@@ -8,7 +8,7 @@ namespace CoreBuyNow.Controllers;
 
 [ApiController]
 [Route("/api/product")]
-public class ProductController (IProductService productService) : ControllerBase
+public class ProductController (IProductService productService, ILogger<ProductController> logger) : ControllerBase
 {
     [HttpGet("attribute/{id:guid}")]
     public async Task<IActionResult> GetSubcategoryAttribute(Guid id)
@@ -21,8 +21,22 @@ public class ProductController (IProductService productService) : ControllerBase
     [Authorize(Roles = "Shop")]
     public async Task<IActionResult> AddProduct(Product product)
     {
-        await productService.AddProduct(product);
-        return Ok();
+        var id = Guid.Parse(User.FindFirst("id")?.Value);
+        try
+        {
+            product.ShopId = id;
+            await productService.AddProduct(product);
+            return Ok(new
+            {
+                message = "Product created successfully"
+            });
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+       
+        
     }
 
     [HttpPut("update/{id:guid}")]
