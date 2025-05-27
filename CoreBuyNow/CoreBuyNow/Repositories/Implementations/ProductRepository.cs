@@ -1,6 +1,7 @@
 ﻿using CoreBuyNow.Models;
 using CoreBuyNow.Models.DTOs;
 using CoreBuyNow.Models.Entities;
+using CoreBuyNow.Recommend;
 using CoreBuyNow.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,54 @@ namespace CoreBuyNow.Repositories.Implementations;
 
 public class ProductRepository(AppDbContext dbContext, ILogger<ProductRepository> logger) : IProductRepository
 {
+    public async Task AddProductAndVector(Product product)
+    {
+        var productAttribute =  dbContext.SubCategoryAttributes 
+            .Where(sa => sa.SubcategoryId == product.SubCategoryId)
+            .Include(sa => sa.ProductAttribute)
+            .Select(sa => sa.ProductAttribute.AttributeName)
+            .ToList();
+        logger.LogInformation("{id} Product Attribute: {ProductAttribute}",product.SubCategoryId, productAttribute);
+        foreach (var key in product.Specifications)
+        {
+            logger.LogInformation("Key: {key}",key.Key);
+            if (!productAttribute.Contains(key.Key))
+            {
+                throw new Exception($"Attribute '{key}' is not valid for this subcategory");
+            }
+        }
+        var shop = dbContext.Shops.Find(product.ShopId);
+        logger.LogInformation("Shop: {shop}", shop);
+        shop.ProductCount = shop.ProductCount + 1;
+        dbContext.Shops.Update(shop);
+        product.ProductId = Guid.NewGuid();
+        product.CreatedDate = DateTime.Now;
+        product.Vector = Array.Empty<double>();
+        var allProducts = await dbContext.Products.Include(p => p.SubCategory).ToListAsync();
+
+        var allDocs = allProducts
+            .Select(p => $"{p.ProductName} {p.SubCategory?.SubCategoryName} " +
+                         string.Join(" ", p.Specifications.Select(kvp => $"{kvp.Key} {kvp.Value}")))
+            .ToList();
+
+        allDocs.Add($"{product.ProductName} {product.SubCategory?.SubCategoryName} " +
+                    string.Join(" ", product.Specifications.Select(kvp => $"{kvp.Key} {kvp.Value}")));
+
+        var tfidf = new TfidfVectorizer();
+        tfidf.Fit(allDocs);
+
+        double maxPrice = Math.Max((double)product.Price, allProducts.Max(p => (double)p.Price));
+        double maxRating = Math.Max(product.Rating, allProducts.Max(p => p.Rating));
+        
+        var vectorizer = new ProductVectorizer(tfidf, maxPrice, maxRating);
+        product.SubCategory = await dbContext.SubCategories.FindAsync(product.SubCategoryId);
+        product.Vector = vectorizer.BuildVector(product);
+        
+        
+        dbContext.Products.Add(product);
+        await dbContext.SaveChangesAsync();
+    }
+
     public async Task<List<ProductAttribute>> GetSubCategoryAttributes(Guid subCategoryId)
     {
         return await dbContext.SubCategoryAttributes
@@ -236,6 +285,7 @@ public class ProductRepository(AppDbContext dbContext, ILogger<ProductRepository
         {
             CategoryId = categoryId,
             CategoryName = categoryName,
+            
             SubCategory = subCategory
         };
     }
@@ -248,6 +298,7 @@ public class ProductRepository(AppDbContext dbContext, ILogger<ProductRepository
             {
                 CategoryId = p.CategoryId,
                 CategoryName = p.CategoryName,
+                ImageUrl = p.ImageUrl,
                 SubCategory = dbContext.SubCategories
                     .Where(s => s.CategoryId == p.CategoryId)
                     .ToList()

@@ -19,6 +19,4 @@ public interface IShopRepository
     Task<double> TiLeHoanThanh(Guid shopId, DateTime? startDate, DateTime? endDate);
     Task<List<Product>> TopSanPham (Guid shopId, bool sort);
     
-    
-    
 }

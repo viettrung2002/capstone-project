@@ -7,6 +7,7 @@ export interface SubCategory {
 export interface ICategory {
     categoryId: string;
     categoryName: string;
+    imageUrl: string;
     subCategory: SubCategory[];
 }
 

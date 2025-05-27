@@ -51,3 +51,9 @@ export interface IProductInBill {
     quantity: number;
 
 }
+
+export interface IProductInCompare {
+    id: string;
+    name?: string;
+    picture: string;
+}

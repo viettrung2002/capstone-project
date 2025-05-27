@@ -1,8 +1,9 @@
 import {HiChevronDown, HiChevronUp} from "react-icons/hi2";
-import {useState, useEffect} from "react";
+import {useState, useEffect, useRef} from "react";
 import {ICategory, ISubCategoryAttribure, SubCategory} from "@/app/types/ subCategory";
 import Cookies from "js-cookie";
 import {useParams, useRouter} from "next/navigation";
+import Image from "next/image";
 export default function CreateProduct() {
     const [openCategory, setOpenCategory] = useState<boolean>(false);
     const [categories, setCategories] = useState<ICategory[]>([]);
@@ -12,6 +13,48 @@ export default function CreateProduct() {
     const [price, setPrice] = useState<number>(0);
     const router = useRouter();
     const [spec, setSpec] = useState<Record<string, string>>({})
+    const [file, setFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [uploading, setUploading] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [urlImage, setUrlImage] = useState("")
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const selectedFile = e.target.files?.[0];
+        if (selectedFile) {
+            setFile(selectedFile);
+            setPreviewUrl(URL.createObjectURL(selectedFile));
+        }
+    };
+
+    const handleUpload = async () => {
+        if (!file) {
+            console.log("No file");
+            return;
+        };
+
+        const formData = new FormData();
+        formData.append('image', file); // Key 'image' phải khớp với .NET API
+
+        try {
+            setUploading(true);
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload`, {
+                method: 'POST',
+                body: formData,
+                // Không cần headers: Content-Type sẽ tự động là 'multipart/form-data'
+            });
+
+            if (!response.ok) throw new Error('Upload failed');
+            const data = await response.json();
+            console.log("URL",data);
+            setUrlImage(data.imageUrl);
+            alert(`Upload thành công! URL: ${data.imageUrl}`);
+        } catch (error) {
+            console.error('Lỗi:', error);
+            alert('Upload thất bại');
+        } finally {
+            setUploading(false);
+        }
+    };
     async function GetCategoryFeature() {
 
         try {
@@ -55,7 +98,7 @@ export default function CreateProduct() {
             return;
         }
         try {
-            const response = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/product/add`,{
+            const response = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/recommend`,{
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -65,7 +108,7 @@ export default function CreateProduct() {
                     productName: productName,
                     subCategoryId: selectedSubCategory?.subCategoryId,
                     price: price,
-                    mainImage: "https://i01.appmifile.com/v1/MI_18455B3E4DA706226CF7535A58E875F0267/pms_1645585904.11171995.png",
+                    mainImage: urlImage,
                     extraImage: "https://i01.appmifile.com/v1/MI_18455B3E4DA706226CF7535A58E875F0267/pms_1645585904.11171995.png",
                     specifications: spec,
                 })
@@ -92,12 +135,26 @@ export default function CreateProduct() {
             <div className={"col-span-1 border-r border-gray-200 flex flex-col"}>
                 {/*HINH ANH*/}
                 <div className={"w-full flex items-center justify-center font-sf"}>
-                    <div className={"w-[120px] h-[120px] bg-gray-200 mr-[15px]"}>
-
+                    <div className={"w-[120px] h-[120px] bg-gray-200 mr-[15px] relative"}>
+                        {previewUrl && (
+                            <Image src={previewUrl} fill={true} alt="Preview"  />
+                        )}
                     </div>
                     <div className={"flex items-center flex-col justify-center"}>
-                        <button className={"px-[15px] py-[5px] bg-blue-500 text-gray-50 text-[15px] hover:shadow-md mt-[5px]"}>
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            onChange={handleFileChange}
+                            accept="image/*"
+                            className="hidden"
+                        />
+                        <button onClick={() => fileInputRef.current?.click()} className={"px-[15px] py-[5px] bg-blue-500 text-gray-50 text-[15px] hover:shadow-md mt-[5px]"}>
                             <p>Chọn Ảnh</p>
+                        </button>
+                        <button onClick={handleUpload}
+                                disabled={uploading}
+                                className={"px-[15px] py-[5px] bg-blue-500 text-gray-50 text-[15px] hover:shadow-md mt-[5px]"}>
+                            <p>{uploading ? 'Đang tải ...' : 'Tải lên'}</p>
                         </button>
                         <p className={"text-gray-600 text-[14px] mt-[10px]"}>Dung lượng tối đa 5 MB</p>
                         <p className={"text-gray-600 text-[14px]"}>Định Dạng: .JPEG, .PNG</p>

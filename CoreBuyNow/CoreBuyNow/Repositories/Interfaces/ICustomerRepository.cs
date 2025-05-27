@@ -9,4 +9,9 @@ public interface ICustomerRepository
     Task EditCustomer(Customer customer, Guid id);
     Task DeleteCustomer(Guid id); 
     Task<Customer> GetCustomerByAccountId(Guid accountId);
+
+    Task RecordInteraction(Guid userId, Guid productId, ActionType action);
+
+    Task<List<Product>> RecommendForUser(Guid userId);
+
 }

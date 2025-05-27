@@ -59,6 +59,8 @@ public class AppDbContext : DbContext
     public DbSet<ItemInCart> ItemInCarts { get; set; }
     public DbSet<ItemInBill> ItemInBills { get; set; }
     public DbSet<Bill> Bills { get; set; }
+    
+    public DbSet<Interaction> Interactions { get; set; }
     public DbSet<VoucherWallet> VoucherWallets { get; set; }
     public DbSet<Admin> Admins { get; set; }
     public DbSet<CustomerInteraction> CustomerInteractions { get; set; }

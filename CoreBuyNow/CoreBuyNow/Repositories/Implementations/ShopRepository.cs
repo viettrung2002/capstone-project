@@ -127,6 +127,7 @@ public class ShopRepository (AppDbContext dbContext) : IShopRepository
         var soLuongDaHuy = await query
             .Where(b => b.ShopId == shopId && b.OrderStatus == OrderStatus.Cancelled)
             .CountAsync();
+        if (soLuongDaHoanThanh + soLuongDaHuy == 0) throw new Exception("No bill has been created.");
         return (double)soLuongDaHoanThanh/(soLuongDaHoanThanh+soLuongDaHuy);
 
     }

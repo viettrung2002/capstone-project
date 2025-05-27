@@ -4,7 +4,7 @@ import { FaFacebookF, FaInstagram } from "react-icons/fa6";
 import FeatureCategories from "@/app/components/feature_category";
 import Product from "@/app/components/product";
 import {ProductSale} from "@/app/components/product";
-import {useState, useEffect} from "react";
+import {useState, useEffect, useRef} from "react";
 import Image from "next/image";
 import {useRouter} from "next/navigation";
 import {IProduct} from "@/app/types/product";
@@ -37,6 +37,8 @@ export default function Home() {
     const token = Cookies.get("token");
     const role = Cookies.get("role");
     const id = Cookies.get("id");
+
+
     useEffect(() => {
 
         if (token != null && role == "Shop") {
@@ -151,286 +153,230 @@ export default function Home() {
         const secs = seconds % 60;
         return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
     };
+
+
     return (
-        <div className="Home bg-gray-200  flex flex-col items-center">
-            <div className="h-[60px] w-full bg-white border-b border-gray-300 flex flex-row items-center justify-center">
-                <div className="flex flex-row 2xl:w-[1300px] xl:w-[1280px]  h-full">
-                    <div className="flex flex-row w-[200px] h-full border-r border-gray-300 items-center relative"
-                         onMouseLeave={() => {
-                             const id = setTimeout(() => {
-                                 setIsOpen(false);
-                             }, 200); //
+        <div className="Home bg-white flex flex-col items-center z-10 relative ">
+            <div className={"w-full h-full fixed top-0 z-0"}>
+                <Image src={"/banner.png"} alt={"banner"} fill={true} style={{objectFit: "fill"}}/>
+            </div>
 
-                             setTimeoutId(id);
-                         }}
-                         onMouseEnter={() => {
-                             if (timeoutId) {
-                                 clearTimeout(timeoutId);
-                             }
-                             setIsOpen(true);
-                         }}>
-                        <HiOutlineBars3 className="text-[18px] mb-[2px]" />
-                        <p className={`font-sf text-cl-text text-[15px] ml-[10px] font-[500] select-none`}>Danh mục</p>
-                        {isOpen?
-                            (
-                                <ul className={`bg-gray-50 absolute top-[62px] border border-gray-200 w-[200px] pl-[30px] pt-[10px] pb-[10px] text-cl-text z-30`}>
-                                    <li onClick={()=> router.push("/categories")} className={`flex items-center w-full h-[35px] font-sf font-[400] text-[15px] hover:text-cl-hover-text `}>Smartphone</li>
-
-                                    <li className={`flex items-center w-full h-[35px] font-sf font-[400] text-[15px] hover:text-cl-hover-text `}>Laptop</li>
-                                    <li className={`flex items-center w-full h-[35px] font-sf font-[400] text-[15px] hover:text-cl-hover-text `}>Watch</li>
-                                    <li className={`flex items-center w-full h-[35px] font-sf font-[400] text-[15px] hover:text-cl-hover-text `}>Television</li>
-                                    <li className={`flex items-center w-full h-[35px] font-sf font-[400] text-[15px] hover:text-cl-hover-text `}>Video games</li>
-                                    <li className={`flex items-center w-full h-[35px] font-sf font-[400] text-[15px] hover:text-cl-hover-text `}>Camera</li>
-                                    <li className={`flex items-center w-full h-[35px] font-sf font-[400] text-[15px] hover:text-cl-hover-text `}>Headphone</li>
-
-                                </ul>
-                            ): null}
-
-                    </div>
-                    <div className=" w-[700px] flex flex-row text-cl-text">
-                        <p className={`select-none flex items-center h-full font-sf font-[500] text-[15px]  hover:text-cl-hover-text ml-[30px]`}>Trang chủ</p>
-                        <p className={`select-none flex items-center h-full font-sf font-[500] text-[15px]  hover:text-cl-hover-text ml-[30px]`}>Mã giảm giá</p>
-                        <p className={`select-none flex items-center h-full font-sf font-[500] text-[15px]  hover:text-cl-hover-text ml-[30px]`}>Top Products</p>
-                        <p onClick={()=> {
-                            const role = Cookies.get("role");
-                            const id = Cookies.get("id");
-                            if (role == "shop") router.push(`/seller/${id}`);
-                        }} className={`select-none flex items-center h-full font-sf font-[500] text-[15px]  hover:text-cl-hover-text ml-[30px]`}>Kênh người bán</p>
-
-                    </div>
-
-                    <ul className="ml-auto h-full flex flex-row text-cl-text items-center">
-                        <li className={`select-none flex items-center h-full font-sf font-[500] text-[15px]  ml-[30px]`}>Contact us:</li>
-                        <li className={`w-[35px] h-[35px] border border-gray-300 rounded-full flex items-center justify-center hover:bg-cl-button hover:text-cl-button-text transform duration-300 ml-[15px]`}>
-                            <FaFacebookF className="text-[20px]" />
-                        </li>
-                        <li className={`w-[35px] h-[35px] border border-gray-300 rounded-full flex items-center justify-center hover:bg-cl-button hover:text-cl-button-text transform duration-300 ml-[10px]`}>
-                            <FaInstagram className="text-[20px]"/>
-                        </li>
-                    </ul>
-                </div>
+            <div className="h-screen w-full mt-[15px] flex flex-col justify-center z-20 font-sf pl-[100px] pb-[180px]">
+                <p className={"font-[500] text-neutral-700 text-[17px] "}>BuyNow</p>
+                <p className={" font-[800] text-[40px]"}>KHÁM PHÁ THẾ GIỚI CÔNG NGHỆ</p>
+                <p className={"w-1/3 font-[400] text-neutral-700"}>
+                    Trải nghiệm mua sắm sản phẩm công nghệ thông minh, nhanh chóng và đáng tin cậy. Khám phá ngay hàng ngàn lựa chọn chính hãng, cập nhật xu hướng công nghệ một cách dễ dàng và tận hưởng cuộc sống hiện đại hơn mỗi ngày!
+                </p>
+                <button
+                    onClick={() => {
+                        const section = document.getElementById("section-to-scroll");
+                        if (section) {
+                            section.scrollIntoView({ behavior: "smooth" });
+                        }
+                    }}
+                    className={"w-[150px] rounded-full py-[8px] bg-neutral-700 mt-[20px] text-neutral-50 hover:bg-amber-600"}>
+                    KHÁM PHÁ NGAY
+                </button>
 
             </div>
             {/*Banner*/}
-            <div className="h-[500px] 2xl:w-[1300px] xl:w-[1280px]  mt-[15px]">
-                <div className=" h-full grid grid-cols-3 gap-[20px] ">
-                    <div className={`col-span-2 overflow-hidden relative`} >
-                        <div
-                            className=" h-full w-full flex transition-transform duration-500 "
-                            style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-                        >
-                            {slides.map((slide) => (
-                                <div
-                                    key={slide.id}
-                                    className={`w-full h-full flex items-center justify-center text-white text-2xl font-bold flex-shrink-0 relative`}
-                                >
-                                    <Image src={slide.bgURL} alt={"banner"} layout="fill" />
-                                    {slide.text}
+
+
+            {/*Categories*/}
+            <div id={"section-to-scroll"} className={"w-full z-10 bg-white flex flex-col items-center shadow-[0px_-40px_40px_rgba(0,0,0,0.2)] "}>
+                <div className={"w-full z-10 bg-white flex justify-center scroll-m-0 h-screen snap-center"}>
+                    <div className="2xl:w-[1300px] xl:w-[1000px]  items-center  justify-center mt-[30px]  ">
+                        <div className={` flex flex-col justify-center items-center`}>
+                            <p className={`font-sf font-[800] text-[35px] text-neutral-800`}>DANH MỤC SẢN PHẨM</p>
+                            <p className={"font-sf font-[500] text-[14px] text-neutral-600 w-[600px] text-center"}>Tất cả sản phẩm công nghệ bạn cần, được phân loại rõ ràng để bạn dễ dàng lựa chọn với hàng ngàn lựa chọn hấp dẫn trong mỗi danh mục.</p>
+                            <div className={`border-b border-blue-400 w-[70px] mt-[15px] mb-[15px]`}></div>
+                        </div>
+                        <div className={`grid grid-cols-4 2xl:gap-[30px] xl:gap-[20px] w-full mt-[10px]`}>
+                            {category.map((category) => (
+                                <FeatureCategories category={category} key={category.categoryId}/>
+                            ))}
+
+                        </div>
+                    </div>
+                </div>
+
+
+                {/*Categories*/}
+                {flashSaleProducts.length == 0 ? null :
+                    <div className={"2xl:w-[1300px] xl:w-[1280px] bg-white pb-[30px] pt-[20px] mt-[30px] flex flex-col "}>
+
+                        <div className={` 2xl:w-[1300px] xl:w-[1280px] relative  `}>
+                            <div className={`h-[50px] w-full pr-[60px] pl-[30px] mb-[20px]  flex items-center justify-between`}>
+                                <div className={`flex items-center`}>
+                                    <p className={`font-sf font-[400] text-[20px] text-cl-text mr-[20px]`}>FLASH SALE</p>
+                                    <div className={`w-[180px] h-[40px] flex border border-neutral-200 rounded-[4px] pl-[25px] bg-white items-center`}>
+                                        <p className={`font-[500] font-sf text-[14px] text-neutral-500`}>End in:</p>
+                                        <p className={`font-[500] font-sf text-[17px] text-neutral-800 ml-[10px]`}>{formatTime(timeLeft)}</p>
+                                    </div>
                                 </div>
-                            ))}
-                        </div>
-                        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-                            {slides.map((_, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() => setCurrentIndex(index)}
-                                    className={`w-3 h-3 rounded-full transition-colors ${currentIndex === index ? 'bg-white' : 'bg-gray-400'}`}
-                                />
-                            ))}
-                        </div>
-                    </div>
-                    <div className={`col-span-1 grid grid-rows-2 gap-[20px]`}>
-                        <div className={`flex flex-col col-span-1 relative justify-center `}>
-                            <div className={`z-10 ml-[30px]`}>
-                                <p className={`font-sf text-gray-500 text-[15px]`}>New line required</p>
-                                <p className={`font-sf font-[600] text-cl-text text-[22px]`}>iPhone 12 Pro Max</p>
-                                <p className={`font-sf-compact font-[700] text-cl-hover-text text-[22px]`}>$259.99</p>
+
+                                <button className={`flex items-center text-neutral-800 hover:text-blue-600`}>
+                                    <p className={`font-[400] font-sf text-[16px] `}>Xem tất cả</p>
+                                    <HiArrowRight className={`text-[20px] ml-[6px] mb-[1px]`}/>
+                                </button>
+
                             </div>
 
-                            <Image src={"/banner/slider-bnr.jpg"} alt={"banner"} layout={"fill"}  />
-                        </div>
-                        <div className={`col-span-1 border `}>
 
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {/*Banner*/}
-            {/*Categories*/}
-            <div className="2xl:w-[1300px] xl:w-[1280px]  items-center justify-center mt-[30px]  pt-[20px] p-[30px]">
-                <div className={` flex flex-col `}>
-                    <p className={`font-sf font-[400] text-[20px] text-cl-text`}>DANH MỤC</p>
-                    {/*<div className={`border-b border-[2px] border-blue-600 w-[50px] mt-[4px]`}></div>*/}
-                </div>
-                <div className={`grid grid-cols-8 gap-[10px] w-full mt-[10px]`}>
-                    {category.map((category) => (
-                        <FeatureCategories category={category} key={category.categoryId}/>
-                    ))}
+                            <div className={`flex h-full w-full justify-center items-center  relative`}>
+                                <button onClick={()=> {
+                                    if (transformSale >= 1)
+                                        setTransformSale(transformSale - 1)
+                                }} className={`absolute left-[-20px] w-[40px] h-[40px] rounded-full bg-white shadow-[0px_3px_7px_rgba(0,0,0,0.2)] flex items-center justify-center hover:bg-blue-500 hover:text-neutral-50 transition-all duration-200 z-20`}>
+                                    <HiArrowLeft className={`text-[20px]`} />
+                                </button>
+                                <button onClick={()=> {
+                                    if (transformSale >= 0)
+                                        setTransformSale(transformSale + 1)
+                                }} className={`absolute right-[-20px] w-[40px] h-[40px] rounded-full bg-white shadow-[0px_3px_7px_rgba(0,0,0,0.2)] flex items-center justify-center hover:bg-blue-500 hover:text-neutral-50 transition-all duration-200 z-20`}>
+                                    <HiArrowRight className={`text-[20px]`} />
+                                </button>
+                                <div className={` w-[calc(100%-60px)] relative overflow-hidden `}>
+                                    <div
+                                        className={`w-full grid gap-[10px] grid-cols-6 py-[10px] px-[5px] relative items-center transition-transform `}
+                                        style={{ transform: `translateX(-${transformSale * 50}%)` }}>
 
-                </div>
-            </div>
+                                        {flashSaleProducts.map((product) => (
+                                            <ProductSale product={product} key={product.productId} />
+                                        ))}
 
-            {/*Categories*/}
-            {flashSaleProducts.length == 0 ? null :
-            <div className={"2xl:w-[1300px] xl:w-[1280px] bg-white pb-[30px] pt-[20px] mt-[30px] flex flex-col "}>
-
-                <div className={` 2xl:w-[1300px] xl:w-[1280px] relative  `}>
-                    <div className={`h-[50px] w-full pr-[60px] pl-[30px] mb-[20px]  flex items-center justify-between`}>
-                        <div className={`flex items-center`}>
-                            <p className={`font-sf font-[400] text-[20px] text-cl-text mr-[20px]`}>FLASH SALE</p>
-                            <div className={`w-[180px] h-[40px] flex border border-gray-200 rounded-[4px] pl-[25px] bg-white items-center`}>
-                                <p className={`font-[500] font-sf text-[14px] text-gray-500`}>End in:</p>
-                                <p className={`font-[500] font-sf text-[17px] text-gray-800 ml-[10px]`}>{formatTime(timeLeft)}</p>
+                                    </div>
+                                </div>
                             </div>
+
+
+
                         </div>
+                    </div>}
+                {/*Flash Sale*/}
 
-                        <button className={`flex items-center text-gray-800 hover:text-blue-600`}>
-                            <p className={`font-[400] font-sf text-[16px] `}>Xem tất cả</p>
-                            <HiArrowRight className={`text-[20px] ml-[6px] mb-[1px]`}/>
-                        </button>
+                {/*Flash Sale*/}
+                {/*Trending*/}
 
+                <div className={"w-full bg-white flex items-center justify-center"}>
+                    <div className="2xl:w-[1300px] xl:w-[1000px] h-screen flex items-center  mt-[30px] flex-col pt-[30px] ">
+                        <div className="w-full flex items-center justify-center">
+                            <div className={`w-full flex flex-col justify-center items-center`}>
+                                <p className={`font-sf font-[800] text-[35px] text-neutral-800`}>SẢN PHẨM ĐƯỢC YÊU THÍCH</p>
+                                <p className={"font-sf font-[500] text-[14px] text-neutral-600 w-[600px] text-center"}>Khám phá những sản phẩm công nghệ được yêu thích nhất hiện nay, với doanh số ấn tượng và đánh giá cao từ người dùng.</p>
+                                <div className={`border-b  border-blue-400 w-[70px] mt-[15px] mb-[15px]`}></div>
+                                {/*<p className={`text-center font-sf font-[400] text-neutral-500 mt-[20px]`}>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form.</p>*/}
+                            </div>
+
+                        </div>
+                        <div className={`grid gap-[20px] grid-cols-5 w-full mt-[10px]`}>
+                            {trendingProducts.map((product) => (
+                                <Product product={product} key={product.productId} />
+                            ))}
+
+                        </div>
                     </div>
+                </div>
 
 
+                {/*Trending*/}
+
+                {/*<div className={`2xl:w-[1300px] xl:w-[1280px] h-[380px] bg-white mt-[30px] grid grid-cols-3 gap-[30px] mb-[50px] shadow-[0px_0px_5px_rgba(0,0,0,0.2)] rounded-[5px]`}>*/}
+                {/*    <div className={`col-span-1 p-[30px] `}>*/}
+                {/*        <div>*/}
+                {/*            <p className={`font-sf font-[600] text-[18px] text-neutral-800 ml-[6px]`}>Best sellers</p>*/}
+                {/*            <div className={`flex`}>*/}
+                {/*                <div className={`border-t border-blue-500 w-[110px] `}></div>*/}
+                {/*                <div className={`flex-1 border-t border-neutral-300`}></div>*/}
+                {/*            </div>*/}
+                {/*        </div>*/}
+                {/*        <div className={` h-[250px] flex flex-col justify-between mt-[20px]`}>*/}
+                {/*            {products.slice(0,3).map((product) => (*/}
+                {/*                <MiniProduct product={product} key={product.id} />*/}
+                {/*            ))}*/}
+                {/*        </div>*/}
+                {/*    </div>*/}
+                {/*    <div className={`col-span-1 p-[30px]`}>*/}
+                {/*        <div>*/}
+                {/*            <p className={`font-sf text-[18px] font-[600] text-neutral-800 ml-[6px]`}>New arrivals</p>*/}
+                {/*            <div className={`flex`}>*/}
+                {/*                <div className={`border-t border-blue-500 w-[120px] `}></div>*/}
+                {/*                <div className={`flex-1 border-t border-neutral-300`}></div>*/}
+                {/*            </div>*/}
+                {/*        </div>*/}
+                {/*        <div className={` h-[250px] flex flex-col justify-between mt-[20px]`}>*/}
+                {/*            {products.slice(0,3).map((product) => (*/}
+                {/*                <MiniProduct product={product} key={product.id} />*/}
+                {/*            ))}*/}
+                {/*        </div>*/}
+                {/*    </div>*/}
+                {/*    <div className={`col-span-1 p-[30px]`}>*/}
+                {/*        <div>*/}
+                {/*            <p className={`font-sf text-[18px] font-[600] text-neutral-800 ml-[6px]`}>Top rated</p>*/}
+                {/*            <div className={`flex`}>*/}
+                {/*                <div className={`border-t border-blue-500 w-[100px] `}></div>*/}
+                {/*                <div className={`flex-1 border-t border-neutral-300`}></div>*/}
+                {/*            </div>*/}
+                {/*        </div>*/}
+                {/*        <div className={` h-[250px] flex flex-col justify-between mt-[20px]`}>*/}
+                {/*            {products.slice(0,3).map((product) => (*/}
+                {/*                <MiniProduct product={product} key={product.id} />*/}
+                {/*            ))}*/}
+                {/*        </div>*/}
+                {/*    </div>*/}
+                {/*</div>*/}
+
+                {/*Mall*/}
+                <div className="2xl:w-[1300px] xl:w-[1280px]  flex items-center justify-center mt-[50px]">
+                    <div className={`w-[600px] flex flex-col items-center`}>
+                        <p className={`font-sf font-[500] text-[30px] text-cl-text`}>Shop chính hãng</p>
+                        <div className={`border-b border-[2px] border-blue-600 w-[50px] mt-[4px]`}></div>
+                        {/*<p className={`text-center font-sf font-[400] text-neutral-500 mt-[20px]`}>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form.</p>*/}
+                    </div>
+                </div>
+                <div className={` 2xl:w-[1300px] xl:w-[1280px] mt-[30px] relative `}>
                     <div className={`flex h-full w-full justify-center items-center  relative`}>
                         <button onClick={()=> {
-                            if (transformSale >= 1)
-                                setTransformSale(transformSale - 1)
-                        }} className={`absolute left-[-20px] w-[40px] h-[40px] rounded-full bg-white shadow-[0px_3px_7px_rgba(0,0,0,0.2)] flex items-center justify-center hover:bg-blue-500 hover:text-gray-50 transition-all duration-200 z-20`}>
+                            if (transformOfficialShop >= 1)
+                                setTransformOfficialShop(transformOfficialShop - 1)
+                        }} className={`absolute left-0 w-[40px] h-[40px] rounded-full bg-white shadow-[0px_3px_7px_rgba(0,0,0,0.2)] flex items-center justify-center hover:bg-blue-500 hover:text-neutral-50 transition-all duration-200 z-20`}>
                             <HiArrowLeft className={`text-[20px]`} />
                         </button>
                         <button onClick={()=> {
-                            if (transformSale >= 0)
-                                setTransformSale(transformSale + 1)
-                        }} className={`absolute right-[-20px] w-[40px] h-[40px] rounded-full bg-white shadow-[0px_3px_7px_rgba(0,0,0,0.2)] flex items-center justify-center hover:bg-blue-500 hover:text-gray-50 transition-all duration-200 z-20`}>
+                            if (transformOfficialShop >= 0)
+                                setTransformOfficialShop(transformOfficialShop + 1)
+                        }} className={`absolute right-0 w-[40px] h-[40px] rounded-full bg-white shadow-[0px_3px_7px_rgba(0,0,0,0.2)] flex items-center justify-center hover:bg-blue-500 hover:text-neutral-50 transition-all duration-200 z-20`}>
                             <HiArrowRight className={`text-[20px]`} />
                         </button>
-                        <div className={` w-[calc(100%-60px)] relative overflow-hidden `}>
+                        <div className={` w-[calc(100%-100px)] h-[180px] flex relative overflow-hidden`}>
                             <div
-                                className={`w-full grid gap-[10px] grid-cols-6 py-[10px] px-[5px] relative items-center transition-transform `}
-                                style={{ transform: `translateX(-${transformSale * 50}%)` }}>
+                                className={`w-full p-[5px] flex items-center transition-transform  `}
+                                style={{ transform: `translateX(-${transformOfficialShop * 50}%)` }}>
 
-                                {flashSaleProducts.map((product) => (
-                                    <ProductSale product={product} key={product.productId} />
+                                {officialShops.map((shop) => (
+                                    <button key ={shop.id} className={`w-[calc((100%-50px)/6)] mr-[10px] h-[100px]  pt-[10px] pb-[10px] pl-[30px] pr-[30px] box-border shadow flex justify-center items-center flex-shrink-0`}>
+                                        <div className={`w-full h-full flex justify-center items-center relative`}>
+                                            <Image src={shop.image} alt={"image"} layout="fill" objectFit="contain" />
+                                        </div>
+
+
+                                    </button>
                                 ))}
 
                             </div>
                         </div>
                     </div>
-
-
-
                 </div>
-            </div>}
-            {/*Flash Sale*/}
+                <div className={"h-screen w-full bg-neutral-300 flex items-center justify-center "}>
 
-            {/*Flash Sale*/}
-            {/*Trending*/}
+                    <p className={"text-neutral-800 font-sf font-[600] hover:text-amber-500"}>TRANG CHU</p>
+                    <div className={"w-[300px] h-[500px] bg-neutral-600 flex"}>
 
-            <div className="2xl:w-[1300px] xl:w-[1280px]  flex items-center justify-center mt-[30px] flex-col  pb-[30px] pt-[20px] px-[30px]">
-                <div className="w-full flex items-center justify-center">
-                    <div className={`w-full flex flex-col`}>
-                        <p className={`font-sf font-[400] text-[20px] text-cl-text mr-[20px]`}>SẢN PHẨM ĐƯỢC YÊU THÍCH</p>
-                        {/*<p className={`text-center font-sf font-[400] text-gray-500 mt-[20px]`}>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form.</p>*/}
-                    </div>
-
-                </div>
-                <div className={`grid gap-[20px] grid-cols-5 w-full mt-[10px]`}>
-                    {trendingProducts.map((product) => (
-                        <Product product={product} key={product.productId} />
-                    ))}
-
-                </div>
-            </div>
-            
-            {/*Trending*/}
-
-            {/*<div className={`2xl:w-[1300px] xl:w-[1280px] h-[380px] bg-white mt-[30px] grid grid-cols-3 gap-[30px] mb-[50px] shadow-[0px_0px_5px_rgba(0,0,0,0.2)] rounded-[5px]`}>*/}
-            {/*    <div className={`col-span-1 p-[30px] `}>*/}
-            {/*        <div>*/}
-            {/*            <p className={`font-sf font-[600] text-[18px] text-gray-800 ml-[6px]`}>Best sellers</p>*/}
-            {/*            <div className={`flex`}>*/}
-            {/*                <div className={`border-t border-blue-500 w-[110px] `}></div>*/}
-            {/*                <div className={`flex-1 border-t border-gray-300`}></div>*/}
-            {/*            </div>*/}
-            {/*        </div>*/}
-            {/*        <div className={` h-[250px] flex flex-col justify-between mt-[20px]`}>*/}
-            {/*            {products.slice(0,3).map((product) => (*/}
-            {/*                <MiniProduct product={product} key={product.id} />*/}
-            {/*            ))}*/}
-            {/*        </div>*/}
-            {/*    </div>*/}
-            {/*    <div className={`col-span-1 p-[30px]`}>*/}
-            {/*        <div>*/}
-            {/*            <p className={`font-sf text-[18px] font-[600] text-gray-800 ml-[6px]`}>New arrivals</p>*/}
-            {/*            <div className={`flex`}>*/}
-            {/*                <div className={`border-t border-blue-500 w-[120px] `}></div>*/}
-            {/*                <div className={`flex-1 border-t border-gray-300`}></div>*/}
-            {/*            </div>*/}
-            {/*        </div>*/}
-            {/*        <div className={` h-[250px] flex flex-col justify-between mt-[20px]`}>*/}
-            {/*            {products.slice(0,3).map((product) => (*/}
-            {/*                <MiniProduct product={product} key={product.id} />*/}
-            {/*            ))}*/}
-            {/*        </div>*/}
-            {/*    </div>*/}
-            {/*    <div className={`col-span-1 p-[30px]`}>*/}
-            {/*        <div>*/}
-            {/*            <p className={`font-sf text-[18px] font-[600] text-gray-800 ml-[6px]`}>Top rated</p>*/}
-            {/*            <div className={`flex`}>*/}
-            {/*                <div className={`border-t border-blue-500 w-[100px] `}></div>*/}
-            {/*                <div className={`flex-1 border-t border-gray-300`}></div>*/}
-            {/*            </div>*/}
-            {/*        </div>*/}
-            {/*        <div className={` h-[250px] flex flex-col justify-between mt-[20px]`}>*/}
-            {/*            {products.slice(0,3).map((product) => (*/}
-            {/*                <MiniProduct product={product} key={product.id} />*/}
-            {/*            ))}*/}
-            {/*        </div>*/}
-            {/*    </div>*/}
-            {/*</div>*/}
-
-            {/*Mall*/}
-            <div className="2xl:w-[1300px] xl:w-[1280px]  flex items-center justify-center mt-[50px]">
-                <div className={`w-[600px] flex flex-col items-center`}>
-                    <p className={`font-sf font-[500] text-[30px] text-cl-text`}>Shop chính hãng</p>
-                    <div className={`border-b border-[2px] border-blue-600 w-[50px] mt-[4px]`}></div>
-                    {/*<p className={`text-center font-sf font-[400] text-gray-500 mt-[20px]`}>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form.</p>*/}
-                </div>
-            </div>
-            <div className={` 2xl:w-[1300px] xl:w-[1280px] mt-[30px] relative `}>
-                <div className={`flex h-full w-full justify-center items-center  relative`}>
-                    <button onClick={()=> {
-                        if (transformOfficialShop >= 1)
-                            setTransformOfficialShop(transformOfficialShop - 1)
-                    }} className={`absolute left-0 w-[40px] h-[40px] rounded-full bg-white shadow-[0px_3px_7px_rgba(0,0,0,0.2)] flex items-center justify-center hover:bg-blue-500 hover:text-gray-50 transition-all duration-200 z-20`}>
-                        <HiArrowLeft className={`text-[20px]`} />
-                    </button>
-                    <button onClick={()=> {
-                        if (transformOfficialShop >= 0)
-                            setTransformOfficialShop(transformOfficialShop + 1)
-                    }} className={`absolute right-0 w-[40px] h-[40px] rounded-full bg-white shadow-[0px_3px_7px_rgba(0,0,0,0.2)] flex items-center justify-center hover:bg-blue-500 hover:text-gray-50 transition-all duration-200 z-20`}>
-                        <HiArrowRight className={`text-[20px]`} />
-                    </button>
-                    <div className={` w-[calc(100%-100px)] h-[180px] flex relative overflow-hidden`}>
-                        <div
-                            className={`w-full p-[5px] flex items-center transition-transform  `}
-                            style={{ transform: `translateX(-${transformOfficialShop * 50}%)` }}>
-
-                            {officialShops.map((shop) => (
-                                <button key ={shop.id} className={`w-[calc((100%-50px)/6)] mr-[10px] h-[100px]  pt-[10px] pb-[10px] pl-[30px] pr-[30px] box-border shadow flex justify-center items-center flex-shrink-0`}>
-                                    <div className={`w-full h-full flex justify-center items-center relative`}>
-                                        <Image src={shop.image} alt={"image"} layout="fill" objectFit="contain" />
-                                    </div>
-
-
-                                </button>
-                            ))}
-
-                        </div>
                     </div>
                 </div>
             </div>
+
+
 
             {/*Mall*/}
         </div>

@@ -25,6 +25,8 @@ public class Product
     public string? MainImage { get; set; }
     [Url]
     public string? ExtraImage { get; set; }
+    
+    public string? Description { get; set; }
     public int Sold { get; set; }
     [Required]
     public DateTime CreatedDate { get; set; }
@@ -34,4 +36,7 @@ public class Product
     [Column(TypeName = "json")] 
     public Dictionary<string, string> Specifications { get; set; } = new ();
     public bool IsFlashSale { get; set; }
+    
+    [Column(TypeName = "json")]
+    public double[] Vector { get; set; } = [];
 }

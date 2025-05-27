@@ -69,35 +69,35 @@ export default function LoginPage() {
             <div className={`w-[500px] h-[600px] rounded-[5px] shadow-[0px_0px_5px_rgba(0,0,0,0.2)] flex flex-col items-center bg-white mb-[50px]`}>
                 <div className={`h-[120px] w-[400px] flex justify-center items-center pt-[20px] text-gray-700 border-b border-gray-200`}>
                     <FaCircleUser className={`text-[40px] `} />
-                    <span className={`font-fre font-[700] text-[35px] ml-[10px]`}>SIGN IN</span>
+                    <span className={`font-sf font-[800] text-[35px] ml-[10px]`}>ĐĂNG NHẬP</span>
                 </div>
                 <div className={`w-[400px] flex flex-col mt-[30px]`}>
-                    <span className={`font-pop text-gray-700 font-[500] text-[20px]`}>USERNAME</span>
+                    <span className={`font-sf text-gray-700 font-[600] text-[20px]`}>TÊN ĐĂNG NHẬP</span>
                     <input
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
-                        placeholder="Enter your username"
-                        className={`flex mt-[10px] items-center font-pop w-full focus:outline-none h-[45px] border-gray-200 border rounded-[4px] px-[15px]`}
+                        placeholder="Nhập tài khoản của bạn"
+                        className={`flex mt-[10px] items-center font-sf w-full focus:outline-none h-[45px] border-gray-200 border rounded-[4px] px-[15px]`}
                     />
                 </div>
                 <div className={`w-[400px] flex flex-col mt-[20px]`}>
-                    <span className={`font-pop text-gray-700 font-[500] text-[20px]`}>PASSWORD</span>
+                    <span className={`font-sf text-gray-700 font-[600] text-[20px]`}>MẬT KHẨU</span>
                     <input
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Enter your password"
-                        className={`flex mt-[10px] items-center font-pop w-full focus:outline-none h-[45px] border-gray-200 border rounded-[4px] px-[15px]`}
+                        placeholder="Nhập mật khẩu của bạn"
+                        className={`flex mt-[10px] items-center font-sf w-full focus:outline-none h-[45px] border-gray-200 border rounded-[4px] px-[15px]`}
                     />
                 </div>
                 <div className={`w-[400px] flex flex-col mt-[10px]`}>
-                    <span className={`font-pop text-blue-500 font-[300] text-[15px]`}>Forgot password?</span>
+                    <span className={`font-sf text-blue-500 font-[400] text-[15px]`}>Quên mật khẩu?</span>
                 </div>
                 <div className={`w-[400px] h-[45px]  mt-[30px] grid grid-cols-10 gap-[10px] rounded-[4px]`}>
                     <div className={`col-span-7 flex rounded-[4px] bg-blue-500 justify-center items-center hover:bg-gray-700 transition-all duration-200`} onClick={handleLogin}>
-                        <span className={`text-gray-50 font-pop text-[20px] font-[600] select-none`}>Sign in</span>
+                        <span className={`text-gray-50 font-sf text-[20px] font-[600] select-none`}>ĐĂNG NHẬP</span>
                     </div>
                     <button onClick={()=> router.push("/register")} className={`col-span-3 flex rounded-[4px] bg-blue-500 justify-center items-center hover:bg-gray-700 transition-all duration-200`}>
-                        <span className={`text-gray-50 font-pop text-[15px] font-[400] select-none`}>Sign up</span>
+                        <span className={`text-gray-50 font-sf text-[15px] font-[400] select-none`}>ĐĂNG KÝ</span>
                         <FaCircleChevronRight className={`text-gray-50 text-[18px] ml-[10px]`} />
                     </button>
                 </div>
@@ -105,18 +105,18 @@ export default function LoginPage() {
                     <div className={`flex-1 border-b h-[1px] border-gray-200`}>
 
                     </div>
-                    <p className={`text-gray-400 font-pop text-[16px] font-[300] px-[10px]`}>OR</p>
+                    <p className={`text-gray-400 font-sf text-[16px] font-[300] px-[10px]`}>hoặc</p>
                     <div className={`flex-1 border-b h-[1px] border-gray-200`}>
                     </div>
                 </div>
                 <div className={`w-[300px] h-[45px] grid grid-cols-2 gap-[20px] mt-[20px]`}>
                     <div className={`col-span-1 rounded-[4px] border-gray-200 border flex items-center pl-[10px] group hover:bg-gray-700 transition-all duration-300 `}>
                         <FaGoogle className="text-[20px] text-blue-500 group-hover:text-gray-50  " />
-                        <p className={`font-pop text-gray-700 text-[15px] font-[500] group-hover:text-gray-50 text-center flex-1 select-none`}>Google</p>
+                        <p className={`font-sf text-gray-700 text-[15px] font-[500] group-hover:text-gray-50 text-center flex-1 select-none`}>Google</p>
                     </div>
                     <div className={`col-span-1 rounded-[4px] border-gray-200 border flex items-center pl-[10px] group hover:bg-gray-700`}>
                         <FaFacebook className="text-[20px] text-blue-500  group-hover:text-gray-50" />
-                        <p className={`font-pop text-gray-700 text-[15px] font-[500] text-center flex-1 select-none group-hover:text-gray-50`}>Facebook</p>
+                        <p className={`font-sf text-gray-700 text-[15px] font-[500] text-center flex-1 select-none group-hover:text-gray-50`}>Facebook</p>
                     </div>
                 </div>
 

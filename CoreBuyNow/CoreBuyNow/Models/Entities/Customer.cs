@@ -23,6 +23,10 @@ public class Customer
     [ForeignKey("AccountId")]
     [JsonIgnore]
     public Account? Account { get; set; }
-    public List<CustomerInteraction> Interactions { get; set; }
-    
+    public List<Interaction> Interactions { get; set; }
+
+    public double[] Vector { get; set; } = [];
+
+
+
 }

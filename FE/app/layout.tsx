@@ -5,13 +5,14 @@ import localFont from "next/font/local";
 import Navbar from "@/app/components/navbar";
 import Footer from "@/app/components/footer";
 import {cookies} from "next/headers";
+import Compare from "@/app/components/compare";
 const sfProRounded = localFont({
     src: [
-        { path: "../public/fonts/SFProRounded-Regular.woff2", weight: "400" },
-        { path: "../public/fonts/SFProRounded-Bold.woff2", weight: "700" },
-        { path: "../public/fonts/SFProRounded-Semibold.woff2", weight: "600" },
-        { path: "../public/fonts/SFProRounded-Medium.woff2", weight: "500" },
-        { path: "../public/fonts/SFProRounded-Black.woff2", weight: "900" },
+        { path: "../public/fonts/SFProDisplay-Regular.woff2", weight: "400" },
+        { path: "../public/fonts/SFProDisplay-Bold.woff2", weight: "700" },
+        { path: "../public/fonts/SFProDisplay-Semibold.woff2", weight: "600" },
+        { path: "../public/fonts/SFProDisplay-Medium.woff2", weight: "500" },
+        { path: "../public/fonts/SFProDisplay-Black.woff2", weight: "900" },
 
     ],
     variable: "--font-sf",
@@ -54,16 +55,14 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('token')?.value;
-    const role = cookieStore.get('role')?.value;
+
   return (
     <html lang="en">
-      <body  className={`${sfProRounded.variable} ${quicksand.variable} ${fre.variable} ${sfCompactRounded.variable} ${pop.variable}`} >
-      {token != null && role == "Shop" ?  null : <Navbar/>}
-
+      <body  className={`${sfProRounded.variable} ${quicksand.variable} ${fre.variable} ${sfCompactRounded.variable} ${pop.variable} flex items-center flex-col`} >
+      <Navbar/>
         {children}
-        <Footer/>
+      <Compare/>
+      <Footer/>
       </body>
     </html>
   );

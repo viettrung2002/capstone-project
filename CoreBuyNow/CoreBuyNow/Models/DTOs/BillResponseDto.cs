@@ -14,3 +14,13 @@ public class BillResponseDto
     public List<ItemInBill>? Items { get; set; }
     
 }
+
+public class BillInShopPage
+{
+    public Guid BillId { set; get; }
+    public string? CustomerName { get; set; }
+    public decimal TotalPrice { get; set; }
+    public OrderStatus OrderStatus { get; set; }
+    
+    
+}

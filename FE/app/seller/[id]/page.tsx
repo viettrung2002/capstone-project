@@ -18,26 +18,7 @@ export default function Seller () {
     const router = useRouter();
     return (
         <div className="w-full bg-gray-200 flex justify-center items-center flex-col">
-            <div className={"w-full h-[50px] bg-white shadow-md flex items-center justify-center"}>
-                <div className={"w-[1300px] h-full flex justify-end items-center"}>
-                    <div className={"flex h-[40px] font-sf  items-center px-[3px] pr-[10px] border border-gray-200 rounded-full"}>
-                        <div className={" h-[34px] w-[34px] bg-gray-200 rounded-full mr-[10px] flex items-center justify-center text-[20px] text-gray-700"}>
-                            <TbUser/>
-                        </div>
-                        <p className={"text-gray-800 text-[15px]"}>Viet Trung</p>
-                    </div>
-                    <button onClick={()=>{
-                        Cookies.remove("id");
-                        Cookies.remove("token");
-                        Cookies.remove("role");
-                        router.push("/");
-                    }} className={"flex justify-center items-center rounded-full h-[40px] w-[40px] border ml-[10px] bg-gray-700 text-gray-50 text-[20px] pl-[2px]"}>
-                        <TbLogout/>
-                    </button>
 
-
-                </div>
-            </div>
             <div className={`w-[1300px] grid grid-cols-5 gap-[20px] mt-[20px]`}>
                 <div className={"col-span-1"}>
                     <div className={"flex h-[30px] pl-[15px] items-center mt-[20px]"}>

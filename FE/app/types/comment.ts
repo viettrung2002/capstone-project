@@ -7,3 +7,8 @@ export interface IComment {
         customerName: string;
         rating: number;
     }
+export interface ICommentReq {
+        productId: string;
+        content: string;
+        rating: number;
+}

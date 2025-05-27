@@ -7,13 +7,20 @@ export default function FeatureCategories({category}:{category: ICategory}) {
     const [seeAll, setSeeAll] = useState<boolean>(false);
     const router = useRouter();
     return (
-        <div onClick={()=> router.push(`categories/${category.categoryId}`)} className={`relative flex flex-col col-span-1 border border-gray-200  items-center p-[20px] justify-between bg-white `}>
-            <div className={` w-4/5 aspect-square flex items-center  rounded-full overflow-hidden mt-[10px]`}>
-                <Image src={"/products/product-2.jpg"} alt={"image"} width={200} height={200} className={"object-contain"} />
+        <div onClick={()=> router.push(`categories/${category.categoryId}`)} className={`group relative flex flex-col col-span-1  items-center 2xl:pb-[10px] xl:pb-[25px] justify-between bg-stone-200 rounded-[22px]  select-none `}>
+            <div className={`w-full aspect-square flex items-center  rounded-full overflow-hidden  relative justify-center group-hover:p-0 p-[10px] transform-all duration-200 `}>
+                <div className={"w-full h-full relative"}>
+                    <Image src={category.imageUrl} alt={"image"} fill={true} className={"object-contain"} />
+                </div>
+
             </div>
-            <div className={"h-[50px] flex  justify-center mt-[20px]"}>
-                <p className={`font-sf text-center font-[400] text-[15px] text-gray-800 `}>{category.categoryName}</p>
+            <div className={"w-full px-[10px]"}>
+                <div className={"w-full flex flex-col justify-center  bg-white py-[10px] opacity-80 rounded-[20px] hover:shadow-md  group 2xl:relative 2xl:bottom-0 xl:absolute xl:bottom-[10px]"}>
+                    <p className={`font-sf text-center font-[500] 2xl:text-[17px] xl:text-[15px] text-neutral-700 uppercase select-none group-hover:text-amber-600`}>{category.categoryName}</p>
+                    <p className={`font-sf text-center font-[500] 2xl:text-[14px] xl:text-[13px] text-neutral-500 `}>323 sản phẩm </p>
+                </div>
             </div>
+
 
         </div>
     )

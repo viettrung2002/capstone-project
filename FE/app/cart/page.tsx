@@ -8,15 +8,6 @@ import {useRouter} from "next/navigation";
 import {IProductInCart} from "@/app/types/product";
 import {IShop} from "@/app/types/shop";
 
-type Product = {
-    id: number;
-    name: string;
-    image: string;
-    price: number;
-    quantity: number;
-    shop_id: number;
-
-}
 
 export  default function Cart() {
     const router = useRouter();
@@ -182,11 +173,10 @@ export  default function Cart() {
     }
 
     function checkActivate () {
-
         return Object.values(localActiveItem).includes(false);
     }
     return (
-        <div className={"w-full flex justify-center flex-col items-center bg-gray-50"}>
+        <div className={"w-full flex justify-center flex-col items-center bg-white"}>
             <div className={`2xl:w-[1300px] xl:w-full h-[40px] mt-[10px]  items-center flex mb-[20px]`}>
                 <div className="flex items-center w-[250px] h-full  ">
                     <Breadcrumb breadcrumbs={breadcrumbs} />
@@ -196,33 +186,33 @@ export  default function Cart() {
             <div className={"w-[1300px] grid grid-cols-10 gap-5"}>
                 <div className="col-span-7">
                     <div className={"w-full flex bg-white"}>
-                        <div className={"w-full h-[50px] border border-gray-200 grid grid-cols-25 px-[20px]"}>
+                        <div className={"w-full h-[50px]  bg-stone-200 grid rounded-full grid-cols-25 px-[20px]"}>
                             <div className={"col-span-1 flex pl-[10px] items-center"}>
                                 <div onClick={()=> {
                                     if (checkActivate()){
                                         setLocalActiveItem(products.reduce((acc,p)=>({...acc, [p.itemId]: true}),{}))
                                     } else setLocalActiveItem(products.reduce((acc,p)=>({...acc, [p.itemId]: false}),{}))
                                 }
-                                } className={"h-[16px] w-[16px] border border-gray-200 flex items-center justify-center"}>
-                                    <div className={`w-[10px] h-[10px] ${checkActivate()? "bg-white" : "bg-gray-600"}`}>
+                                } className={"h-[16px] w-[16px] border border-stone-200 flex items-center justify-center"}>
+                                    <div className={`w-[10px] h-[10px] ${checkActivate()? "bg-white" : "bg-stone-600"}`}>
 
                                     </div>
                                 </div>
                             </div>
                             <div className={"col-span-8  flex items-center"}>
-                                <p className={"font-sf text-gray-600 text-[15px]"}>Sản phẩm</p>
+                                <p className={"font-sf text-stone-800 text-[15px]"}>Sản phẩm</p>
                             </div>
                             <div className={"col-span-5 flex items-center justify-center"}>
-                                <p className={"font-sf text-gray-600 text-[15px]"}>Đơn giá</p>
+                                <p className={"font-sf text-stone-800 text-[15px]"}>Đơn giá</p>
                             </div>
                             <div className={"col-span-3 flex items-center justify-center"}>
-                                <p className={"font-sf text-gray-600 text-[15px]"}>Số lượng</p>
+                                <p className={"font-sf text-stone-800 text-[15px]"}>Số lượng</p>
                             </div>
                             <div className={"col-span-5  flex items-center justify-center"}>
-                                <p className={"font-sf text-gray-600 text-[15px]"}>Số tiền</p>
+                                <p className={"font-sf text-stone-800 text-[15px]"}>Số tiền</p>
                             </div>
                             <div className={"col-span-3  flex items-center justify-center"}>
-                                <p className={"font-sf text-gray-600 text-[15px]"}>Thao tác</p>
+                                <p className={"font-sf text-stone-800 text-[15px]"}>Thao tác</p>
                             </div>
                         </div>
 
@@ -231,41 +221,41 @@ export  default function Cart() {
                     <div className={"w-full flex flex-col "}>
 
                         {shop.map((shop) => (
-                            <div key={shop.shopId} className={"w-full bg-white border border-gray-200 mt-[20px]"}>
-                                <div className={"w-full h-[40px] border-b border-gray-200 grid grid-cols-25 px-[20px]"}>
+                            <div key={shop.shopId} className={"w-full bg-white border border-stone-200 rounded-[25px] mt-[30px]"}>
+                                <div className={"w-full h-[10px]  px-[20px] relative"}>
                                     {/*<div className={"col-span-1 flex pl-[10px] items-center"}>*/}
-                                    {/*    <div  className={"h-[16px] w-[16px] border border-gray-200"}>*/}
+                                    {/*    <div  className={"h-[16px] w-[16px] border border-stone-200"}>*/}
 
                                     {/*    </div>*/}
                                     {/*</div>*/}
-                                    <div className={"col-span-10  flex items-center"}>
-                                        <p className={"col-span-10 text-[16px] font-sf"}>{shop.shopName}</p>
-                                    </div>
+
+                                        <p className={" text-[16px] absolute top-[-13px] font-sf text-stone-800 font-[500] uppercase px-[8px] bg-[white]"}>{shop.shopName}</p>
+
 
                                 </div>
                                 <div className={"w-full px-[20px]"}>
                                     {products.map((product) => (
                                         product.shopId === shop.shopId ? (
-                                            <div key={product.itemId} className={"w-full border-b border-gray-200 grid grid-cols-25 py-[5px]"}>
+                                            <div key={product.itemId} className={"w-full  border-stone-200 grid grid-cols-25 py-[5px]"}>
                                                 <div className={"col-span-1 flex pl-[10px] items-center"}>
                                                     <div onClick={()=> {
                                                         setLocalActiveItem((prev) => ({...prev,[product.itemId]: !prev[product.itemId]}))
-                                                    }} className={"h-[16px] w-[16px] border border-gray-200 flex justify-center items-center"}>
-                                                        <div className={`h-[10px] w-[10px] ${localActiveItem[product.itemId] ? "bg-gray-600" : "bg-white" }`}></div>
+                                                    }} className={"h-[18px] w-[18px] border border-stone-300 flex justify-center items-center rounded-full"}>
+                                                        <div className={`h-[12px] w-[12px] rounded-full ${localActiveItem[product.itemId] ? "bg-stone-600" : "bg-white" }`}></div>
                                                     </div>
                                                 </div>
                                                 <div className={"col-span-8 flex items-center"}>
-                                                    <div className={"relative w-[65px] h-[65px] border border-gray-200 mr-[10px]"}>
-                                                        <Image src={"/products/product-4.jpg"} alt={"image"} fill={true}/>
+                                                    <div className={"relative w-[80px] h-[80px] bg-stone-200 rounded-[20px] bg-radial mr-[10px]"}>
+                                                        <Image src={"/products/product-1.jpg"} alt={"image"} fill={true}/>
                                                     </div>
-                                                    <p className={"font-sf text-gray-600 text-[15px]"}>{product.productName}</p>
+                                                    <p className={"font-sf text-stone-700 font-[500] text-[15px]"}>{product.productName}</p>
                                                 </div>
                                                 <div className={"col-span-5 flex items-center justify-center"}>
-                                                    <p className={"font-sf text-gray-600 text-[15px]"}>{product.price}</p>
+                                                    <p className={"font-sf text-stone-600 text-[15px]"}>{product.price}</p>
                                                 </div>
                                                 <div className={"col-span-3 flex items-center justify-center"}>
-                                                    <div className={"w-[110px] h-[30px]  flex"}>
-                                                        <button onClick={()=> UpdateQuantity(product.itemId, product.quantity-1)} className={"h-[30px] w-[30px] border border-gray-200 flex justify-center items-center"}>
+                                                    <div className={"w-[110px] h-[35px] bg-stone-200 rounded-full px-[10px] overflow-hidden flex"}>
+                                                        <button onClick={()=> UpdateQuantity(product.itemId, product.quantity-1)} className={"h-[35px] w-[35px] border border-stone-200 flex justify-center items-center"}>
                                                             <HiMiniMinus/>
                                                         </button>
                                                         <input onChange={(e) => {
@@ -304,8 +294,8 @@ export  default function Cart() {
 
                                                             }, 1000); // 500ms sau khi ngưng gõ mới gọi
 
-                                                        }} type={"number"} className={"flex text-[16px] text-gray-700 font-sf w-[50px] h-full border border-gray-200 items-center  text-center"} value={localQuantity[product.itemId] ?? product.quantity} />
-                                                        <button onClick={()=> UpdateQuantity(product.itemId, product.quantity+1)} className={"h-[30px] w-[30px] border border-gray-200 flex justify-center items-center"}>
+                                                        }} type={"number"} className={" appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none flex text-[16px] text-stone-700 font-sf w-[50px] h-full   items-center  text-center"} value={localQuantity[product.itemId] ?? product.quantity} />
+                                                        <button onClick={()=> UpdateQuantity(product.itemId, product.quantity+1)} className={"h-[35px] w-[35px]   flex justify-center items-center"}>
 
                                                             <HiMiniPlus/>
                                                         </button>
@@ -313,10 +303,10 @@ export  default function Cart() {
 
                                                 </div>
                                                 <div className={"col-span-5  flex items-center justify-center"}>
-                                                    <p className={"font-sf text-gray-600 text-[15px]"}>{product.price*product.quantity}</p>
+                                                    <p className={"font-sf text-stone-600 text-[15px]"}>{product.price*product.quantity}</p>
                                                 </div>
                                                 <div className={"col-span-3  flex items-center justify-center"}>
-                                                    <button onClick={()=> RemoveItem(product.itemId)} className={"flex justify-center items-center w-[30px] h-[30px] rounded-full bg-blue-500 text-gray-50 text-[16px] hover:bg-gray-700"}>
+                                                    <button onClick={()=> RemoveItem(product.itemId)} className={"flex justify-center items-center w-[35px] h-[35px] rounded-full bg-stone-800 text-stone-50 text-[16px] hover:bg-stone-700"}>
                                                         <HiOutlineTrash/>
                                                     </button>
 
@@ -331,23 +321,23 @@ export  default function Cart() {
                         ))}
                     </div>
                 </div>
-                <div className={"col-span-3 border-gray-200 border sticky top-[80px] p-[30px] pt-[25px] max-h-fit flex items-center flex-col bg-white"}>
-                    <p className={"font-sf text-gray-800 font-400 text-[18px]"}>TẠM TÍNH</p>
-                    <div className={"border-b border-gray-200 w-full mt-[10px]"}></div>
+                <div className={"col-span-3 border-stone-200 border sticky top-[80px] p-[30px] pt-[20px] max-h-fit flex items-center flex-col bg-white rounded-[25px]"}>
+                    <p className={"font-sf text-stone-800 font-[800] text-[22px]"}>TẠM TÍNH</p>
+                    <div className={"border-b border-stone-200 w-full mt-[10px]"}></div>
                     <div className={"flex justify-between items-center mt-[20px] w-full"}>
-                        <p className={"font-sf text-gray-600 font-400 text-[16px]"}>Tổng cộng (10 sản phẩm)</p>
+                        <p className={"font-sf text-stone-600 font-400 text-[16px]"}>Tổng cộng (10 sản phẩm)</p>
                         <p className={"font-sf text-blue-600 font-400 text-[17px]"}>28900000</p>
                     </div>
                     <div className={"flex justify-between items-center mt-[10px] w-full"}>
-                        <p className={"font-sf text-gray-600 font-400 text-[16px]"}>Giảm giá sản phẩm</p>
+                        <p className={"font-sf text-stone-600 font-400 text-[16px]"}>Giảm giá sản phẩm</p>
                         <p className={"font-sf text-blue-600 font-400 text-[17px]"}>28900000</p>
                     </div>
-                    <div className={"border-b border-gray-200 w-full mt-[10px]"}></div>
+                    <div className={"border-b border-stone-200 w-full mt-[10px]"}></div>
                     <div className={"flex justify-between items-center mt-[10px] w-full"}>
-                        <p className={"font-sf text-gray-600 font-400 text-[16px]"}>Tổng số tiền</p>
+                        <p className={"font-sf text-stone-800 font-[600] text-[16px] uppercase"}>Tổng số tiền</p>
                         <p className={"font-sf text-blue-600 font-[500] text-[18px]"}>100000000</p>
                     </div>
-                    <div className={"border-b border-gray-200 w-full mt-[10px] mb-[20px]"}></div>
+                    <div className={"border-b border-stone-200 w-full mt-[10px] mb-[20px]"}></div>
 
                         <button onClick={()=> {
                             const updatedProducts = products.map((p) => ({
@@ -360,7 +350,7 @@ export  default function Cart() {
                             localStorage.setItem("productInBill", JSON.stringify(productInBill))
                             router.push("/bill")
                         }}
-                            className={"flex h-[40px]  w-full col-span-2 justify-center items-center bg-blue-500 text-gray-50"}>
+                            className={"flex h-[40px]  w-full col-span-2 justify-center items-center bg-stone-800 rounded-full text-stone-50"}>
                             <p className={"font-sf text-[16px]"}>MUA HÀNG</p>
                         </button>
 
