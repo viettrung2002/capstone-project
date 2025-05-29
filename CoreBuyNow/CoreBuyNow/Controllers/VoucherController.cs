@@ -60,6 +60,7 @@ public class VoucherController (IVoucherService voucherService, ILogger<VoucherC
     }
 
     [HttpGet]
+   
     public async Task<IActionResult> GetAllVouchers(Role? role, int pageIndex = 1, int pageSize = 10)
     {
         try
@@ -71,7 +72,6 @@ public class VoucherController (IVoucherService voucherService, ILogger<VoucherC
                     data = await voucherService.GetAllVoucher(role.Value, pageIndex, pageSize)
                 });
             }
-
             return Ok(new
             {
                 data = await voucherService.GetAllVoucher(pageIndex, pageSize)
@@ -134,14 +134,16 @@ public class VoucherController (IVoucherService voucherService, ILogger<VoucherC
             return BadRequest(e.Message);
         }
     }
-    [HttpGet("shop/{shopId:guid}")]
-    public async Task<IActionResult> GetShopVouchers(Guid shopId)
+    [HttpGet("shop")]
+    [Authorize(Roles = "Shop")]
+    public async Task<IActionResult> GetShopVouchers()
     {
         try
         {
+            var shopId = User.FindFirst("id")?.Value;
             return Ok(new
             {
-                data = await voucherService.GetVoucherShop(shopId)
+                data = await voucherService.GetVoucherShop(Guid.Parse(shopId))
             });
         }
         catch (Exception e)

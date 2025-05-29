@@ -27,6 +27,4 @@ public class Customer
 
     public double[] Vector { get; set; } = [];
 
-
-
 }

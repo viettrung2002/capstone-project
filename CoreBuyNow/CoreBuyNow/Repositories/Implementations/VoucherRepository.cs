@@ -52,8 +52,10 @@ public class VoucherRepository ( IScheduler scheduler ,AppDbContext dbContext, I
         if (voucher.VoucherId == Guid.Empty)
             voucher.VoucherId = Guid.NewGuid();
 
+        logger.LogInformation("Start Time : {time}", DateTime.SpecifyKind(voucher.StartTime, DateTimeKind.Utc));
+        logger.LogInformation("Now : {time}", DateTime.UtcNow);
         // Kiểm tra thời gian
-        if (DateTime.SpecifyKind(voucher.StatTime, DateTimeKind.Utc) <= DateTime.UtcNow)
+        if (DateTime.SpecifyKind(voucher.StartTime, DateTimeKind.Utc) <= DateTime.UtcNow)
             throw new Exception("Voucher Start Time must be in the future");
 
         var hasShop = voucher.ShopId != null && voucher.ShopId != Guid.Empty;
@@ -64,9 +66,9 @@ public class VoucherRepository ( IScheduler scheduler ,AppDbContext dbContext, I
         voucher.IsIssued = false;
         dbContext.Vouchers.Add(voucher);
 
-        logger.LogInformation("StartTime: {time}", voucher.StatTime);
+        logger.LogInformation("StartTime: {time}", voucher.StartTime);
         // var startTimeUtc = DateTime.UtcNow.AddMinutes(1);
-        var startTimeUtc = voucher.StatTime.ToUniversalTime();// Chạy sau 1 phút
+        var startTimeUtc = voucher.StartTime.ToUniversalTime();// Chạy sau 1 phút
         logger.LogInformation("Current UTC time: {utcNow}, StartTimeUTC: {time}", DateTime.UtcNow, startTimeUtc);
 
         // Kiểm tra startTimeUtc
@@ -110,7 +112,7 @@ public class VoucherRepository ( IScheduler scheduler ,AppDbContext dbContext, I
                 {
                     VoucherId = voucherId,
                     VoucherName = v.VoucherName,
-                    StartTime = v.StatTime,
+                    StartTime = v.StartTime,
                     EndTime = v.EndTime,
                     Value = v.Value,
                     Quantity = v.Quantity,
@@ -130,7 +132,7 @@ public class VoucherRepository ( IScheduler scheduler ,AppDbContext dbContext, I
             {
                 VoucherId = voucherId,
                 VoucherName = v.VoucherName,
-                StartTime = v.StatTime,
+                StartTime = v.StartTime,
                 EndTime = v.EndTime,
                 Value = v.Value,
                 Quantity = v.Quantity,
@@ -155,7 +157,7 @@ public class VoucherRepository ( IScheduler scheduler ,AppDbContext dbContext, I
             await dbContext.Vouchers
                 .Include(v => v.Admin)
                 .Include(v => v.Shop)
-                .Where(v=>v.EndTime >= DateTime.Now && v.StatTime<=DateTime.Now && v.Role == role)
+                .Where(v=>v.EndTime >= DateTime.Now && v.StartTime<=DateTime.Now && v.Role == role)
                 .OrderByDescending(b => b.Value)
                 .Skip((pageIndex - 1) * pageSize)
                 .Take(pageSize)
@@ -163,7 +165,7 @@ public class VoucherRepository ( IScheduler scheduler ,AppDbContext dbContext, I
                 {
                     VoucherId = v.VoucherId,
                     VoucherName = v.VoucherName,
-                    StartTime = v.StatTime,
+                    StartTime = v.StartTime,
                     EndTime = v.EndTime,
                     Value = v.Value,
                     Quantity = v.Quantity,
@@ -197,7 +199,7 @@ public class VoucherRepository ( IScheduler scheduler ,AppDbContext dbContext, I
                 {
                     VoucherId = v.VoucherId,
                     VoucherName = v.VoucherName,
-                    StartTime = v.StatTime,
+                    StartTime = v.StartTime,
                     EndTime = v.EndTime,
                     Value = v.Value,
                     Quantity = v.Quantity,

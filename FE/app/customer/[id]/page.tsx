@@ -62,6 +62,10 @@ export default function CustomerPage() {
         }
         GetCustomer();
 
+
+    }, []);
+
+    useEffect(() => {
         const GetBill = async () => {
             const token = Cookies.get("token");
             if (!token) {
@@ -70,7 +74,7 @@ export default function CustomerPage() {
             }
 
             try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bill?pageIndex=1&pageSize=10`, {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bill?${orderStatus == 1 ? "orderStatus=Pending&" : orderStatus == 2 ? "orderStatus=Confirmed&" : orderStatus == 3 ? "orderStatus=Shipped&" : orderStatus == 4 ? "orderStatus=Completed&": orderStatus == 5 ? "orderStatus=Cancelled&": null }pageIndex=1&pageSize=10`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -87,8 +91,28 @@ export default function CustomerPage() {
             }
         }
         GetBill();
-    }, []);
-
+    }, [orderStatus]);
+    const CancelBill = async (id: string) => {
+        const token = Cookies.get("token");
+        if (!token) {
+            router.push("/login");
+            return;
+        }
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bill/cancel?billId=${id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                }
+            });
+            if (response.ok){
+                const data = await response.json();
+                console.log(data);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
     function formatVND(amount: number): string {
         return amount.toLocaleString('vi-VN') ;
     }
@@ -384,6 +408,32 @@ export default function CustomerPage() {
                         bills.map((bill)=>
                             <div key={bill.billId} className={"w-full bg-white mt-[20px] border border-stone-200 rounded-[25px] relative pt-[10px] pb-[5px]"}>
                                 <p className={"font-sf text-stone-800 text-[16px] absolute uppercase px-[8px] bg-white top-[-13px] font-[600] left-[30px] select-none hover:text-amber-600"}>{bill.shopName}</p>
+                                {bill.orderStatus == "Pending" && (
+                                    <div className={"absolute h-[25px] px-[30px] flex justify-center items-center font-sf rounded-bl-[25px] bg-yellow-600 text-white top-[-1px] right-0 rounded-tr-[25px] text-[14px] font-[500]"}>
+                                        <p>Đang Xử Lý</p>
+                                    </div>
+                                )}
+                                {bill.orderStatus == "Confirmed" && (
+                                    <div className={"absolute h-[25px] px-[30px] flex justify-center items-center font-sf rounded-bl-[25px] bg-blue-500 text-white top-[-1px] right-0 rounded-tr-[25px] text-[14px] font-[500]"}>
+                                        <p>Đã Xác Nhận Đơn</p>
+                                    </div>
+                                )}
+                                {bill.orderStatus == "Shipped" && (
+                                    <div className={"absolute h-[25px] px-[30px] flex justify-center items-center font-sf rounded-bl-[25px] bg-cyan-600 text-white top-[-1px] right-0 rounded-tr-[25px] text-[14px] font-[500]"}>
+                                        <p>Đang Vận Chuyển</p>
+                                    </div>
+                                )}
+                                {bill.orderStatus == "Completed" && (
+                                    <div className={"absolute h-[25px] px-[30px] flex justify-center items-center font-sf rounded-bl-[25px] bg-green-600 text-white top-[-1px] right-0 rounded-tr-[25px] text-[14px] font-[500]"}>
+                                        <p>Đã Hoành Thành</p>
+                                    </div>
+                                )}
+                                {bill.orderStatus == "Cancelled" && (
+                                    <div className={"absolute h-[25px] px-[30px] flex justify-center items-center font-sf rounded-bl-[25px] bg-red-500 text-white top-[-1px] right-0 rounded-tr-[25px] text-[14px] font-[500]"}>
+                                        <p>Đã Hủy </p>
+                                    </div>
+                                )}
+
                                 <div className={"w-full px-[20px] border-dashed border-stone-200 border-b"}>
                                     {/*<div className={"w-full h-[50px] border-b border-stone-200 flex items-center"}>*/}
                                     {/*    <div className={"flex items-center"}>*/}
@@ -419,9 +469,16 @@ export default function CustomerPage() {
                                         <p className={"text-[15px] mr-[10px]"}>Thành tiền:</p>
                                         <p className={"text-[22px] text-amber-600"}>{bill.totalPrice}</p>
                                     </div>
-                                    <button className={"px-[20px] py-[8px] bg-amber-600 hover:bg-stone-700 rounded-full"}>
-                                        <p className={"font-sf text-stone-50 text-[15px]"}>Mua Lại</p>
-                                    </button>
+                                    <div className={"flex "}>
+                                        {bill.orderStatus == "Pending" && (
+                                            <button onClick={()=>CancelBill(bill.billId)} className={"px-[20px] py-[8px] bg-stone-800 hover:bg-stone-700 rounded-full mr-[10px]"}>
+                                                <p className={"font-sf text-stone-50 text-[15px]"}>Hủy Đơn</p>
+                                            </button>
+                                        )}
+                                        <button className={"px-[20px] py-[8px] bg-amber-600 hover:bg-stone-700 rounded-full"}>
+                                            <p className={"font-sf text-stone-50 text-[15px]"}>Mua Lại</p>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         )

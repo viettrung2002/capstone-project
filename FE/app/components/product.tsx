@@ -234,10 +234,10 @@ export function ProductR({product}: {product: IProduct}) {
 export function ProductInShop({product}: {product: IProduct}) {
     const router = useRouter();
     return (
-        <div onClick={()=>router.push(`/product/${product.productId}`)} className={` col-span-1 aspect-[68/100] rounded-[5px] bg-white border border-neutral-200 p-[7px] `}>
+        <div onClick={()=>router.push(`/product/${product.productId}`)} className={` col-span-1 aspect-[68/100] bg-white `}>
             <div
 
-                className={`bg-neutral-50 group relative w-full aspect-square rounded-[4px] flex items-center justify-center p-[20px] hover:p-[0px] transition-all duration-200 ease-in-out overflow-hidden`}>
+                className={` group relative w-full aspect-square rounded-[20px] bg-stone-200 flex items-center justify-center p-[20px] hover:p-[0px] transition-all duration-200 ease-in-out overflow-hidden`}>
                 <Image src={"/products/product-1.jpg"} alt={"product_image"} width={1000} height={1000} className={"object-contain"}/>
 
                 <button onClick={() => AddToCart(product.productId, router )} className={`absolute w-[130px] h-[45px] hover:bg-neutral-700 bg-blue-500 rounded-[4px] bottom-[30px] flex items-center justify-center transition-all duration-200 translate-y-[75px] opacity-0 ease-in-out group-hover:opacity-100 group-hover:translate-y-0 `}>
@@ -252,7 +252,7 @@ export function ProductInShop({product}: {product: IProduct}) {
 
 
             </div>
-            <div className={`pl-[10px] pt-[10px] flex flex-col justify-between`}>
+            <div className={`pl-[10px] pt-[10px] flex flex-col justify-center items-center`}>
                 <p className={`font-sf text-[13px] text-neutral-500 `}>{product.subCategoryName}</p>
                 <p className={`font-sf mt-[3px] text-cl-text text-[15px] font-[600] line-clamp-1`}>{product.productName}</p>
                 <div className={`flex items-center h-[20px] text-[12px] `}>
@@ -261,12 +261,12 @@ export function ProductInShop({product}: {product: IProduct}) {
                     {(product.rating >= 3) ? (<HiStar className={`text-neutral-500`}/>) : <HiOutlineStar className={`text-neutral-500`}/>}
                     {(product.rating >= 4) ? (<HiStar className={`text-neutral-500`}/>) : <HiOutlineStar className={`text-neutral-500`}/>}
                     {(product.rating >= 5) ? (<HiStar className={`text-neutral-500`}/>) : <HiOutlineStar className={`text-neutral-500`}/>}
-                    <p className={`font-sf text-neutral-500 ml-[10px] tex `}>{product.reviewCount} Review</p>
+
                 </div>
 
                 {product.discount > 0 ? (
                     <div className={`flex items-center`}>
-                        <p className={`font-sf text-cl-hover-text text-[16px] font-[700] `}>${product.price - product.price * product.discount / 100}  </p>
+                        <p className={`font-sf text-amber-600 text-[16px] font-[700] `}>${product.price - product.price * product.discount / 100}  </p>
                         <div className={`relative ml-[10px]`}>
                             <p className={`font-sf text-neutral-400 text-[13px] font-[400] ml-[0px]`}>${product.price}  </p>
                             <div className={`absolute w-full border-t border-neutral-400 top-1/2 `}></div>
@@ -274,7 +274,7 @@ export function ProductInShop({product}: {product: IProduct}) {
                     </div>
                 ): (
                     <div className={`flex items-end`}>
-                        <p className={`font-sf text-cl-hover-text text-[16px] font-[700] `}>${product.price }  </p>
+                        <p className={`font-sf text-amber-600 text-[16px] font-[700] `}>${product.price }  </p>
                     </div>
                 )}
             </div>

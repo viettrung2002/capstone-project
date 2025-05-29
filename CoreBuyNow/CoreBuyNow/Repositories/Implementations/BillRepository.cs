@@ -140,8 +140,8 @@ public class BillRepository (AppDbContext dbContext, ILogger<BillRepository> log
                 .Select(b => new BillResponseDto
                 {
                     BillId = b.BillId,
-                    ShopName = b.Items[0].Product.Shop.ShopName,
-                    ShopId = b.Items[0].Product.Shop.ShopId,
+                    ShopName = b.Items.FirstOrDefault().Product.Shop.ShopName,
+                    ShopId = b.Items.FirstOrDefault().Product.Shop.ShopId,
                     OrderStatus = b.OrderStatus,
                     TotalPrice = b.TotalPrice,
                     Items = b.Items

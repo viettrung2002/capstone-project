@@ -388,10 +388,10 @@ export default function Bill() {
 
                         {shopVouchers.map((v) => (
                             <div key={v.voucherWalletId} className={"h-[100px] mb-[20px] flex"}>
-                                <div className={"h-full aspect-square bg-blue-300"}>
+                                <div className={"h-full aspect-square bg-stone-300 rounded-l-[20px]"}>
 
                                 </div>
-                                <div className={"flex-1 border-y border-r border-stone-200 flex justify-between px-[20px]  items-center"}>
+                                <div className={"flex-1 border-y border-r border-stone-200 flex justify-between px-[20px] rounded-r-[20px]  items-center"}>
                                     <div>
                                         <p className={"font-sf text-stone-800 text-[16px]"}>{v.voucher.voucherName}</p>
                                         <div className={"flex items-baseline h-[20px]"}>

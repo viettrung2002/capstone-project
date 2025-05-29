@@ -11,13 +11,13 @@ export default function Compare() {
     const [products, setProducts] = useState<IProductData[]>([]);
     useEffect(() => {
         function checkLocalStorage() {
-            setHasItems(localStorage.length > 0);
 
             const newProducts: IProductData[] = [];
 
             for (let i = 0; i < localStorage.length; i++) {
                 const key = localStorage.key(i);
-                if (key) {
+                if (key != "productInBill" && key) {
+                    setHasItems(true);
                     const value = localStorage.getItem(key);
                     if (value) {
                         const product = JSON.parse(value) as IProductData;

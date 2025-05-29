@@ -10,7 +10,7 @@ public class Voucher
     [StringLength(500)]
     public string VoucherName { get; set; } = string.Empty;
     [Required]
-    public DateTime StatTime { get; set; }
+    public DateTime StartTime { get; set; }
     [Required]
     public DateTime EndTime { get; set; }
     [Required]

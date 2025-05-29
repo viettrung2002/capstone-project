@@ -90,7 +90,7 @@ export default function OrderManagement() {
                 bills.map((bill)=>
                     <div key={bill.billId} className={"w-full bg-white mt-[10px] border border-gray-200"}>
                         <div className={"h-[50px] border-b border-gray-200 px-[20px] flex items-center justify-between"}>
-                            <p className={"font-sf text-gray-800 "}>{bill.orderStatus == "Pending" ? "CHỜ XÁC NHẬN" : bill.orderStatus == "Confirmed" ? "ĐÃ XÁC NHẬN" : "ĐANG GIAO HÀNG"}</p>
+                            <p className={"font-sf text-gray-800 "}>{bill.orderStatus == "Pending" ? "ĐANG XỬ LÝ" : bill.orderStatus == "Confirmed" ? "ĐÃ XÁC NHẬN" : bill.orderStatus == "Shipped" ? "ĐANG GIAO HÀNG" : bill.orderStatus == "Completed" ? "ĐÃ HOÀN THÀNH"  : "ĐÃ HỦY"}</p>
                             <button onClick={()=> UpdateBill(bill.billId)} className={"px-[20px] bg-blue-500 hover:bg-gray-700 h-[35px]"}>
                                 <p className={"font-sf text-gray-50 text-[15px]"}>{bill.orderStatus == "Pending" ? "Xác Nhận Đơn" : "Cập Nhật Trạng Thái"}</p>
                             </button>
