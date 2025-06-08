@@ -1,33 +1,33 @@
 'use client'
 
 import {
-    HiOutlineChevronDown,
     HiOutlineClipboard,
     HiOutlinePencilSquare,
-    HiOutlinePercentBadge,
-    HiOutlineTicket,
-    HiOutlineUser, HiOutlineWallet
+    HiOutlineUser
 } from "react-icons/hi2";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import Cookies from "js-cookie";
 import {useRouter} from "next/navigation";
 import {ICustomer} from "@/app/types/account";
 import {HiOutlineSearch} from "react-icons/hi";
 import {Bill} from "@/app/types/bill";
+import Image from "next/image";
 export default function CustomerPage() {
     const router = useRouter();
     const [customer, setCustomer] = useState<ICustomer>();
     const [isOpenAccountInfo, setIsOpenAccountInfo] = useState(true);
     const [activeTab, setActiveTab] = useState(0);
     const [userName, setUerName] = useState("ngviettrung2002");
-    const [gender, setGender] = useState(true);
-    const [showDate, setShowDate] = useState(0);
+
     const [bills, setBills] = useState<Bill[]>([]);
-
-    const [day, setDay] = useState<number>(0);
-    const [month, setMonth] = useState<number>(0);
-    const [year, setYear] = useState<number>(0);
-
+    const [file, setFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [uploading, setUploading] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [openNotificationCancelBill, setOpenNotificationCancelBill] = useState<boolean>(false);
+    const [openNotificationConfirmBill, setOpenNotificationConfirmBill] = useState<boolean>(false);
+    const [reload, setReload] = useState<boolean>(true);
+    const [idToCancel, setIdToCancel] = useState<string>("00000000-0000-0000-0000-000000000000");
     // TAB ĐỔI MẬT KHẨU
     const [oldPassword, setOldPassword] = useState("");
     const [password, setPassword] = useState("");
@@ -37,6 +37,99 @@ export default function CustomerPage() {
     // ĐƠN MUA
     const [orderStatus, setOrderStatus] = useState(0);
     // ĐƠN MUA
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const selectedFile = e.target.files?.[0];
+        if (selectedFile) {
+            setFile(selectedFile);
+            setPreviewUrl(URL.createObjectURL(selectedFile));
+        }
+    };
+    const updateCustomer = async () => {
+        const token = Cookies.get("token");
+        if (!token) {
+            router.push("/login");
+            return;
+        }
+            try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/customer`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`
+                    },
+                    body: JSON.stringify(customer)
+                });
+                if (response.ok){
+                    const data = await response.json();
+                    setReload(!reload)
+                    alert("Cập nhật thành công")
+                    console.log(data);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+    }
+    const ChangePassword = async (oldPass: string, newPass: string, accountId: string) => {
+        const token = Cookies.get("token");
+        if (!token) {
+            router.push("/login");
+            return;
+        }
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/account/change-password?oldPassword=${oldPass}&newPassword=${newPass}&accountId=${accountId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+            });
+            if (response.ok){
+                const data = await response.json();
+                setReload(!reload);
+                setPassword("")
+                setConfirmPassword("")
+                setOldPassword("")
+                alert("Đổi mật khẩu thành công")
+                console.log(data);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+
+    }
+    const handleUpload = async () => {
+        if (!file) {
+            console.log("No file");
+            return;
+        };
+
+        const formData = new FormData();
+        formData.append('image', file); // Key 'image' phải khớp với .NET API
+
+        try {
+            setUploading(true);
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload`, {
+                method: 'POST',
+                body: formData,
+                // Không cần headers: Content-Type sẽ tự động là 'multipart/form-data'
+            });
+
+            if (!response.ok) throw new Error('Upload failed');
+            const data = await response.json();
+            console.log("URL",data);
+            setCustomer( (prevState) => ({
+                ...prevState,
+                avatar: data.imageUrl,
+            }))
+            alert(`Upload thành công! URL: ${data.imageUrl}`);
+        } catch (error) {
+            console.error('Lỗi:', error);
+            alert('Upload thất bại');
+        } finally {
+            setUploading(false);
+        }
+    };
     useEffect(() => {
         const token = Cookies.get("token");
         if (!token) {
@@ -63,7 +156,7 @@ export default function CustomerPage() {
         GetCustomer();
 
 
-    }, []);
+    }, [reload]);
 
     useEffect(() => {
         const GetBill = async () => {
@@ -116,8 +209,65 @@ export default function CustomerPage() {
     function formatVND(amount: number): string {
         return amount.toLocaleString('vi-VN') ;
     }
+    const UpdateBill = async (billId: string) => {
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bill/update-status?billID=${billId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                }
+            });
+            if (response.ok){
+                const data = await response.json();
+                console.log(data);
+                alert("Cập nhật thành công")
+                setReload(!reload);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    useEffect(() => {
+        console.log(customer);
+    }, [customer]);
     return(
         <div className={`w-full flex items-center justify-center bg-white`}>
+            {openNotificationCancelBill && (
+                <div className={"absolute top-[50px] border border-stone-200 py-[20px] px-[20px] flex flex-col z-50 bg-white rounded-[25px] shadow-md "}>
+                    <p>Xác nhận hủy đơn</p>
+                    <div className={"flex mt-[15px] "}>
+                        <button onClick={()=> {
+                            CancelBill(idToCancel)
+                            setOpenNotificationCancelBill(false)
+                        }} className={"px-[20px] py-[6px] flex justify-center items-center font-sf bg-amber-600 text-white rounded-full mr-[10px]"}>
+                            Xác Nhận
+                        </button>
+                        <button onClick={()=> {
+                            setOpenNotificationCancelBill(false)
+                        }} className={"px-[20px] py-[6px] flex justify-center items-center font-sf bg-stone-200 rounded-full"}>
+                            Thoát
+                        </button>
+                    </div>
+                </div>
+            )}
+            {openNotificationConfirmBill && (
+                <div className={"absolute top-[50px] border border-stone-200 py-[20px] px-[20px] flex flex-col z-50 bg-white rounded-[25px] shadow-md "}>
+                    <p>Xác nhận hoàn thành đơn</p>
+                    <div className={"flex mt-[15px] "}>
+                        <button onClick={()=> {
+                            UpdateBill(idToCancel)
+                            setOpenNotificationConfirmBill(false)
+                        }} className={"px-[20px] py-[6px] flex justify-center items-center font-sf bg-amber-600 text-white rounded-full mr-[10px]"}>
+                            Xác Nhận
+                        </button>
+                        <button onClick={()=> {
+                            setOpenNotificationConfirmBill(false)
+                        }} className={"px-[20px] py-[6px] flex justify-center items-center font-sf bg-stone-200 rounded-full"}>
+                            Thoát
+                        </button>
+                    </div>
+                </div>
+            )}
             <div className={`w-[1300px] grid grid-cols-5 gap-[20px] mt-[20px] `}>
                 <div className={`col-span-1 max-h-fit rounded-[25px] border border-stone-200`}>
                     <div className={"h-[85px] flex p-[15px] border-b border-stone-200"}>
@@ -143,9 +293,9 @@ export default function CustomerPage() {
                             <div onClick={()=>setActiveTab(0)} className={` ${activeTab == 0 ? "text-amber-600" : "text-stone-800"} select-none flex pl-[40px] h-[35px] items-center  font-sf text-[16px] `}>
                                 Hồ Sơ
                             </div>
-                            <div onClick={()=>setActiveTab(1)} className={` ${activeTab == 1 ? "text-amber-600" : "text-stone-800"} select-none flex pl-[40px] h-[35px] items-center  font-sf text-[16px] `}>
-                                Địa Chỉ
-                            </div>
+                            {/*<div onClick={()=>setActiveTab(1)} className={` ${activeTab == 1 ? "text-amber-600" : "text-stone-800"} select-none flex pl-[40px] h-[35px] items-center  font-sf text-[16px] `}>*/}
+                            {/*    Địa Chỉ*/}
+                            {/*</div>*/}
                             <div onClick={()=>setActiveTab(2)} className={` ${activeTab == 2 ? "text-amber-600" : "text-stone-800"} select-none flex pl-[40px] h-[35px] items-center  font-sf text-[16px] `}>
                                 Đổi Mật Khẩu
                             </div>
@@ -159,18 +309,18 @@ export default function CustomerPage() {
                             </div>
                             <p className={` ${activeTab == 4 ? "text-amber-600" : "text-stone-800"} flex font-sf text-[16px] `}>Đơn Mua</p>
                         </div>
-                        <div className={"flex h-[35px] pl-[15px] items-center"}>
-                            <div className={"w-[25px] text-[20px]"}>
-                                <HiOutlinePercentBadge/>
-                            </div>
-                            <p className={` ${activeTab == 5 ? "text-amber-600" : "text-stone-800"} flex font-sf text-[16px] `}>Kho Voucher </p>
-                        </div>
-                        <div onClick={()=> setActiveTab(6)} className={"flex h-[35px] pl-[15px] items-center"}>
-                            <div className={"w-[25px] text-[20px]"}>
-                                <HiOutlineWallet/>
-                            </div>
-                            <p className={` ${activeTab == 6 ? "text-amber-600" : "text-stone-800"} flex font-sf text-[16px] select-none`}>Ví BuyNow </p>
-                        </div>
+                        {/*<div className={"flex h-[35px] pl-[15px] items-center"}>*/}
+                        {/*    <div className={"w-[25px] text-[20px]"}>*/}
+                        {/*        <HiOutlinePercentBadge/>*/}
+                        {/*    </div>*/}
+                        {/*    <p className={` ${activeTab == 5 ? "text-amber-600" : "text-stone-800"} flex font-sf text-[16px] `}>Kho Voucher </p>*/}
+                        {/*</div>*/}
+                        {/*<div onClick={()=> setActiveTab(6)} className={"flex h-[35px] pl-[15px] items-center"}>*/}
+                        {/*    <div className={"w-[25px] text-[20px]"}>*/}
+                        {/*        <HiOutlineWallet/>*/}
+                        {/*    </div>*/}
+                        {/*    <p className={` ${activeTab == 6 ? "text-amber-600" : "text-stone-800"} flex font-sf text-[16px] select-none`}>Ví BuyNow </p>*/}
+                        {/*</div>*/}
                     </div>
 
 
@@ -209,89 +359,101 @@ export default function CustomerPage() {
                                 <div className={"h-[40px] w-full flex items-center justify-end mt-[20px]"}>
                                     <p className={"font-sf text-stone-600 text-[15px]"}>Ngày Sinh</p>
                                 </div>
+                                <div className={"h-[40px] w-full flex items-center justify-end mt-[20px]"}>
+                                    <p className={"font-sf text-stone-600 text-[15px]"}>Địa Chỉ</p>
+                                </div>
                             </div>
                             <div className={"col-span-5"}>
                                 <div className={"h-[40px] w-full rounded-full"}>
                                     <input onChange={(e)=> setUerName(e.target.value)} type={"text"} value={userName} className={"w-full h-full border border-stone-200 font-sf rounded-full text-stone-800 focus:outline-none px-[20px]"}/>
                                 </div>
                                 <div className={"h-[40px] w-full mt-[20px] rounded-full"}>
-                                    <input onChange={(e)=> setUerName(e.target.value)} type={"text"} value={userName} className={"w-full h-full border border-stone-200 font-sf rounded-full text-stone-800 focus:outline-none px-[20px]"}/>
+                                    <input onChange={(e)=> setCustomer( (prevState) => ({
+                                        ...prevState,
+                                        customerName: e.target.value,
+                                    }))} type={"text"} value={customer ? customer.customerName : ""} className={"w-full h-full border border-stone-200 font-sf rounded-full text-stone-800 focus:outline-none px-[20px]"}/>
                                 </div>
-                                <div className={"h-[40px] w-full mt-[15px] flex items-center"}>
-                                    <p className={"font-sf text-stone-800 text-[16px] mr-[15px]"}>ngviettrung2002@gmail.com</p>
-                                    <p className={"font-sf text-amber-600 text-[15px] underline"}>Thay Đổi</p>
+                                <div className={"h-[40px] w-full mt-[15px] rounded-full"}>
+                                    <input onChange={(e)=> setCustomer( (prevState) => ({
+                                        ...prevState,
+                                        email: e.target.value,
+                                    }))} type={"text"} value={customer?.email ? customer.email : ""} className={"w-full h-full border border-stone-200 font-sf rounded-full text-stone-800 focus:outline-none px-[20px]"}/>
                                 </div>
-                                <div className={"h-[40px] w-full mt-[15px] flex items-center"}>
-                                    <p className={"font-sf text-stone-800 text-[16px] mr-[15px]"}>{customer?.phoneNumber ? customer.phoneNumber : "Không có"}</p>
-                                    <p className={"font-sf text-amber-600 text-[15px] underline"}>Thay Đổi</p>
+                                <div className={"h-[40px] w-1/2 mt-[15px] rounded-full"}>
+                                    <input onChange={(e)=> setCustomer( (prevState) => ({
+                                        ...prevState,
+                                        phoneNumber: e.target.value,
+                                    }))} type={"text"} value={customer?.phoneNumber ? customer.phoneNumber : ""} className={"w-full h-full border border-stone-200 font-sf rounded-full text-stone-800 focus:outline-none px-[20px]"}/>
                                 </div>
                                 <div className={"h-[40px] w-full mt-[15px] flex items-center"}>
                                     <div className={"flex items-center"}>
-                                        <div onClick={()=> setGender(true)} className={"w-[16px] h-[16px] rounded-full border border-stone-300 flex items-center justify-center mr-[10px]"}>
-                                            <div className={`${gender ? "bg-stone-600" : null} w-[10px] h-[10px] rounded-full`} ></div>
+                                        <div onClick={()=> setCustomer( (prevState) => ({
+                                            ...prevState,
+                                            gender: true,
+                                        }))} className={"w-[16px] h-[16px] rounded-full border border-stone-300 flex items-center justify-center mr-[10px]"}>
+                                            <div className={`${customer?.gender ? "bg-stone-600" : null} w-[10px] h-[10px] rounded-full`} ></div>
                                         </div>
                                         <p className={"font-sf text-stone-800 text-[16px]"}>Nam</p>
-                                        <div onClick={()=>setGender(false)} className={"w-[16px] h-[16px] rounded-full border border-stone-300 flex items-center justify-center ml-[20px] mr-[10px]"}>
-                                            <div className={`${!gender ? "bg-stone-600" : null} w-[10px] h-[10px] rounded-full`} ></div>
+                                        <div onClick={()=>setCustomer( (prevState) => ({
+                                            ...prevState,
+                                            gender: false,
+                                        }))} className={"w-[16px] h-[16px] rounded-full border border-stone-300 flex items-center justify-center ml-[20px] mr-[10px]"}>
+                                            <div className={`${!customer?.gender ? "bg-stone-600" : null} w-[10px] h-[10px] rounded-full`} ></div>
                                         </div>
                                         <p className={"font-sf text-stone-800 text-[16px]"}>Nữ</p>
                                     </div>
                                 </div>
-                                <div className={"h-[40px] w-full mt-[20px] flex items-center"}>
-                                    <div className={"flex h-full w-[100px] bg-stone-200 px-[15px] items-center justify-between relative rounded-full"}>
-                                        <p className={"font-sf text-[16px] text-stone-800"}>{day == 0 ? "Ngày" : day}</p>
-                                        <HiOutlineChevronDown onClick={()=> setShowDate(showDate == 0 ? 1 : 0)} className={"text-[16px] text-stone-800"}/>
-                                        {showDate == 1 ?
-                                            <div className={"absolute w-[100px] h-[130px] left-[-1px] border border-stone-200 bottom-[-131px] bg-white overflow-y-auto"}>
-                                                {Array.from({ length: 30 }).map((_, index) => (
-                                                    <div key={index} onClick={()=> setDay(index + 1)} className=" px-[15px] py-[2px] bg-white border-stone-100 border-b font-sf text-[15px]">
-                                                        {index + 1}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                            : null}
-                                    </div>
-
-                                    <div className={"flex h-full w-[130px]  bg-stone-200 px-[15px] items-center justify-between relative ml-[10px] rounded-full"}>
-                                        <p className={"font-sf text-[16px] text-stone-800"}>{month == 0 ? "Tháng" : month}</p>
-                                        <HiOutlineChevronDown onClick={()=> setShowDate(showDate == 0 ? 2 : 0)} className={"text-[16px] text-stone-800"}/>
-                                        {showDate == 2 ?
-                                            <div className={"absolute w-[130px] h-[130px] left-[-1px] border border-stone-200 bottom-[-131px] bg-white overflow-y-auto"}>
-                                                {Array.from({ length: 12 }).map((_, index) => (
-                                                    <div key={index} onClick={()=>setMonth(index+1)} className=" px-[15px] py-[2px] bg-white border-stone-100 border-b font-sf text-[15px]">
-                                                        Tháng {index + 1}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                            : null}
-                                    </div>
-                                    <div className={"flex h-full w-[100px] bg-stone-200 px-[15px] items-center justify-between relative ml-[10px] rounded-full"}>
-                                        <p className={"font-sf text-[16px] text-stone-800"}>{year == 0 ? "Năm" : year}</p>
-                                        <HiOutlineChevronDown onClick={()=> setShowDate(showDate == 0 ? 3 : 0)} className={"text-[16px] text-stone-800"}/>
-                                        {showDate == 3 ?
-                                            <div className={"absolute w-[100px] h-[130px] left-[-1px] border border-stone-200 bottom-[-131px] bg-white overflow-y-auto"}>
-                                                {Array.from({ length: 80 }).map((_, index) => (
-                                                    <div key={index} onClick={()=> setYear(2025-index)} className=" px-[15px] py-[2px] bg-white border-stone-100 border-b font-sf text-[15px]">
-                                                        {2025 - index}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                            : null}
-                                    </div>
+                                <div className={"h-[40px] w-[160px] mt-[20px] flex items-center rounded-full bg-stone-200 justify-center"}>
+                                    <input
+                                        type={"date"}
+                                        value={customer?.birthDay === "0001-01-01T00:00:00"
+                                            ? ""
+                                            : customer?.birthDay?.slice(0, 10) ?? ""}
+                                        onChange={(e) =>
+                                            setCustomer((prev) => ({
+                                                ...prev!,
+                                                birthDay: `${e.target.value}T00:00:00`,
+                                            }))
+                                        }
+                                        className={"font-sf"}
+                                    />
                                 </div>
-                                <button className={"px-[25px] py-[8px] bg-amber-600 mt-[20px] hover:bg-stone-700 rounded-full"}>
+                                <div className={"h-[40px] w-full mt-[20px] rounded-full"}>
+                                    <input onChange={(e)=> setCustomer( (prevState) => ({
+                                        ...prevState,
+                                        address: e.target.value,
+                                    }))} type={"text"} value={customer ? customer.address : ""} className={"w-full h-full border border-stone-200 font-sf rounded-full text-stone-800 focus:outline-none px-[20px]"}/>
+                                </div>
+                                <button onClick={()=> updateCustomer()} className={"px-[25px] py-[8px] bg-amber-600 mt-[20px] hover:bg-stone-700 rounded-full"}>
                                     <p className={"font-sf text-stone-50 text-[15px]"}>Lưu</p>
                                 </button>
 
                             </div>
                         </div>
                         <div className={"col-span-1 max-h-fit border-l border-stone-200 mt-[20px] flex items-center flex-col "}>
-                            <div className={"border w-[100px] h-[100px] rounded-full overflow-hidden border-stone-200 flex items-center justify-center mt-[20px]"}>
-                                <HiOutlineUser className={"text-[60px] text-stone-300"} />
+                            <div className={"border w-[100px] h-[100px] rounded-full overflow-hidden border-stone-200 flex items-center relative justify-center mt-[20px]"}>
+                                {previewUrl ? (
+                                    <Image src={previewUrl} fill={true} alt="Preview"  />
+                                ) : customer?.avatar ? <Image src={customer.avatar} fill={true} alt="Preview"  /> :  <HiOutlineUser className={"text-[60px] text-stone-300"} />}
                             </div>
-                            <button className={"px-[15px] py-[8px] bg-stone-200 mt-[20px] rounded-full"}>
-                                <p className={"font-sf text-stone-800 text-[15px] "}>Chọn Ảnh</p>
-                            </button>
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                onChange={handleFileChange}
+                                accept="image/*"
+                                className="hidden"
+                            />
+                            <div className={"flex "}>
+                                <button onClick={() => fileInputRef.current?.click()} className={"px-[15px] py-[8px] bg-stone-200 mt-[20px] rounded-full mr-[5px]"}>
+                                    <p className={"font-sf text-stone-800 text-[15px] "}>Chọn Ảnh</p>
+                                </button>
+                                <button onClick={handleUpload}
+                                        disabled={uploading}
+                                        className={"px-[15px] py-[8px] bg-amber-600 text-gray-50 text-[15px] mt-[20px] hover:shadow-md rounded-full ml-[5px]"}>
+                                    <p>{uploading ? 'Đang tải ...' : 'Tải lên'}</p>
+                                </button>
+                            </div>
+
                             <p className={"font-sf text-stone-600 text-[14px] mt-[10px]"}>Dung lượng tối đa 1MB</p>
                             <p className={"font-sf text-stone-600 text-[14px]"}>Định dạng: .JPEG, .PNG</p>
                         </div>
@@ -333,7 +495,14 @@ export default function CustomerPage() {
                                     <input onChange={(e)=> setConfirmPassword(e.target.value)} type={"text"} value={confirmPassword} className={"w-full rounded-full h-full border border-stone-200 font-sf text-stone-800 focus:outline-none px-[20px]"}/>
                                 </div>
 
-                                <button className={"px-[20px] py-[8px] bg-amber-600 mt-[20px] hover:bg-stone-700 rounded-full"}>
+                                <button onClick={()=> {
+                                    if (password != confirmPassword) {
+                                        alert("Mật khẩu không trùng nhau");
+                                        return;
+                                    }
+                                    if (customer?.accountId)
+                                        ChangePassword(oldPassword, password, customer.accountId)
+                                }} className={"px-[20px] py-[8px] bg-amber-600 mt-[20px] hover:bg-stone-700 rounded-full"}>
                                     <p className={"font-sf text-stone-50 text-[15px]"}>Xác Nhận</p>
                                 </button>
 
@@ -469,22 +638,33 @@ export default function CustomerPage() {
                                         <p className={"text-[15px] mr-[10px]"}>Thành tiền:</p>
                                         <p className={"text-[22px] text-amber-600"}>{bill.totalPrice}</p>
                                     </div>
-                                    <div className={"flex "}>
+                                    <div className={"flex relative"}>
+
+                                        {bill.orderStatus == "Shipped" && (
+                                            <button  onClick={()=>{
+                                                setOpenNotificationConfirmBill(true);
+                                                setIdToCancel(bill.billId)
+                                            }} className={"px-[20px] py-[8px] bg-stone-800 hover:bg-stone-700 rounded-full mr-[10px]"}>
+                                                <p className={"font-sf text-stone-50 text-[15px]"}>Hoàn Thành</p>
+                                            </button>
+                                        )}
                                         {bill.orderStatus == "Pending" && (
-                                            <button onClick={()=>CancelBill(bill.billId)} className={"px-[20px] py-[8px] bg-stone-800 hover:bg-stone-700 rounded-full mr-[10px]"}>
+                                            <button onClick={()=> {
+                                                setOpenNotificationCancelBill(true);
+                                                setIdToCancel(bill.billId)
+                                            }} className={"px-[20px] py-[8px]  bg-stone-800 hover:bg-stone-700 rounded-full mr-[10px]"}>
                                                 <p className={"font-sf text-stone-50 text-[15px]"}>Hủy Đơn</p>
                                             </button>
                                         )}
                                         <button className={"px-[20px] py-[8px] bg-amber-600 hover:bg-stone-700 rounded-full"}>
                                             <p className={"font-sf text-stone-50 text-[15px]"}>Mua Lại</p>
                                         </button>
+
                                     </div>
                                 </div>
                             </div>
                         )
                     }
-
-
                 </div>
                 {/*ĐƠN MUA*/}
 
