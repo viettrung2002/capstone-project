@@ -22,7 +22,11 @@ public class CommentRepository (AppDbContext dbContext) : ICommentRepository
         {
             throw new Exception("Comment Id is required!");
         }
-        
+        var product = dbContext.Products.FirstOrDefault(p => p.ProductId == comment.ProductId);
+        if (product == null) throw new Exception("Product not found!");
+        var count = dbContext.Comments.Count(c => c.ProductId == comment.ProductId);
+        product.Rating = (product.Rating * count + comment.Rating)/(count + 1); 
+        dbContext.Products.Update(product);
         comment.CreatedDate = DateTime.Now;
         dbContext.Comments.Add(comment);
         await dbContext.SaveChangesAsync();

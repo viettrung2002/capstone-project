@@ -11,4 +11,6 @@ public interface IAccountRepository
     Task<AccountResponseDto<Customer>> CustomerLogin(string username, string password);
     Task<AccountResponseDto<Admin>> AdminLogin(string username, string password);
     AccountRole GetRole (string username);
+    
+    Task ChangePassword(string oldPassword, string newPassword, Guid accountId);
 }

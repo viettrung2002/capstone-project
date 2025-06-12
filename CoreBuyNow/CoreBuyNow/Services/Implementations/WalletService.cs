@@ -6,9 +6,9 @@ namespace CoreBuyNow.Services.Implementations;
 
 public class WalletService (IWalletRepository walletRepository) : IWalletService 
 {
-    public async Task CreateWallet(Guid userId)
+    public async Task CreateWallet(Guid userId, string otp)
     {
-        await walletRepository.CreateWallet(userId);
+        await walletRepository.CreateWallet(userId, otp);
     }
 
     public async Task DeleteWallet(Guid userId)

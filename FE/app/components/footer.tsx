@@ -6,7 +6,7 @@ import Image from "next/image";
 export default function Footer() {
     const [email, setEmail] = useState<string>('');
     return(
-        <div className="footer bg-gray-800 w-full h-[650px] flex justify-center mt-[20px]">
+        <div className="footer bg-gray-800 w-full h-[650px] flex justify-center  z-20">
             <div className="flex items-center w-[1400px] h-full flex-col ">
                 <div className={`flex w-full h-[130px] border-b border-gray-500 items-center justify-between mb-[20px]`}>
                     <div className={`h-full w-[250px] border-r border-gray-500`}>

@@ -5,6 +5,7 @@ using CoreBuyNow.Models;
 using CoreBuyNow.Models.DTOs;
 using CoreBuyNow.Models.Entities;
 using CoreBuyNow.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace CoreBuyNow.Repositories.Implementations;
@@ -84,6 +85,16 @@ public class AccountRepository(AppDbContext dbContext, IConfiguration configurat
     {
         var role = dbContext.Accounts.Where(x=>x.UserName == username).Select(x=>x.Role);
         return role.SingleOrDefault();
+    }
+
+    public async Task ChangePassword(string oldPassword, string newPassword, Guid accountId)
+    {
+        var account = dbContext.Accounts.FirstOrDefault(x => x.AccountId == accountId);
+        if (account == null) throw new Exception ("Invalid account.");
+        if (account.PassWord != oldPassword) throw new Exception ("Invalid password.");
+        account.PassWord = newPassword;
+        dbContext.Accounts.Update(account);
+        await dbContext.SaveChangesAsync();
     }
 
     private string GenerateJwtToken(string username, string role, Guid id)

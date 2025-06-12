@@ -1,4 +1,5 @@
-﻿using CoreBuyNow.Models.Entities;
+﻿using CoreBuyNow.Models.DTOs;
+using CoreBuyNow.Models.Entities;
 using CoreBuyNow.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,14 +11,14 @@ public class BillController(IBillService billService, ILogger<BillController> lo
 {
     [HttpPost]
     [Authorize(Roles = "Customer")]
-    public async Task<IActionResult> Create(Bill bill)
+    public async Task<IActionResult> Create(BillRequestDto req)
     {
         try
         {
             var id = User.FindFirst("id")?.Value;
             logger.LogInformation("ID={id}", id);
             
-            await billService.CreateBill(bill, Guid.Parse(id));
+            await billService.CreateBill(req, Guid.Parse(id));
             
             return Ok(new
             {
@@ -26,7 +27,7 @@ public class BillController(IBillService billService, ILogger<BillController> lo
         }
         catch (Exception e)
         {
-            return BadRequest(e.Message);
+            return BadRequest(new {error = e.Message});
         }
     }
 
@@ -116,5 +117,19 @@ public class BillController(IBillService billService, ILogger<BillController> lo
             return BadRequest(e.Message);
         }
     }
-    
+    [HttpGet("details/{billId:guid}")]
+    public async Task<IActionResult> GetBill(Guid billId)
+    {
+        try
+        {
+            return Ok(new
+            {
+                data = await billService.GetBill(billId)
+            });
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
 }

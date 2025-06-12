@@ -6,15 +6,12 @@ import {HiStar , HiOutlineStar} from "react-icons/hi2";
 export default function ComparePage(){
     const [products, setProducts] = useState<IProductData[]>([]);
     useEffect(()=> {
-
-
         for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
-            if (key) {
+            if (key != "productInBill" && key) {
                 const value = localStorage.getItem(key);
                 if (value) {
                     const product = JSON.parse(value) as IProductData;
-
                     setProducts(prevState => [...prevState, product]);
                 }
             }
@@ -113,7 +110,6 @@ export default function ComparePage(){
                                     <div className={" flex justify-start items-start w-full"}>
                                         <p  className={"text-[15px] font-[500] "}>{value}</p>
                                     </div>
-
                                 </div>
                             )) : null}
                         </div>

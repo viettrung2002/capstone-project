@@ -120,6 +120,7 @@ public class VoucherController (IVoucherService voucherService, ILogger<VoucherC
     }
 
     [HttpGet("admin/all")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetAdminVouchers()
     {
         try

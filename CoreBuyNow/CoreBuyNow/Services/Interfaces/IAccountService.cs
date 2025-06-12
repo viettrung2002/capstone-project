@@ -12,4 +12,6 @@ public interface IAccountService
     Task<Customer>GetCustomer(Guid customerId);
 
     Task<ShopResponseDto> GetShop(Guid shopId);
+    
+    Task ChangePassword(string oldPassword, string newPassword, Guid accountId);
 }

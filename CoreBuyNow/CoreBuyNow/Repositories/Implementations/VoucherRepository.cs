@@ -239,7 +239,6 @@ public class VoucherRepository ( IScheduler scheduler ,AppDbContext dbContext, I
     public async Task<List<Voucher>> GetVoucherAdmin()
     {
         return await dbContext.Vouchers
-            .Where(v =>v.AdminId != Guid.Empty || v.AdminId != null)
             .ToListAsync();
     }
     

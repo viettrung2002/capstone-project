@@ -4,7 +4,7 @@ namespace CoreBuyNow.Services.Interfaces;
 
 public interface IWalletService
 {
-    Task CreateWallet(Guid userId);
+    Task CreateWallet(Guid userId, string otp);
     Task DeleteWallet(Guid userId);
     Task<Wallet> GetWallet(Guid userId);
     Task TransferMoney(decimal amount, string description, Guid userId, Guid recipientId);

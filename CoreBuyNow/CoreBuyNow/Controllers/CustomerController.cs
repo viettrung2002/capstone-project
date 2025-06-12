@@ -1,3 +1,4 @@
+using CoreBuyNow.Models.Entities;
 using CoreBuyNow.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,5 +21,17 @@ public class CustomerController (ICustomerService customerService, ILogger<Custo
         {
             return BadRequest(e.Message);
         }
+    }
+
+    [HttpPut]
+    [Authorize(Roles = "Customer")]
+    public async Task<IActionResult> EditCustomer(Customer customer)
+    {
+        var id = User.FindFirst("id")?.Value;
+        await customerService.EditCustomer(customer, Guid.Parse(id));
+        return Ok(new
+        {
+            message = "Customer updated",
+        });
     }
 }

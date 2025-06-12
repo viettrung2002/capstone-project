@@ -20,8 +20,18 @@ public class Shop
     public bool IsOfficial { get; set; }
     [Required]
     public Guid AccountId { get; set; }
+    [StringLength(250)]
+    public string? Email { get; set; }
     [ForeignKey("AccountId")]
     [JsonIgnore]
     public Account? Account { get; set; }     
+    [StringLength(500)]
     public string? Avatar { get; set; }
+    public Status Status { get; set; }
+}
+
+public enum Status
+{
+    Active ,
+    Inactive 
 }

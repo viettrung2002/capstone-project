@@ -41,7 +41,7 @@ export default function Compare() {
     }, [products.length]);
     return (
         <div className={`${hasItems ? "visible" :"hidden"} h-[50px] w-[300px] bg-neutral-300/60 z-30 fixed bottom-0 flex items-center rounded-full px-[8px] justify-between`}>
-            <button className={"h-[35px] flex w-[35px] justify-center items-center font-sf text-white bg-stone-800 hover:bg-stone-600 rounded-full text-[20px]"}>
+            <button onClick={()=> setHasItems(false)} className={"h-[35px] flex w-[35px] justify-center items-center font-sf text-white bg-stone-800 hover:bg-stone-600 rounded-full text-[20px]"}>
                 <TbTrash/>
             </button>
             <div className={"flex "}>
@@ -61,6 +61,7 @@ export default function Compare() {
                             <p className={"text-[16px] font-[500] text-stone-800"}>{product.productName}</p>
                             <p className={"text-[15px] font-[500] text-amber-600"}>{product.price}</p>
                         </div>
+
 
                     </div>
                 ))}

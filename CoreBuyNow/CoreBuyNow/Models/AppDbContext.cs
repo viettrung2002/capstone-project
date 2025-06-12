@@ -64,13 +64,18 @@ public class AppDbContext : DbContext
     public DbSet<VoucherWallet> VoucherWallets { get; set; }
     public DbSet<Admin> Admins { get; set; }
     public DbSet<CustomerInteraction> CustomerInteractions { get; set; }
-    
+    public DbSet<Notification> Notifications { get; set; }
     public DbSet<Wallet> Wallets { get; set; }
     public DbSet<Transaction> Transactions { get; set; }
     public DbSet<Voucher> Vouchers { get; set; }
     public DbSet<Product> Products { get; set; }
     public DbSet<Category> Categories { get; set; }
     public DbSet<SubCategory> SubCategories { get; set; }
+    public DbSet<Province> Provinces { get; set; }
+    public DbSet<District> Districts { get; set; }
+    
+    public DbSet<Address> Addresses { get; set; }
+    public DbSet<Ward> Wards { get; set; }
     public DbSet<SubCategoryAttribute> SubCategoryAttributes { get; set; }
     public DbSet<ProductAttribute> ProductAttributes { get; set; }
     

@@ -1,10 +1,12 @@
+'use client'
+
 import {HiChevronDown, HiChevronUp} from "react-icons/hi2";
 import {useState, useEffect, useRef} from "react";
 import {ICategory, ISubCategoryAttribure, SubCategory} from "@/app/types/ subCategory";
 import Cookies from "js-cookie";
 import {useParams, useRouter} from "next/navigation";
 import Image from "next/image";
-export default function CreateProduct() {
+export default function Page() {
     const [openCategory, setOpenCategory] = useState<boolean>(false);
     const [categories, setCategories] = useState<ICategory[]>([]);
     const [selectedSubCategory, setSelectedSubCategory] = useState<SubCategory>();
@@ -17,6 +19,7 @@ export default function CreateProduct() {
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [uploading, setUploading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [description, setDescription] = useState<string>("");
     const [urlImage, setUrlImage] = useState("")
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = e.target.files?.[0];
@@ -109,6 +112,7 @@ export default function CreateProduct() {
                     subCategoryId: selectedSubCategory?.subCategoryId,
                     price: price,
                     mainImage: urlImage,
+                    description: description,
                     extraImage: "https://i01.appmifile.com/v1/MI_18455B3E4DA706226CF7535A58E875F0267/pms_1645585904.11171995.png",
                     specifications: spec,
                 })
@@ -148,16 +152,16 @@ export default function CreateProduct() {
                             accept="image/*"
                             className="hidden"
                         />
-                        <button onClick={() => fileInputRef.current?.click()} className={"px-[15px] py-[5px] bg-blue-500 text-gray-50 text-[15px] hover:shadow-md mt-[5px]"}>
+                        <button onClick={() => fileInputRef.current?.click()} className={"px-[15px] py-[5px] bg-blue-500 text-gray-50 text-[15px] hover:shadow-md mt-[5px] rounded-full"}>
                             <p>Chọn Ảnh</p>
                         </button>
                         <button onClick={handleUpload}
                                 disabled={uploading}
-                                className={"px-[15px] py-[5px] bg-blue-500 text-gray-50 text-[15px] hover:shadow-md mt-[5px]"}>
+                                className={"px-[15px] py-[5px] bg-blue-500 text-gray-50 text-[15px] hover:shadow-md mt-[5px] rounded-full"}>
                             <p>{uploading ? 'Đang tải ...' : 'Tải lên'}</p>
                         </button>
-                        <p className={"text-gray-600 text-[14px] mt-[10px]"}>Dung lượng tối đa 5 MB</p>
-                        <p className={"text-gray-600 text-[14px]"}>Định Dạng: .JPEG, .PNG</p>
+                        {/*<p className={"text-gray-600 text-[14px] mt-[10px]"}>Dung lượng tối đa 5 MB</p>*/}
+                        {/*<p className={"text-gray-600 text-[14px]"}>Định Dạng: .JPEG, .PNG</p>*/}
                         <p className={"text-gray-600 text-[14px]"}>Tỉ lệ hình ảnh: 1x1</p>
                     </div>
                 </div>
@@ -173,6 +177,9 @@ export default function CreateProduct() {
 
                         <div className={"h-[40px] flex items-center justify-center text-gray-800 text-[15px] mt-[20px]"}>
                             <p>Giá tiền</p>
+                        </div>
+                        <div className={"h-[40px] flex items-center justify-center text-gray-800 text-[15px] mt-[20px]"}>
+                            <p>Mô Tả</p>
                         </div>
 
                     </div>
@@ -227,6 +234,13 @@ export default function CreateProduct() {
                             />
                             <p className={"text-[15px] ml-[10px] text-gray-600"}>VND</p>
                         </div>
+                        <textarea
+
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            className={"h-[120px] w-full border border-gray-200 focus:outline-none rounded-[8px] text-[15px] mt-[20px] px-[10px] py-[10px]"}
+                        />
+                        <button onClick={()=> CreateProduct()} className={"w-[140px] h-[40px] rounded-full bg-blue-500 flex justify-center items-center text-white mt-[20px]"} >Tạo Sản Phẩm</button>
 
 
 
@@ -259,7 +273,6 @@ export default function CreateProduct() {
                                         />
                                         <p className={"text-gray-600 text-[15px] ml-[10px]"}>{attribute.unit}</p>
                                     </div>
-
                                     : attribute.dataType == "String" ?
                                         <div className={"w-full h-full flex items-center"}>
                                             <input
@@ -305,7 +318,7 @@ export default function CreateProduct() {
                 </div>
             </div>
 
-            <button onClick={()=> CreateProduct()}>HEHEHHE</button>
+
         </div>
     )
 }

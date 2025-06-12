@@ -8,4 +8,10 @@ public class CustomerService (ICustomerRepository customerRepository) : ICustome
     {
         return await customerRepository.GetCustomerById(customerId);
     }
+
+
+    public async Task EditCustomer(Customer customer, Guid id)
+    {
+        await customerRepository.EditCustomer(customer, id);
+    }
 }

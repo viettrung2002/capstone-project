@@ -8,6 +8,7 @@ public class ProductResponseDto {
     public int Discount {set; get;}
     public int ReviewCount {set; get;}
     public decimal Price {set; get;}
+    public int Inventory {set; get;}
     public int Like  {set; get;}
 }
 
@@ -32,5 +33,7 @@ public class ProductInfoResponseDto
         public Dictionary<string, string> Specifications { get; set; } = new ();
         public bool IsFlashSale { get; set; }
         public int ReviewCount { get; set; }
+        
+        public int Inventory { get; set; }
     
 }

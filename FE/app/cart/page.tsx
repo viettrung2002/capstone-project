@@ -25,6 +25,17 @@ export  default function Cart() {
             return acc;
         }, {} as Record<string, boolean>)
     );
+    const [total, setTotal] = useState(0);
+    useEffect(() => {
+        const newTotal = products.reduce((sum, product) => {
+            if (localActiveItem[product.itemId]) {
+                return sum + product.price * product.quantity;
+            }
+            return sum;
+        }, 0);
+
+        setTotal(newTotal);
+    }, [products, localActiveItem]);
     const [localQuantity, setLocalQuantities] = useState<Record<string, string>>(products.reduce((acc,p)=>({...acc, [p.itemId]: p.quantity}),{}))
     // const handleQuantityChange = (itemId: string, value: number) => {
     //     const newQuantity = parseInt(value, 10);
@@ -176,28 +187,28 @@ export  default function Cart() {
         return Object.values(localActiveItem).includes(false);
     }
     return (
-        <div className={"w-full flex justify-center flex-col items-center bg-white"}>
-            <div className={`2xl:w-[1300px] xl:w-full h-[40px] mt-[10px]  items-center flex mb-[20px]`}>
-                <div className="flex items-center w-[250px] h-full  ">
-                    <Breadcrumb breadcrumbs={breadcrumbs} />
+        <div className={"w-full flex justify-center flex-col items-center bg-white pt-[20px] pb-[20px]"}>
+            {/*<div className={`2xl:w-[1300px] xl:w-full h-[40px] mt-[10px]  items-center flex mb-[20px]`}>*/}
+            {/*    <div className="flex items-center w-[250px] h-full  ">*/}
+            {/*        <Breadcrumb breadcrumbs={breadcrumbs} />*/}
 
-                </div>
-            </div>
+            {/*    </div>*/}
+            {/*</div>*/}
             <div className={"w-[1300px] grid grid-cols-10 gap-5"}>
                 <div className="col-span-7">
                     <div className={"w-full flex bg-white"}>
                         <div className={"w-full h-[50px]  bg-stone-200 grid rounded-full grid-cols-25 px-[20px]"}>
                             <div className={"col-span-1 flex pl-[10px] items-center"}>
-                                <div onClick={()=> {
-                                    if (checkActivate()){
-                                        setLocalActiveItem(products.reduce((acc,p)=>({...acc, [p.itemId]: true}),{}))
-                                    } else setLocalActiveItem(products.reduce((acc,p)=>({...acc, [p.itemId]: false}),{}))
-                                }
-                                } className={"h-[16px] w-[16px] border border-stone-200 flex items-center justify-center"}>
-                                    <div className={`w-[10px] h-[10px] ${checkActivate()? "bg-white" : "bg-stone-600"}`}>
+                                {/*<div onClick={()=> {*/}
+                                {/*    if (checkActivate()){*/}
+                                {/*        setLocalActiveItem(products.reduce((acc,p)=>({...acc, [p.itemId]: true}),{}))*/}
+                                {/*    } else setLocalActiveItem(products.reduce((acc,p)=>({...acc, [p.itemId]: false}),{}))*/}
+                                {/*}*/}
+                                {/*} className={"h-[16px] w-[16px] border border-stone-200 flex items-center justify-center"}>*/}
+                                {/*    <div className={`w-[10px] h-[10px] ${checkActivate()? "bg-white" : "bg-stone-600"}`}>*/}
 
-                                    </div>
-                                </div>
+                                {/*    </div>*/}
+                                {/*</div>*/}
                             </div>
                             <div className={"col-span-8  flex items-center"}>
                                 <p className={"font-sf text-stone-800 text-[15px]"}>Sản phẩm</p>
@@ -326,16 +337,16 @@ export  default function Cart() {
                     <div className={"border-b border-stone-200 w-full mt-[10px]"}></div>
                     <div className={"flex justify-between items-center mt-[20px] w-full"}>
                         <p className={"font-sf text-stone-600 font-400 text-[16px]"}>Tổng cộng (10 sản phẩm)</p>
-                        <p className={"font-sf text-blue-600 font-400 text-[17px]"}>28900000</p>
+                        <p className={"font-sf text-amber-600 font-400 text-[17px]"}>{total}</p>
                     </div>
                     <div className={"flex justify-between items-center mt-[10px] w-full"}>
                         <p className={"font-sf text-stone-600 font-400 text-[16px]"}>Giảm giá sản phẩm</p>
-                        <p className={"font-sf text-blue-600 font-400 text-[17px]"}>28900000</p>
+                        <p className={"font-sf text-amber-600 font-400 text-[17px]"}>0</p>
                     </div>
                     <div className={"border-b border-stone-200 w-full mt-[10px]"}></div>
                     <div className={"flex justify-between items-center mt-[10px] w-full"}>
                         <p className={"font-sf text-stone-800 font-[600] text-[16px] uppercase"}>Tổng số tiền</p>
-                        <p className={"font-sf text-blue-600 font-[500] text-[18px]"}>100000000</p>
+                        <p className={"font-sf text-amber-600 font-[500] text-[18px]"}>{total}</p>
                     </div>
                     <div className={"border-b border-stone-200 w-full mt-[10px] mb-[20px]"}></div>
 

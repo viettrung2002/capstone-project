@@ -53,7 +53,6 @@ public class ProductRepository(AppDbContext dbContext, ILogger<ProductRepository
         product.SubCategory = await dbContext.SubCategories.FindAsync(product.SubCategoryId);
         product.Vector = vectorizer.BuildVector(product);
         
-        
         dbContext.Products.Add(product);
         await dbContext.SaveChangesAsync();
     }
@@ -127,7 +126,8 @@ public class ProductRepository(AppDbContext dbContext, ILogger<ProductRepository
                 Rating = p.Rating,
                 Discount = p.Discount,
                 Specifications = p.Specifications,
-                IsFlashSale = p.IsFlashSale
+                IsFlashSale = p.IsFlashSale,
+                Inventory = p.Inventory,
             })
             .FirstOrDefaultAsync();
         return res;
@@ -217,7 +217,7 @@ public class ProductRepository(AppDbContext dbContext, ILogger<ProductRepository
         {
             
             var items = await query
-                .Take(8)
+                .Take(10)
                 .Select(p => new ProductResponseDto {
                     ProductId = p.ProductId,
                     ProductName = p.ProductName,
@@ -227,7 +227,9 @@ public class ProductRepository(AppDbContext dbContext, ILogger<ProductRepository
                     Sold = p.Sold,
                     Discount = p.Discount,
                     ReviewCount = dbContext.Comments.Where(c=>c.ProductId == p.ProductId).Count(),
-                    Price = p.Price
+                    Price = p.Price,
+                    Inventory = p.Inventory,
+                    
                 })
                 .ToListAsync();
             return new PageResponseDto<ProductResponseDto>(filter.Index, filter.Size, totalItems, items);
@@ -247,7 +249,8 @@ public class ProductRepository(AppDbContext dbContext, ILogger<ProductRepository
                     Sold = p.Sold,
                     Discount = p.Discount,
                     ReviewCount = dbContext.Comments.Where(c=>c.ProductId == p.ProductId).Count(),
-                    Price = p.Price
+                    Price = p.Price,
+                    Inventory = p.Inventory,
                 })
                 .ToListAsync();
             return new PageResponseDto<ProductResponseDto>(filter.Index, filter.Size, totalItems, items);
@@ -266,7 +269,8 @@ public class ProductRepository(AppDbContext dbContext, ILogger<ProductRepository
                     Sold = p.Sold,
                     Discount = p.Discount,
                     ReviewCount = dbContext.Comments.Where(c=>c.ProductId == p.ProductId).Count(),
-                    Price = p.Price
+                    Price = p.Price,
+                    Inventory = p.Inventory,
                 })
                 .ToListAsync();
             return new PageResponseDto<ProductResponseDto>(filter.Index, filter.Size, totalItems, items);

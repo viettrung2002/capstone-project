@@ -13,5 +13,7 @@ public interface ICustomerRepository
     Task RecordInteraction(Guid userId, Guid productId, ActionType action);
 
     Task<List<Product>> RecommendForUser(Guid userId);
+    
+    
 
 }

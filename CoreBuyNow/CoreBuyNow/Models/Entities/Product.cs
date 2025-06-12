@@ -26,7 +26,10 @@ public class Product
     [Url]
     public string? ExtraImage { get; set; }
     
+    
     public string? Description { get; set; }
+    
+    public int Inventory { get; set; }
     public int Sold { get; set; }
     [Required]
     public DateTime CreatedDate { get; set; }

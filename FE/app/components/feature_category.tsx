@@ -17,7 +17,6 @@ export default function FeatureCategories({category}:{category: ICategory}) {
             <div className={"w-full px-[10px]"}>
                 <div className={"w-full flex flex-col justify-center  bg-white py-[10px] opacity-80 rounded-[20px] hover:shadow-md  group 2xl:relative 2xl:bottom-0 xl:absolute xl:bottom-[10px]"}>
                     <p className={`font-sf text-center font-[500] 2xl:text-[17px] xl:text-[15px] text-neutral-700 uppercase select-none group-hover:text-amber-600`}>{category.categoryName}</p>
-                    <p className={`font-sf text-center font-[500] 2xl:text-[14px] xl:text-[13px] text-neutral-500 `}>323 sản phẩm </p>
                 </div>
             </div>
 

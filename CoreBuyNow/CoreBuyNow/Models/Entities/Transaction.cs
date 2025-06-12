@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace CoreBuyNow.Models.Entities;
 
@@ -7,6 +8,7 @@ public class Transaction
     [Key]
     public Guid TransactionId { get; set; }
     public Guid WalletId { get; set; }
+    [JsonIgnore]
     public Wallet? Wallet { get; set; }
     [Required]
     public TransactionType TransactionType { get; set; }

@@ -11,12 +11,12 @@ public class WalletController (IWalletService walletService) : ControllerBase
 {
     [HttpPut]
     [Authorize(Roles = "Customer, Shop")]
-    public async Task<IActionResult> CreateWallet()
+    public async Task<IActionResult> CreateWallet([FromBody] string otp)
     {
         try
         {
             var id = Guid.Parse(User.FindFirst("id")?.Value);
-            await walletService.CreateWallet(id);
+            await walletService.CreateWallet(id, otp);
             return Ok(new
             {
                 message = "Wallet was created"

@@ -227,19 +227,18 @@ export default function Categories() {
         console.log(locationFilter);
     }, [locationFilter]);
     return (
-        <div className={`flex items-center justify-center flex-col bg-white z-10`}>
+        <div className={`flex items-center justify-center flex-col bg-white z-10 pt-[20px]`}>
 
-            <div className={`w-[1300px] h-[40px] mt-[10px] px-[10px] items-center flex `}>
-                <div className="flex items-center w-[250px] h-full  ">
-                    <Breadcrumb breadcrumbs={breadcrumbs} />
-                </div>
-            </div>
+            {/*<div className={`w-[1300px] h-[40px] mt-[10px] px-[10px] items-center flex `}>*/}
+            {/*    <div className="flex items-center w-[250px] h-full  ">*/}
+            {/*        <Breadcrumb breadcrumbs={breadcrumbs} />*/}
+            {/*    </div>*/}
+            {/*</div>*/}
+            {/*/!*Banner*!/*/}
+            {/*<div>*/}
+            {/*    Banner*/}
+            {/*</div>*/}
             {/*Banner*/}
-            <div>
-                Banner
-            </div>
-            {/*Banner*/}
-
 
             {/*Product*/}
             <div className="flex gap-[20px] w-[1300px] ">
@@ -278,7 +277,7 @@ export default function Categories() {
                                     </div>
                                     <div className={"h-full flex flex-col justify-between pr-[12px] py-[5px]"}>
                                         <p className={"ml-[10px]  font-sf font-[600] text-[14px] text-neutral-800 mt-[0px]"}>{officialStore.shopName}</p>
-                                        <button className={" ml-[10px] w-[90px] flex justify-center items-center hover:bg-amber-500 text-neutral-50 py-[3px] bg-stone-600 font-sf rounded-full font-[500] text-[13px] "}>Xem thêm</button>
+                                        <button onClick={()=> router.push(`/shop/${officialStore.shopId}`)} className={" ml-[10px] w-[90px] flex justify-center items-center hover:bg-amber-500 text-neutral-50 py-[3px] bg-stone-600 font-sf rounded-full font-[500] text-[13px] "}>Xem thêm</button>
                                     </div>
                                 </div>
 

@@ -1,14 +1,14 @@
+'use client'
 import {useState, useEffect} from "react";
 import {useRouter} from "next/navigation";
 import Cookies from "js-cookie";
 import {IVoucher} from "@/app/types/voucher";
 import {HiOutlineSearch} from "react-icons/hi";
-import {Calendar} from "@/components/ui/calendar";
 import * as React from "react"
 import {TbEdit, TbTrash} from "react-icons/tb";
 
 
-export default function VoucherManagement() {
+export default function Page() {
     const router = useRouter();
     const [vouchers, setVouchers] = useState<IVoucher[]>([])
     const  [searchQuery, setSearchQuery] = useState("")
@@ -122,14 +122,14 @@ export default function VoucherManagement() {
         console.log(startDate.toISOString());
     }, [startDate]);
     return (
-        <div className={"w-full bg-white font-sf"}>
+        <div className={"w-full bg-gray-200 font-sf"}>
             <div className={"w-full h-[40px] bg-white mt-[10px] flex items-center px-[10px] rounded-[8px] shadow-md"}>
-                <HiOutlineSearch className={"text-[22px] mr-[10px] text-gray-700"}/>
+                <HiOutlineSearch className={"text-[22px] mr-[10px] text-stone-700"}/>
                 <input
                     value={searchQuery}
                     onChange={(e)=> setSearchQuery(e.target.value)}
                     type={"text"}
-                    className={"flex-1 focus:outline-none pr-[10px] font-sf text-[15px] placeholder:text-gray-400 text-gray-800"}
+                    className={"flex-1 focus:outline-none pr-[10px] font-sf text-[15px] placeholder:text-stone-400 text-stone-800"}
                     placeholder={"Bạn có thể tìn kiếm theo tên sản phẩm"}/>
             </div>
             <div className={"w-full grid grid-cols-4 h-[50px] gap-[1px] mt-[15px] "}>
@@ -179,8 +179,8 @@ export default function VoucherManagement() {
                         {vouchers.map((voucher)=> {
                             return(
                             new Date(voucher.startTime).getTime() <= Date.now() && new Date(voucher.endTime).getTime() >= Date.now() ?
-                                <div key={voucher.voucherId} className={"col-span-1 h-[100px] border-stone-200 flex border rounded-[20px] overflow-hidden"}>
-                                    <div className={"h-full aspect-square  bg-stone-200"}>
+                                <div key={voucher.voucherId} className={"col-span-1 h-[100px] border-stone-200 flex border rounded-[25px] overflow-hidden bg-white p-[5px]"}>
+                                    <div className={"h-full aspect-square  bg-stone-200 rounded-[20px]"}>
 
                                     </div>
                                     <div className={"flex-1 font-sf pl-[15px] flex flex-col justify-center"}>
@@ -194,7 +194,7 @@ export default function VoucherManagement() {
                                             <p className={"text-[15px] ml-[5px] text-stone-900 font-[600]"}>{voucher.minPrice}</p>
                                         </div>
 
-                                        <p className={"text-[13px] text-stone-700"}>Kết thúc: 20/9/2025</p>
+                                        <p className={"text-[13px] text-stone-700"}>Kết thúc: {new Date(voucher.endTime).getHours()}:{new Date(voucher.endTime).getMinutes()}, {new Date(voucher.endTime).getDay()}-{new Date(voucher.endTime).getMonth()}-{new Date(voucher.endTime).getFullYear()}</p>
                                     </div>
                                 </div> : null
                         )})}
@@ -206,8 +206,8 @@ export default function VoucherManagement() {
 
                         {vouchers.map((voucher)=> (
                             new Date(voucher.startTime).getTime() >= Date.now() ?
-                                <div key={voucher.voucherId} className={"col-span-1 h-[120px] border-stone-200 flex border rounded-[20px] overflow-hidden"}>
-                                    <div className={"h-full aspect-square  bg-stone-200"}>
+                                <div key={voucher.voucherId} className={"col-span-1 h-[120px] border-stone-200 flex border rounded-[25px] overflow-hidden bg-white p-[5px] "}>
+                                    <div className={"h-full aspect-square rounded-[20px] bg-stone-200"}>
 
                                     </div>
                                     <div className={"flex-1 font-sf pl-[15px] flex flex-col justify-center"}>
@@ -242,8 +242,8 @@ export default function VoucherManagement() {
 
                         {vouchers.map((voucher)=> (
                             new Date(voucher.endTime).getTime() <= Date.now() ?
-                                <div key={voucher.voucherId} className={"col-span-1 h-[100px] border-stone-200 flex border rounded-[20px] overflow-hidden"}>
-                                    <div className={"h-full aspect-square  bg-stone-200"}>
+                                <div key={voucher.voucherId} className={"col-span-1 h-[100px] border-stone-200 flex border rounded-[25px] overflow-hidden bg-white p-[5px]"}>
+                                    <div className={"h-full aspect-square  bg-stone-200 rounded-[20px]"}>
 
                                     </div>
                                     <div className={"flex-1 font-sf pl-[15px] flex flex-col justify-center"}>
@@ -266,7 +266,7 @@ export default function VoucherManagement() {
                 )}
 
                 {activeTab == 3 && (
-                    <div className={"w-full h-full  grid grid-cols-3 gap-[20px] relative "}>
+                    <div className={"w-full h-full  grid grid-cols-3 gap-[20px] relative bg-white rounded-[25px] py-[20px]" }>
 
                         <div className={"col-span-1"}>
                             <div className={"h-[40px] flex items-center justify-end"}>
@@ -341,14 +341,14 @@ export default function VoucherManagement() {
                                 </button>
                                 {showDatePicker && (
                                     <div className={"absolute top-[45px] bg-stone-100 rounded-[20px] pb-[10px]"}>
-                                        <Calendar
-                                            mode="single"
-                                            selected={startDate}
-                                            onSelect={(date) => {
-                                                if (date) setStartDate(date);
-                                            }}
-                                            initialFocus
-                                        />
+                                        {/*<Calendar*/}
+                                        {/*    mode="single"*/}
+                                        {/*    selected={startDate}*/}
+                                        {/*    onSelect={(date) => {*/}
+                                        {/*        if (date) setStartDate(date);*/}
+                                        {/*    }}*/}
+                                        {/*    initialFocus*/}
+                                        {/*/>*/}
                                         <div className={"w-full h-[40px] mt-[10px] relative flex justify-between px-[10px] items-center"}>
                                             <button onClick={()=>setOpenHour(!openHour)} className={"h-full w-[105px] flex items-center justify-center bg-stone-200 rounded-full"}>
                                                 {startDate.getHours() == 0 ? "00" : "Giờ"}
@@ -402,14 +402,14 @@ export default function VoucherManagement() {
                                 </button>
                                 {showEndDatePicker && (
                                     <div className={"absolute top-[45px] bg-stone-100 rounded-[20px] pb-[10px]"}>
-                                        <Calendar
-                                            mode="single"
-                                            selected={endDate}
-                                            onSelect={(date) => {
-                                                if (date) setEndDate(date);
-                                            }}
-                                            initialFocus
-                                        />
+                                        {/*<Calendar*/}
+                                        {/*    mode="single"*/}
+                                        {/*    selected={endDate}*/}
+                                        {/*    onSelect={(date) => {*/}
+                                        {/*        if (date) setEndDate(date);*/}
+                                        {/*    }}*/}
+                                        {/*    initialFocus*/}
+                                        {/*/>*/}
                                         <div className={"w-full h-[40px] mt-[10px] relative flex justify-between px-[10px] items-center"}>
                                             <button onClick={()=>setOpenHour(!openHour)} className={"h-full w-[105px] flex items-center justify-center bg-stone-200 rounded-full"}>
                                                 {endDate.getHours() == 0 ? "00" : "Giờ"}

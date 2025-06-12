@@ -8,18 +8,11 @@ namespace CoreBuyNow.Repositories.Implementations;
 
 public class BillRepository (AppDbContext dbContext, ILogger<BillRepository> logger) : IBillRepository
 {
-    public async Task CreateBill(Bill bill, Guid customerId)
+    public async Task CreateBill(BillRequestDto req, Guid customerId)
     {
-        if (bill.BillId == Guid.Empty) bill.BillId = Guid.NewGuid();
-        bill.CreateDate = DateTime.Now;
         
-        var customer = await dbContext.Customers.FindAsync(customerId);
-        logger.LogInformation("customer Id {id}", customer.CustomerId);
-        logger.LogInformation("customer Id {price}", bill.TotalPrice);
-        if (customer == null)
-        {
-            throw new Exception("Customer not found");
-        }
+        var bill = req.Bill;
+        if (bill.BillId == Guid.Empty) bill.BillId = Guid.NewGuid();
         if (bill.Items != null)
         {
             foreach (var item in bill.Items)
@@ -36,17 +29,54 @@ public class BillRepository (AppDbContext dbContext, ILogger<BillRepository> log
             {
                 item.UnitPrice = product.Price;
                 // bill.TotalPrice += product.Price - (product.Price * product.Discount / 100) * item.Quantity;
-
+                item.Image = product.MainImage;
                 bill.ShopId = product.ShopId;
             }
         }
+        if (!string.IsNullOrEmpty(req.Otp))
+        {
+            var walletCustomer = dbContext.Wallets.FirstOrDefault(w=>w.UserId == customerId);
+            if (walletCustomer == null) throw new Exception("Wallet user not found");
+            var walletShop = dbContext.Wallets.FirstOrDefault(w => w.UserId == bill.ShopId);
+            if (walletShop == null) throw new Exception("Wallet shop not found");
+            if (walletCustomer.Otp != req.Otp) throw new Exception("Otp doesn't match");
+            if (walletCustomer.Balance < bill.TotalPrice) throw new Exception("Insufficient balance to pay");
+            walletCustomer.Balance -= bill.TotalPrice;
+            var withdrawTransaction = new Transaction
+            {
+                TransactionId = Guid.NewGuid(),
+                WalletId = walletCustomer.WalletId,
+                TransactionType = TransactionType.Withdraw,
+                Amount = bill.TotalPrice,
+                BalanceAfter = walletCustomer.Balance,
+                Description = "Thanhn toan don hang " + bill.BillId,
+                CreateDate = DateTime.Now,
+            };
+            bill.PaymentType = PaymentType.Wallet;
+            dbContext.Wallets.Update(walletCustomer);
+            dbContext.Transactions.Add(withdrawTransaction);
+        }
+        else
+        {
+            bill.PaymentType = PaymentType.Cod;
+        }
+        
+        bill.CreateDate = DateTime.Now;
+        var customer = await dbContext.Customers.FindAsync(customerId);
+        logger.LogInformation("customer Id {id}", customer.CustomerId);
+        logger.LogInformation("customer Id {price}", bill.TotalPrice);
+        if (customer == null)
+        {
+            throw new Exception("Customer not found");
+        }
+        
 
         if (bill.ShopVoucherId != Guid.Empty || bill.ShopVoucherId != Guid.Empty)
         {
             
             var voucher = dbContext.VoucherWallets.Include(b=>b.Voucher).Where(v=>v.CustomerId == customerId).FirstOrDefault(b=>b.VoucherId == bill.ShopVoucherId);
             if (voucher is { Voucher: not null })
-            {
+            {   
                 logger.LogInformation($"Voucher ID nhan duoc tu client: {voucher.VoucherId}");
                 if (voucher.Quantity > 0)
                 {
@@ -89,7 +119,21 @@ public class BillRepository (AppDbContext dbContext, ILogger<BillRepository> log
             } else throw new Exception("Shipping Voucher not found");
         }
         bill.CustomerId = customerId;
+        
+        // Check Inventory
+        foreach (var item in bill.Items)
+        {
+            var product = dbContext.Products.FirstOrDefault(p => p.ProductId == item.ProductId);
+            if (product == null) throw new Exception ("Not found product");
+            if (product.Inventory > item.Quantity)
+            {
+                product.Inventory -= item.Quantity;
+                dbContext.Products.Update(product);
+            }
+            else throw new Exception("Insufficient inventory");
+        }
         dbContext.Bills.Add(bill);
+        
         await dbContext.SaveChangesAsync();
     }
 
@@ -115,8 +159,11 @@ public class BillRepository (AppDbContext dbContext, ILogger<BillRepository> log
                     ShopName = b.Items.Select(i => i.Product.Shop.ShopName).FirstOrDefault(),
                     ShopId = b.Items.Select(i => i.Product.Shop.ShopId).FirstOrDefault(),
                     OrderStatus = b.OrderStatus,
+                    Note = b.Note,
                     TotalPrice = b.TotalPrice,
-                    Items = b.Items
+                    Items = b.Items,
+                    CustomerId = b.CustomerId,
+                    PaymentType = b.PaymentType,
                 })
                 .ToListAsync()
         );
@@ -143,8 +190,11 @@ public class BillRepository (AppDbContext dbContext, ILogger<BillRepository> log
                     ShopName = b.Items.FirstOrDefault().Product.Shop.ShopName,
                     ShopId = b.Items.FirstOrDefault().Product.Shop.ShopId,
                     OrderStatus = b.OrderStatus,
+                    CustomerId = b.CustomerId,
+                    Note = b.Note,
                     TotalPrice = b.TotalPrice,
-                    Items = b.Items
+                    Items = b.Items,
+                    PaymentType = b.PaymentType,
                 })
                 .ToListAsync()
         );
@@ -152,7 +202,7 @@ public class BillRepository (AppDbContext dbContext, ILogger<BillRepository> log
 
     public async Task UpdateStatus(Guid billId)
     {
-        var bill = await dbContext.Bills.FindAsync(billId);
+        var bill = dbContext.Bills.Include(b=>b.Items).FirstOrDefault(b=>b.BillId == billId);
         if (bill == null)
         {
             throw new Exception("Bill not found");
@@ -163,19 +213,92 @@ public class BillRepository (AppDbContext dbContext, ILogger<BillRepository> log
         }
         bill.OrderStatus += 1;
         dbContext.Update(bill);
+        if (bill.OrderStatus == OrderStatus.Completed)
+        {
+            foreach (var item in bill.Items)
+            {
+                var product = dbContext.Products.FirstOrDefault(p => p.ProductId == item.ProductId);
+                if (product == null) throw new Exception ("Not found product");
+                product.Sold += item.Quantity;
+                dbContext.Products.Update(product);
+            }
+
+            if (bill.PaymentType == PaymentType.Wallet)
+            {
+                var shopWallet = dbContext.Wallets.FirstOrDefault(w => w.UserId == bill.ShopId);
+                if (shopWallet == null) throw new Exception ("Not found shop wallet");
+                if (bill.VoucherId != Guid.Empty)
+                {
+                    var value = dbContext.Vouchers.Where(v=>v.VoucherId == bill.VoucherId).Select(v=>v.Value);
+                    shopWallet.Balance += (Convert.ToDecimal(value) + bill.TotalPrice);
+                    var dTransaction = new Transaction
+                    {
+                        TransactionId = Guid.NewGuid(),
+                        WalletId = shopWallet.WalletId,
+                        TransactionType = TransactionType.Deposit,
+                        Amount = bill.TotalPrice + Convert.ToDecimal(value),
+                        BalanceAfter = shopWallet.Balance,
+                        Description = "Nhan Tien Tu Don Hang " + bill.BillId,
+                        CreateDate = DateTime.Now,
+                    };
+                    dbContext.Transactions.Add(dTransaction);
+                }
+                else
+                {
+                    shopWallet.Balance +=  bill.TotalPrice;
+                    var dTransaction = new Transaction
+                    {
+                        TransactionId = Guid.NewGuid(),
+                        WalletId = shopWallet.WalletId,
+                        TransactionType = TransactionType.Deposit,
+                        Amount = bill.TotalPrice,
+                        BalanceAfter = shopWallet.Balance,
+                        Description = "Nhan Tien Tu Don Hang " + bill.BillId,
+                        CreateDate = DateTime.Now,
+                    };
+                    dbContext.Transactions.Add(dTransaction);
+                }
+            }
+        }
+            
         await dbContext.SaveChangesAsync();
     }
 
     public async Task CancelBill(Guid billId)
     {
-        var bill = await dbContext.Bills.FindAsync(billId);
+        var bill = dbContext.Bills
+            .Include(b => b.Items)
+            .FirstOrDefault(b=>b.BillId == billId);
         if (bill == null)
         {
             throw new Exception("Bill not found");
         }
         if (bill.OrderStatus == OrderStatus.Completed ) throw new Exception("Bill is completed");
         bill.OrderStatus = OrderStatus.Cancelled;
+        foreach (var item in bill.Items)
+        {
+            var product = dbContext.Products.FirstOrDefault(p => p.ProductId == item.ProductId);
+            if (product == null) throw new Exception ("Not found product");
+            product.Inventory += item.Quantity;
+            dbContext.Products.Update(product);
+        }
         dbContext.Update(bill);
+        if (bill.PaymentType == PaymentType.Wallet)
+        {
+            var customerWallet = dbContext.Wallets.FirstOrDefault(w => w.UserId == bill.CustomerId);
+            if (customerWallet == null) throw new Exception ("Not found user Wallet");
+            customerWallet.Balance += bill.TotalPrice;
+            var dTransaction = new Transaction
+            {
+                TransactionId = Guid.NewGuid(),
+                WalletId = customerWallet.WalletId,
+                TransactionType = TransactionType.Deposit,
+                Amount = bill.TotalPrice,
+                BalanceAfter = customerWallet.Balance,
+                Description = "Hoan Tien Don Hang " + bill.BillId,
+                CreateDate = DateTime.Now,
+            };
+        }
         await dbContext.SaveChangesAsync();
     }
 
@@ -199,8 +322,11 @@ public class BillRepository (AppDbContext dbContext, ILogger<BillRepository> log
                     {
                         BillId = b.BillId,
                         OrderStatus = b.OrderStatus,
+                        Note = b.Note,
                         TotalPrice = b.TotalPrice,
-                        Items = b.Items
+                        Items = b.Items,
+                        CustomerId = b.CustomerId,
+                        PaymentType = b.PaymentType,
                     })
                     .ToListAsync()
             );
@@ -223,11 +349,21 @@ public class BillRepository (AppDbContext dbContext, ILogger<BillRepository> log
                     {
                         BillId = b.BillId,
                         OrderStatus = b.OrderStatus,
+                        Note = b.Note,
                         TotalPrice = b.TotalPrice,
-                        Items = b.Items
+                        Items = b.Items,
+                        CustomerId = b.CustomerId,
+                        PaymentType = b.PaymentType,
                     })
                     .ToListAsync()
             );
         }
+    }
+
+    public async Task<Bill> GetBill(Guid billId)
+    {
+        var bill = await dbContext.Bills.Include(b => b.Items).FirstOrDefaultAsync(b => b.BillId == billId);
+        if (bill == null ) throw new Exception ("Bill not found");
+        return bill;
     }
 }

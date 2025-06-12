@@ -84,11 +84,12 @@ public class AccountController(IAccountService accountService) : ControllerBase
     {
         try
         {
-            var customerId = Guid.Parse(User.FindFirst("id")?.Value); 
+            var customerId = User.FindFirst("id")?.Value;
+            if (customerId == null) return Unauthorized();
             return Ok(new
-            {
-                data = await accountService.GetCustomer(customerId)
-            });
+                {
+                    data = await accountService.GetCustomer(Guid.Parse(customerId))
+                });
         }
         catch (Exception e)
         {
@@ -111,5 +112,24 @@ public class AccountController(IAccountService accountService) : ControllerBase
             return BadRequest(e.Message);
         }
     }
-    
+
+    [HttpPut("change-password")]
+    [Authorize(Roles = "Customer, Shop")]
+    public async Task<IActionResult> ChangePassword(string oldPassword, string newPassword, string accountId)
+    {
+        try
+        {
+            await accountService.ChangePassword(oldPassword, newPassword, Guid.Parse(accountId));
+            return Ok(new
+            {
+               message = "Password changed"
+            });
+            
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
 }

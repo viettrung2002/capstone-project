@@ -7,9 +7,9 @@ namespace CoreBuyNow.Services.Implementations;
 
 public class BillService (IBillRepository billRepository) : IBillService
 {
-    public async Task CreateBill(Bill bill, Guid customerId)
+    public async Task CreateBill(BillRequestDto req, Guid customerId)
     {
-        await billRepository.CreateBill(bill, customerId);
+        await billRepository.CreateBill(req, customerId);
     }
 
     public async Task<PageResponseDto<BillResponseDto>> GetBills(Guid customerId, int pageIndex, int pageSize)
@@ -35,5 +35,10 @@ public class BillService (IBillRepository billRepository) : IBillService
     public async Task<PageResponseDto<BillResponseDto>> GetBillWithShopId(Guid shopId, OrderStatus? status, int pageIndex, int pageSize)
     {
         return await billRepository.GetBillWithShopId(shopId, status, pageIndex, pageSize);
+    }
+
+    public async Task<Bill> GetBill(Guid billId)
+    {
+        return await billRepository.GetBill(billId);
     }
 }

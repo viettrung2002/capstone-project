@@ -27,3 +27,13 @@ export interface IShopInShop {
     follower: number,
     categories: SubCategory[],
 }
+
+export interface IShopInAdminPage {
+    shopId: string;
+    shopName: string;
+    avatar: string;
+    revenue: number;
+    billCount: number;
+    productCount: number;
+    status: string;
+}

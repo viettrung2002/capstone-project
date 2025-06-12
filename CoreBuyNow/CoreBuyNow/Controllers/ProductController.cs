@@ -70,7 +70,7 @@ public class ProductController (IProductService productService, ILogger<ProductC
     }
     
     [HttpGet("get/{id:guid}")]
-    [Authorize(Roles = "Customer")]
+    [Authorize(Roles = "Customer, Shop")]
     public async Task<IActionResult> GetProduct(Guid id) => Ok(await productService.GetProductById(id));
     
     [HttpPost("search")]

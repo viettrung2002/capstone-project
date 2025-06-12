@@ -6,7 +6,7 @@ import Cookies from "js-cookie";
 import {useRouter} from "next/navigation";
 import {Bill} from "@/app/types/bill";
 
-export default function OrderManagement() {
+export default function Page() {
     const [orderStatus, setOrderStatus] = useState(0);
     const router = useRouter();
     const [bills, setBills] = useState<Bill[]>([]);
@@ -38,9 +38,9 @@ export default function OrderManagement() {
         GetBill();
     },[updateBills])
 
-    const UpdateBill = async (billId: string) => {
+    const UpdateBill = async (bill: Bill) => {
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bill/update-status?billID=${billId}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bill/update-status?billID=${bill.billId}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -48,8 +48,37 @@ export default function OrderManagement() {
             });
             if (response.ok){
                 const data = await response.json();
-                console.log(data)
+                console.log(data);
+                CreateNotification(bill);
                 setUpdateBills(!updateBills);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    const CreateNotification = async (bill : Bill) => {
+        const title = bill.orderStatus == "Pending" ? "Đã xác nhận đơn hàng" : bill.orderStatus == "Confirmed" ? "Đang vận chuyển" : bill.orderStatus == "Shipped" ? "Đã hoàn thành đơn hàng" : "Đã hủy đơn" ;
+        const content = bill.orderStatus == "Pending" ? `Đơn hàng ${bill.billId} đã được xác nhận. Vui lòng kiểm tra lại thông tin đơn hàng trong phần Chi tiết đơn hàng.`
+            : bill.orderStatus == "Confirmed" ? `Đơn hàng ${bill.billId} đã được người bán giao cho đơn vị vận chuyển.`
+                : bill.orderStatus == "Shipped" ? `Đơn hàng ${bill.billId} đã được giao thành công đến bạn.`
+                    : `Đơn hàng ${bill.billId} đã bị hủy.` ;
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/notification`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    billId: bill.billId,
+                    userId: bill.customerId,
+                    content: content,
+                    title: title,
+                })
+            });
+            if (response.ok){
+                const data = await response.json();
+                console.log(data)
+                alert(data.message)
             }
         } catch (error) {
             console.log(error);
@@ -91,9 +120,12 @@ export default function OrderManagement() {
                     <div key={bill.billId} className={"w-full bg-white mt-[10px] border border-gray-200"}>
                         <div className={"h-[50px] border-b border-gray-200 px-[20px] flex items-center justify-between"}>
                             <p className={"font-sf text-gray-800 "}>{bill.orderStatus == "Pending" ? "ĐANG XỬ LÝ" : bill.orderStatus == "Confirmed" ? "ĐÃ XÁC NHẬN" : bill.orderStatus == "Shipped" ? "ĐANG GIAO HÀNG" : bill.orderStatus == "Completed" ? "ĐÃ HOÀN THÀNH"  : "ĐÃ HỦY"}</p>
-                            <button onClick={()=> UpdateBill(bill.billId)} className={"px-[20px] bg-blue-500 hover:bg-gray-700 h-[35px]"}>
+
+                            {bill.orderStatus != "Completed" &&
+                            <button onClick={()=> UpdateBill(bill)} className={"px-[20px] bg-blue-500 hover:bg-gray-700 h-[35px]"}>
                                 <p className={"font-sf text-gray-50 text-[15px]"}>{bill.orderStatus == "Pending" ? "Xác Nhận Đơn" : "Cập Nhật Trạng Thái"}</p>
                             </button>
+                            }
                         </div>
                         <div className={"w-full px-[20px] border-dashed border-gray-200 border-b"}>
                             {

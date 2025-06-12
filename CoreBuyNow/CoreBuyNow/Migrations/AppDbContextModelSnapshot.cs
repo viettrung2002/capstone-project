@@ -46,6 +46,48 @@ namespace CoreBuyNow.Migrations
                     b.ToTable("Accounts");
                 });
 
+            modelBuilder.Entity("CoreBuyNow.Models.Entities.Address", b =>
+                {
+                    b.Property<Guid>("AddressId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("DistrictId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<Guid>("ProvinceId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("StreetAddress")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("WardId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("AddressId");
+
+                    b.HasIndex("DistrictId");
+
+                    b.HasIndex("ProvinceId");
+
+                    b.HasIndex("WardId");
+
+                    b.ToTable("Addresses");
+                });
+
             modelBuilder.Entity("CoreBuyNow.Models.Entities.Admin", b =>
                 {
                     b.Property<Guid>("AdminId")
@@ -81,7 +123,14 @@ namespace CoreBuyNow.Migrations
                     b.Property<Guid>("ItemInCartId")
                         .HasColumnType("char(36)");
 
+                    b.Property<string>("Note")
+                        .HasMaxLength(1500)
+                        .HasColumnType("varchar(1500)");
+
                     b.Property<int>("OrderStatus")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PaymentType")
                         .HasColumnType("int");
 
                     b.Property<Guid>("ShippingVoucherId")
@@ -172,11 +221,22 @@ namespace CoreBuyNow.Migrations
                         .HasMaxLength(2005)
                         .HasColumnType("varchar(2005)");
 
+                    b.Property<string>("Avatar")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
                     b.Property<DateTime>("BirthDay")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("CustomerName")
                         .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<Guid>("DefaultAddressId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Email")
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)");
 
@@ -235,6 +295,26 @@ namespace CoreBuyNow.Migrations
                     b.ToTable("CustomerInteractions");
                 });
 
+            modelBuilder.Entity("CoreBuyNow.Models.Entities.District", b =>
+                {
+                    b.Property<Guid>("DistrictId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("DistrictName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<Guid>("ProvinceId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("DistrictId");
+
+                    b.HasIndex("ProvinceId");
+
+                    b.ToTable("Districts");
+                });
+
             modelBuilder.Entity("CoreBuyNow.Models.Entities.Interaction", b =>
                 {
                     b.Property<Guid>("InteractionId")
@@ -273,6 +353,9 @@ namespace CoreBuyNow.Migrations
 
                     b.Property<Guid>("BillId")
                         .HasColumnType("char(36)");
+
+                    b.Property<string>("Image")
+                        .HasColumnType("longtext");
 
                     b.Property<Guid>("ProductId")
                         .HasColumnType("char(36)");
@@ -319,6 +402,37 @@ namespace CoreBuyNow.Migrations
                     b.ToTable("ItemInCarts");
                 });
 
+            modelBuilder.Entity("CoreBuyNow.Models.Entities.Notification", b =>
+                {
+                    b.Property<Guid>("NotificationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("BillId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Content")
+                        .HasMaxLength(3000)
+                        .HasColumnType("varchar(3000)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("Read")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Title")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("NotificationId");
+
+                    b.ToTable("Notifications");
+                });
+
             modelBuilder.Entity("CoreBuyNow.Models.Entities.Product", b =>
                 {
                     b.Property<Guid>("ProductId")
@@ -336,6 +450,9 @@ namespace CoreBuyNow.Migrations
 
                     b.Property<string>("ExtraImage")
                         .HasColumnType("longtext");
+
+                    b.Property<int>("Inventory")
+                        .HasColumnType("int");
 
                     b.Property<bool>("IsFlashSale")
                         .HasColumnType("tinyint(1)");
@@ -404,6 +521,21 @@ namespace CoreBuyNow.Migrations
                     b.ToTable("ProductAttributes");
                 });
 
+            modelBuilder.Entity("CoreBuyNow.Models.Entities.Province", b =>
+                {
+                    b.Property<Guid>("ProvinceId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("ProvinceName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("ProvinceId");
+
+                    b.ToTable("Provinces");
+                });
+
             modelBuilder.Entity("CoreBuyNow.Models.Entities.Shop", b =>
                 {
                     b.Property<Guid>("ShopId")
@@ -419,10 +551,15 @@ namespace CoreBuyNow.Migrations
                         .HasColumnType("varchar(2000)");
 
                     b.Property<string>("Avatar")
-                        .HasColumnType("longtext");
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(250)
+                        .HasColumnType("varchar(250)");
 
                     b.Property<bool>("IsOfficial")
                         .HasColumnType("tinyint(1)");
@@ -434,6 +571,9 @@ namespace CoreBuyNow.Migrations
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.HasKey("ShopId");
 
@@ -597,6 +737,11 @@ namespace CoreBuyNow.Migrations
                     b.Property<Guid?>("CustomerId")
                         .HasColumnType("char(36)");
 
+                    b.Property<string>("Otp")
+                        .IsRequired()
+                        .HasMaxLength(6)
+                        .HasColumnType("varchar(6)");
+
                     b.Property<Guid?>("ShopId")
                         .HasColumnType("char(36)");
 
@@ -606,6 +751,10 @@ namespace CoreBuyNow.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("char(36)");
 
+                    b.Property<string>("WalletNumber")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.HasKey("WalletId");
 
                     b.HasIndex("CustomerId");
@@ -613,6 +762,53 @@ namespace CoreBuyNow.Migrations
                     b.HasIndex("ShopId");
 
                     b.ToTable("Wallets");
+                });
+
+            modelBuilder.Entity("CoreBuyNow.Models.Entities.Ward", b =>
+                {
+                    b.Property<Guid>("WardId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("DistrictId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("WardName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("WardId");
+
+                    b.HasIndex("DistrictId");
+
+                    b.ToTable("Wards");
+                });
+
+            modelBuilder.Entity("CoreBuyNow.Models.Entities.Address", b =>
+                {
+                    b.HasOne("CoreBuyNow.Models.Entities.District", "District")
+                        .WithMany()
+                        .HasForeignKey("DistrictId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CoreBuyNow.Models.Entities.Province", "Province")
+                        .WithMany()
+                        .HasForeignKey("ProvinceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CoreBuyNow.Models.Entities.Ward", "Ward")
+                        .WithMany()
+                        .HasForeignKey("WardId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("District");
+
+                    b.Navigation("Province");
+
+                    b.Navigation("Ward");
                 });
 
             modelBuilder.Entity("CoreBuyNow.Models.Entities.Admin", b =>
@@ -692,6 +888,17 @@ namespace CoreBuyNow.Migrations
                     b.Navigation("Customer");
 
                     b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("CoreBuyNow.Models.Entities.District", b =>
+                {
+                    b.HasOne("CoreBuyNow.Models.Entities.Province", "Province")
+                        .WithMany()
+                        .HasForeignKey("ProvinceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Province");
                 });
 
             modelBuilder.Entity("CoreBuyNow.Models.Entities.Interaction", b =>
@@ -867,6 +1074,17 @@ namespace CoreBuyNow.Migrations
                     b.Navigation("Customer");
 
                     b.Navigation("Shop");
+                });
+
+            modelBuilder.Entity("CoreBuyNow.Models.Entities.Ward", b =>
+                {
+                    b.HasOne("CoreBuyNow.Models.Entities.District", "District")
+                        .WithMany()
+                        .HasForeignKey("DistrictId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("District");
                 });
 
             modelBuilder.Entity("CoreBuyNow.Models.Entities.Account", b =>

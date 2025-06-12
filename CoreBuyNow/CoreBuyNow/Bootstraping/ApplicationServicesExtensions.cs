@@ -2,6 +2,7 @@
 using System.Text.Json.Serialization;
 using CoreBuyNow.Models;
 using CoreBuyNow.Models.Entities;
+using CoreBuyNow.Repositories;
 using CoreBuyNow.Repositories.Implementations;
 using CoreBuyNow.Repositories.Interfaces;
 using CoreBuyNow.Services.Implementations;
@@ -60,7 +61,8 @@ public static class ApplicationServicesExtensions
         builder.Services.AddScoped<IBillRepository, BillRepository>();
         builder.Services.AddScoped<IVoucherRepository, VoucherRepository>();
         builder.Services.AddScoped<IWalletRepository, WalletRepository>();
-        
+        builder.Services.AddScoped<IAdminRepository, AdminRepository>();
+        builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
         builder.Services.AddScoped<IShopService, ShopService>();
         builder.Services.AddScoped<IWalletService, WalletService>();
         builder.Services.AddScoped<IAccountService, AccountService>();
@@ -70,7 +72,9 @@ public static class ApplicationServicesExtensions
         builder.Services.AddScoped<ICartService, CartService>();
         builder.Services.AddScoped<IBillService, BillService>();
         builder.Services.AddScoped<IVoucherService, VoucherService>();
-
+        builder.Services.AddScoped<IAddressRepository, AddressRepository>();
+        builder.Services.AddScoped<PayOsService>();
+        builder.Services.AddScoped<AddressImporter>();
         builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

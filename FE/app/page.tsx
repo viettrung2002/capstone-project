@@ -34,6 +34,7 @@ export default function Home() {
     const [flashSaleProducts, setFlashSaleProducts] = useState<IProduct[]>([]);
     const [category, setCategory] = useState<ICategory[]>([]);
     const router = useRouter();
+    const [openNotification, setOpenNotification] = useState<boolean>(false);
     const token = Cookies.get("token");
     const role = Cookies.get("role");
     const id = Cookies.get("id");
@@ -55,9 +56,8 @@ export default function Home() {
                     },
                     body: JSON.stringify({
                         index: 0,
-                        size:10,
+                        size: 10,
                         isHome: true,
-
                     })
                 })
                 const data = await response.json();
@@ -79,7 +79,7 @@ export default function Home() {
                     },
                     body: JSON.stringify({
                         index: 0,
-                        size:8,
+                        size: 10,
                         isFlashSale: true,
                         isHome: true,
                     })
@@ -136,6 +136,12 @@ export default function Home() {
         }, 3000);
         return () => clearInterval(interval);
     }, []);
+
+    useEffect(() => {
+        window.addEventListener("userLoggedIn", ()=> setOpenNotification(true));
+        return () => window.removeEventListener("userLoggedIn", ()=> setOpenNotification(true));
+    }, []);
+
     useEffect(() => {
         if (timeLeft <= 0) return;
 
@@ -154,16 +160,25 @@ export default function Home() {
         return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
     };
 
-
     return (
         <div className="Home bg-white flex flex-col items-center z-10 relative ">
+
+            {
+                openNotification && (
+                    <div className={"absolute top-0 w-[200px] h-[50px] border border-amber-600"}>
+
+                    </div>
+                )
+            }
             <div className={"w-full h-full fixed top-0 z-0"}>
-                <Image src={"/banner.png"} alt={"banner"} fill={true} style={{objectFit: "fill"}}/>
+                <Image src={"/banner.png"} alt={"banner"} fill={true} style={{objectFit: "cover"}}/>
             </div>
 
             <div className="h-screen w-full mt-[15px] flex flex-col justify-center z-20 font-sf pl-[100px] pb-[180px]">
                 <p className={"font-[500] text-neutral-700 text-[17px] "}>BuyNow</p>
-                <p className={" font-[800] text-[40px]"}>KHÁM PHÁ THẾ GIỚI CÔNG NGHỆ</p>
+                <p className={" font-[800] text-[40px] text-amber-600"}
+                   style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.2)" }}
+                >KHÁM PHÁ THẾ GIỚI CÔNG NGHỆ</p>
                 <p className={"w-1/3 font-[400] text-neutral-700"}>
                     Trải nghiệm mua sắm sản phẩm công nghệ thông minh, nhanh chóng và đáng tin cậy. Khám phá ngay hàng ngàn lựa chọn chính hãng, cập nhật xu hướng công nghệ một cách dễ dàng và tận hưởng cuộc sống hiện đại hơn mỗi ngày!
                 </p>
@@ -367,13 +382,7 @@ export default function Home() {
                         </div>
                     </div>
                 </div>
-                <div className={"h-screen w-full bg-neutral-300 flex items-center justify-center "}>
 
-                    <p className={"text-neutral-800 font-sf font-[600] hover:text-amber-500"}>TRANG CHU</p>
-                    <div className={"w-[300px] h-[500px] bg-neutral-600 flex"}>
-
-                    </div>
-                </div>
             </div>
 
 

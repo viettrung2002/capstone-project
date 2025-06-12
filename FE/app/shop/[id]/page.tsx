@@ -86,12 +86,12 @@ export default function Shop() {
         GetProduct();
     }, [pageIndex, pageSize, sortBy, searchQuery, subCategoryId]);
     return (
-        <div className="w-full flex  flex-col items-center">
-            <div className={`2xl:w-[1300px] xl:w-full h-[40px] mt-[10px]  items-center flex mb-[20px]`}>
-                <div className="flex items-center w-[250px] h-full  ">
-                    <Breadcrumb breadcrumbs={breadcrumbs} />
-                </div>
-            </div>
+        <div className="w-full flex  flex-col items-center pt-[20px]">
+            {/*<div className={`2xl:w-[1300px] xl:w-full h-[40px] mt-[10px]  items-center flex mb-[20px]`}>*/}
+            {/*    <div className="flex items-center w-[250px] h-full  ">*/}
+            {/*        <Breadcrumb breadcrumbs={breadcrumbs} />*/}
+            {/*    </div>*/}
+            {/*</div>*/}
             <div className={"w-full mb-[20px]"}>
                 <div className={"w-full  bg-white flex justify-center "}>
                     <div className={"w-[1300px]  h-full border border-stone-200 rounded-[25px] flex pt-[30px] px-[30px] flex-col "}>

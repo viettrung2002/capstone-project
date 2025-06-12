@@ -16,6 +16,7 @@ public class ShopRepository (AppDbContext dbContext) : IShopRepository
         }
         if (shop.ShopId == Guid.Empty) shop.ShopId = Guid.NewGuid();
         shop.CreatedDate = DateTime.Now;
+        shop.Status = Status.Inactive;
         dbContext.Shops.Add(shop);
         await dbContext.SaveChangesAsync();
     }

@@ -102,4 +102,9 @@ public class AccountService (IAccountRepository accountRepository, ICustomerRepo
     {
         return await shopRepository.GetShopById(shopId);
     }
+
+    public async Task ChangePassword(string oldPassword, string newPassword, Guid accountId)
+    {
+        await accountRepository.ChangePassword(oldPassword, newPassword, accountId);
+    }
 }

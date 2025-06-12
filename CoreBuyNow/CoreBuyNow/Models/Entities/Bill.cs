@@ -23,6 +23,10 @@ public class Bill
     public Guid ShopVoucherId { get; set; }
     public Guid VoucherId { get; set; }
     public List<ItemInBill> Items { get; set; } = [];
+    [StringLength(1500)]
+    public string? Note { get; set; }
+
+    public PaymentType PaymentType { get; set; } = PaymentType.Cod;
 
 }
 
@@ -35,18 +39,24 @@ public enum OrderStatus
     Cancelled
 }
 
+public enum PaymentType
+{
+    Cod,
+    Wallet
+}
 public class ItemInBill
 {
     
     [Key]
     public Guid ItemId { get; set; }
     public Guid BillId { get; set; }
+    [JsonIgnore]
     public Bill? Bill { get; set; }
     [Required]
     public Guid ProductId { get; set; }
 
     public string? ProductName { set; get; }
-
+    public string? Image { set; get; }
     [JsonIgnore]
     public Product? Product { get; set; }
     public decimal UnitPrice { get; set; }

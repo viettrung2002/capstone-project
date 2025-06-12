@@ -8,6 +8,7 @@ export interface IProduct {
     sold: number;
     rating: number;
     reviewCount: number;
+    inventory: number;
 }
 export interface IProductData {
     productId: string;
@@ -27,6 +28,8 @@ export interface IProductData {
     specifications: Record<string, string>;
     isFlashSale: boolean;
     reviewCount: number;
+    inventory: number;
+    description: string;
 }
 
 export interface IProductInCart {
@@ -49,7 +52,6 @@ export interface IProductInBill {
     productName: string;
     unitPrice: number;
     quantity: number;
-
 }
 
 export interface IProductInCompare {

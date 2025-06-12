@@ -31,6 +31,8 @@ namespace CoreBuyNow.Repositories.Implementations
             existingCustomer.BirthDay = customer.BirthDay;
             existingCustomer.Address = customer.Address;
             existingCustomer.PhoneNumber = customer.PhoneNumber;
+            existingCustomer.Email = customer.Email;
+            existingCustomer.Avatar = customer.Avatar;
             dbContext.Customers.Update(existingCustomer);
             await dbContext.SaveChangesAsync();
         }

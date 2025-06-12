@@ -10,6 +10,7 @@ import {IProductData, IProductInCompare} from "@/app/types/product";
 import Cookies from "js-cookie";
 import {IComment, ICommentReq} from "@/app/types/comment";
 import {TbArrowDown, TbChevronDown, TbMinus, TbPlus, TbStar, TbStarFilled} from "react-icons/tb";
+import type {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
 type Product = {
     id: number;
     category: string;
@@ -26,17 +27,44 @@ export default function ProductInfo () {
     const [chooseColor , setChooseColor] = useState("")
     const [product, setProduct] = useState<IProductData | null>(null)
     const [rating, setRating] = useState<Record<number, number> | null>(null)
+    const [tab, setTab] = useState("spec")
     const [comment, setComment] = useState<IComment[]>([])
     const [openFilterComment, setOpenFilterComment] = useState<boolean>(false)
     const [star, setStar] = useState(0)
     const [showPostComment, setShowPostComment] = useState<boolean>(false)
     const [reload, setReload] = useState<boolean>(false)
+    const [recomendProducts, setRecomendProducts] = useState<IProductData[]>([])
+    const [showNotification, setShowNotification] = useState<boolean>(false)
+    const [showOutOfInventory, setShowOutOfInventory] = useState<boolean>(false)
     const [newComment, setNewComment] = useState<ICommentReq>({
         content: "",
         rating: 5,
         productId: id ? id.toString() : ""
     })
     const token = Cookies.get("token");
+
+    async function AddToCart( productId: string) {
+        if (!token) {
+            router.push("/login");
+        }
+        try {
+            const response = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/cart`,{
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    productId: productId,
+                })
+            })
+            const data = await response.json();
+            setShowNotification(true)
+            console.log(data);
+        } catch (error) {
+            console.log(error)
+        }
+    }
     useEffect(() => {
         async function GetProductById () {
 
@@ -78,7 +106,28 @@ export default function ProductInfo () {
             }
         }
         GetRating ();
-    }, []);
+
+        async function GetRecommendedProduct () {
+            try {
+                const response = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/recommend`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`
+                    }
+                })
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log(data);
+                    setRecomendProducts(data.data);
+                }
+
+            } catch (error) {
+                console.error(error)
+            }
+        }
+        GetRecommendedProduct()
+    }, [reload]);
 
     useEffect(() => {
         async function GetComments () {
@@ -112,110 +161,7 @@ export default function ProductInfo () {
         "/e.png",
 
     ]
-    const products = {
-        id: 1,
-        category: "Laptop",
-        name: "Macbook Pro M4 51Gb",
-        image: `/products/product-1.jpg`,
-        star: 4.5,
-        price: 4000,
-        discount: 10,
-        color: ["green", "blue", "red"],
-        stock: 10
-
-    }
-    const recomendedProducts : Product[] = [
-        {
-            id: 1,
-            category: "Laptop",
-            name: "MacBook Pro M4",
-            image: "/products/product-1.jpg",
-            star: 4.5,
-            price: 4000,
-            discount: 10,
-        },
-        {
-            id: 2,
-            category: "Laptop",
-            name: "MacBook Air M2",
-            image: "/products/product-2.jpg",
-            star: 4.2,
-            price: 2500,
-            discount: 5,
-        },
-        {
-            id: 3,
-            category: "Laptop",
-            name: "Dell XPS 15",
-            image: "/products/product-3.jpg",
-            star: 4.7,
-            price: 3300,
-            discount: 8,
-        },
-        {
-            id: 4,
-            category: "Laptop",
-            name: "HP Spectre x360",
-            image: "/products/product-4.jpg",
-            star: 4.3,
-            price: 2900,
-            discount: 7,
-        },
-        {
-            id: 5,
-            category: "Laptop",
-            name: "Asus ROG Zephyrus",
-            image: "/products/product-5.jpg",
-            star: 4.8,
-            price: 3500,
-            discount: 12,
-        },
-        {
-            id: 6,
-            category: "Laptop",
-            name: "Lenovo ThinkPad X1",
-            image: "/products/product-6.jpg",
-            star: 4.4,
-            price: 2700,
-            discount: 6,
-        },
-        {
-            id: 7,
-            category: "Laptop",
-            name: "Acer Swift 5",
-            image: "/products/product-7.jpg",
-            star: 4.1,
-            price: 2100,
-            discount: 9,
-        },
-        {
-            id: 8,
-            category: "Laptop",
-            name: "MSI Prestige 14",
-            image: "/products/product-8.jpg",
-            star: 4.0,
-            price: 2400,
-            discount: 10,
-        },
-        {
-            id: 9,
-            category: "Laptop",
-            name: "Razer Blade 14",
-            image: "/products/product-5.jpg",
-            star: 4.6,
-            price: 3700,
-            discount: 15,
-        },
-        {
-            id: 10,
-            category: "Laptop",
-            name: "Surface Laptop 5",
-            image: "/products/product-8.jpg",
-            star: 4.2,
-            price: 2600,
-            discount: 5,
-        },
-    ]
+    //
     async function CreateComment () {
         if (!token) {
             router.push("/login");
@@ -234,7 +180,9 @@ export default function ProductInfo () {
             if (response.ok) {
                 const data = await response.json();
                 console.log("comment",data);
+                setShowPostComment(false)
                 setReload(!reload);
+
             }
 
         } catch (error) {
@@ -247,7 +195,14 @@ export default function ProductInfo () {
 
     function AddToCompare(product: IProductData) {
         console.log("add to Compare", product);
-        if (localStorage.length >= 2) {
+        let d = 0 ;
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key != "productInBill") {
+                    d +=1
+                }
+            }
+        if (d >= 2) {
             console.log('DA QUA 2 SAN PHAM');
             return;
         }
@@ -261,12 +216,26 @@ export default function ProductInfo () {
     }
 
     return (
-        <div className="w-full flex bg-white flex-col items-center">
-            <div className={`w-[1300px] h-[40px] mt-[10px]  items-center flex mb-[20px]`}>
-                <div className="flex items-center w-[250px] h-full  ">
-                    <Breadcrumb breadcrumbs={breadcrumbs} />
+        <div className="w-full flex bg-white flex-col items-center pt-[20px]">
+            {/*<div className={`w-[1300px] h-[40px] mt-[10px]  items-center flex mb-[20px]`}>*/}
+            {/*    <div className="flex items-center w-[250px] h-full  ">*/}
+            {/*        <Breadcrumb breadcrumbs={breadcrumbs} />*/}
+            {/*    </div>*/}
+            {/*</div>*/}
+            {showNotification &&
+                <div className={"absolute top-[50px] border border-stone-200 py-[20px] px-[20px] flex flex-col z-50 bg-white rounded-[25px] shadow-md "}>
+                    <p>{showOutOfInventory ? "Số lượng tồn kho không đủ" : "Thêm sản phẩm vào giỏ hành thành công"}</p>
+                    <div className={"flex mt-[15px] "}>
+                        <button onClick={()=> {
+                            setShowNotification(false)
+                            setShowOutOfInventory(false)
+                        }} className={"px-[20px] py-[6px] flex justify-center items-center font-sf bg-amber-600 text-white rounded-full mr-[10px]"}>
+                            Ok
+                        </button>
+                    </div>
                 </div>
-            </div>
+            }
+
             <div className={`w-[1300px] h-[490px] flex gap-[40px] mb-[30px]  `}>
                 <div className="w-[660px] h-full  bg-white flex gap-[20px]">
                     <div className={"grid w-[170px] gap-[15px] col-span-1  "}>
@@ -294,25 +263,27 @@ export default function ProductInfo () {
                     </div>
                     <div className={"h-[25px] w-full flex mt-[5px] "}>
                         <div className={"h-[25px] flex items-center pr-[10px]  "}>
+                            {product &&
+                                <div className={"flex text-yellow-500 items-center justify-center mr-[5px] text-[16px] "}>
+                                    {Array.from({length: Math.round(product.rating)}, (_, index) => (
+                                        <HiStar className={"mb-[1px] "} key={index} />
+                                    ))}
+                                    {(5-Math.round(product.rating)) >= 1  ?
+                                        (
+                                            Array.from({length: 5 - Math.round(product.rating)}, (_, index) => (
+                                                <HiOutlineStar key={index} />
+                                            ))
+                                        ) : null }
+                                </div>
+                            }
 
-                            <div className={"flex text-yellow-500 items-center justify-center mr-[5px] text-[16px] "}>
-                                {Array.from({length: Math.round(products.star)}, (_, index) => (
-                                    <HiStar className={"mb-[1px] "} key={index} />
-                                ))}
-                                {(5-Math.round(products.star)) >= 1  ?
-                                    (
-                                        Array.from({length: 5 - Math.round(products.star)}, (_, index) => (
-                                            <HiOutlineStar key={index} />
-                                        ))
-                                    ) : null }
-                            </div>
-                            <div className={"font-sf text-[15px]"}>
-                                <p>{product?.rating}</p>
-                            </div>
+                            {/*<div className={"font-sf text-[15px]"}>*/}
+                            {/*    <p>{product?.rating}</p>*/}
+                            {/*</div>*/}
 
                         </div>
                         <div className={"h-[25px]  border-x flex items-center px-[10px] border-stone-200"}>
-                            <p className={"font-sf text-stone-800 text-[15px]"}>{product?.reviewCount}</p>
+                            <p className={"font-sf text-stone-800 text-[15px]"}>{product?.reviewCount} đánh giá</p>
                         </div>
                         <div className={"h-[25px]  flex items-center px-[10px]"}>
                             <p className={"font-sf text-stone-800 text-[15px]"}>{product?.sold} Đã bán</p>
@@ -363,8 +334,9 @@ export default function ProductInfo () {
                             <div className={"flex items-center  mt-[5px] mb-[5px] "}>
                                 <div className={"w-[150px] h-[40px] bg-stone-200 flex justify-between rounded-full overflow-hidden items-center px-[20px] py-[1px] text-stone-900"}>
                                     <div onClick={()=>  {
-                                        if (quantity<products.stock)
-                                            setQuantity(quantity+1)
+                                        if (product)
+                                            if (quantity<product.inventory)
+                                                setQuantity(quantity+1)
                                     }} className={"flex row-span-1 justify-center items-center "}>
                                         <TbMinus/>
                                     </div>
@@ -376,7 +348,7 @@ export default function ProductInfo () {
                                     </div>
 
                                 </div>
-                                <p className={"font-sf text-stone-600 text-[14px] ml-[10px] "}>10 sản phẩm có sẵn</p>
+                                <p className={"font-sf text-stone-600 text-[14px] ml-[10px] "}>{product?.inventory} sản phẩm có sẵn</p>
                             </div>
 
                         </div>
@@ -389,8 +361,8 @@ export default function ProductInfo () {
                     <div className={"h-[40px] w-full grid grid-cols-11 gap-[20px] "}>
                         <div className="col-span-5  relative flex items-end ">
                             <p className="font-sf text-stone-600 text-[14px] mb-[5px] absolute top-[-6px]">Tạm tính</p>
-                            <p className={"text-[14px] self-end mb-[3px] mr-[2px] text-blue-500 font-sf underline"}>đ</p>
-                            <p className={" font-sf font-[600] text-blue-500 text-[22px] leading-[24px] "}>{product != undefined ? quantity * (product.price - product.price * product.discount / 100) :  null}</p>
+                            <p className={"text-[14px] self-end mb-[3px] mr-[2px] text-amber-600 font-sf underline"}>đ</p>
+                            <p className={" font-sf font-[600] text-amber-600 text-[22px] leading-[24px] "}>{product != undefined ? quantity * (product.price - product.price * product.discount / 100) :  null}</p>
                         </div>
                         
                             <button className={"rounded-full h-[40px] col-span-3 flex justify-center items-center bg-stone-800  font-sf text-[15px] text-white hover:bg-stone-700 hover:shadow-lg"}>
@@ -407,7 +379,9 @@ export default function ProductInfo () {
                     </div>
                     <div className={" w-full  grid grid-cols-10 gap-x-[20px] mt-[20px] "}>
                         <div className="col-span-4  border-stone-200">
-                            <button className={"border h-full w-full col-span-4 flex justify-center items-center bg-stone-800 font-sf font-[500] text-[15px] text-white hover:bg-stone-700 rounded-full hover:shadow-lg"}>
+                            <button onClick={()=> {
+                                if (product) if (product.inventory > 0) AddToCart(product.productId); else {setShowOutOfInventory(true); setShowNotification(true)}
+                            }} className={"border h-full w-full col-span-4 flex justify-center items-center bg-stone-800 font-sf font-[500] text-[15px] text-white hover:bg-stone-700 rounded-full hover:shadow-lg"}>
                                 <p className={"mt-[1px] uppercase"}>Thêm vào giỏ hàng</p>
                             </button>
                         </div>
@@ -432,32 +406,37 @@ export default function ProductInfo () {
             </div>
 
             {/*THong tin san pham*/}
-            <div className="w-[1300px] gap-x-[30px] grid grid-cols-11 mt-[40px] font-sf">
-                <div className="col-span-11 w-full  grid grid-cols-5 gap-x-[20px]">
-                    <div className=" flex flex-col justify-center items-center col-span-3 rounded-[25px] border border-stone-200 relative pt-[30px] pb-[10px]">
+            <div className="w-[1300px] gap-x-[30px] grid grid-cols-11 mt-[40px] font-sf ">
+                <div className="col-span-11 w-full  grid grid-cols-5 gap-x-[20px] ">
+                    <div className=" flex flex-col justify-center items-center col-span-3 rounded-[25px] border border-stone-200 relative pt-[30px] pb-[10px] max-h-fit">
                         <p className="font-sf font-[700] text-[24px] mb-[15px] uppercase bg-white absolute top-[-18px] px-[15px] text-stone-800">Thông tin chi tiết</p>
                         <div className={"h-[40px] w-full flex items-center justify-center"}>
-                            <div className={"w-[220px] border border-stone-200 rounded-full h-full flex items-center justify-center mr-[10px]"}>
+                            <div onClick={()=>setTab("des")} className={`w-[220px] rounded-full h-full flex items-center justify-center mr-[10px] ${tab == "des" ? " bg-amber-600 text-white " : " border border-stone-200 " }`}>
                                 <p className={"text-[15px] font-[500] "}>Mô Tả Sản Phẩm</p>
                             </div>
-                            <div className={"w-[220px] border border-stone-200 rounded-full h-full flex items-center justify-center ml-[10px]"}>
+                            <div onClick={()=>setTab("spec")} className={`w-[220px]  rounded-full h-full flex items-center justify-center ml-[10px] ${tab == "spec" ? " bg-amber-600 text-white " : " border border-stone-200 " }`}>
                                 <p className={"text-[15px] font-[500] "}>Thông Số Kỹ Thuật</p>
                             </div>
                         </div>
-                        <div className="flex flex-col w-full px-[30px] py-[20px] pt-[10px]">
-                            {product? Object.entries(product.specifications).map(([key,value], index) => (
-                                <div key={index} className="h-[40px] w-full bg-stone-100 rounded-full  pr-[10px] mt-[8px] items-center grid grid-cols-8 px-[20px] gap-[20px]">
 
-                                    <div className={"col-span-3 flex"}>
-                                        <p  className={"text-[15px] font-[500] "}>{key}:</p>
-                                    </div>
-                                    <div className="h-full flex items-center font-sf text-[15px] text-stone-600 col-span-5">
-                                        <p>{value}</p>
-                                    </div>
-                                </div>
-                            )) : null}
+                        {tab == "spec" ? (
+                            <div className="flex flex-col w-full px-[30px] py-[20px] pt-[10px]">
+                                {product? Object.entries(product.specifications).map(([key,value], index) => (
+                                    <div key={index} className="h-[40px] w-full bg-stone-100 rounded-full  pr-[10px] mt-[8px] items-center grid grid-cols-8 px-[20px] gap-[20px]">
 
-                        </div>
+                                        <div className={"col-span-3 flex"}>
+                                            <p  className={"text-[15px] font-[500] "}>{key}:</p>
+                                        </div>
+                                        <div className="h-full flex items-center font-sf text-[15px] text-stone-600 col-span-5">
+                                            <p>{value == "true" ? "Có" : value == "false" ? "Không" : value}</p>
+                                        </div>
+                                    </div>
+                                )) : null}
+                            </div>
+                        ) : (
+                            <p>{product?.description}</p>
+                        )}
+
                     </div>
                     <div className=" rounded-[25px] border border-stone-200 p-[30px] pb-[10px] col-span-2 relative flex flex-col items-center max-h-fit">
                         <p className="font-sf font-[700] text-[24px] text-stone-800 uppercase absolute top-[-18px] bg-white px-[15px]">Đánh giá sản phẩm</p>
@@ -466,7 +445,7 @@ export default function ProductInfo () {
                             <div className={"flex items-center"}>
                                 <HiStar className="text-yellow-500 text-[20px] mr-[5px]"/>
                                 <div className="flex items-end">
-                                    <p className="font-sf font-[800] text-[22px] leading-[30px]">{products.star}</p>
+                                    <p className="font-sf font-[800] text-[22px] leading-[30px]">{product?.rating}</p>
                                 </div>
                             </div>
                             <div className={"flex h-full items-center relative"}>
@@ -540,7 +519,7 @@ export default function ProductInfo () {
                                     <div className={`flex-1 flex flex-col w-[calc(100%-60px)] `}>
                                         <div className={` flex` }>
                                             {[...Array(5)].map((_, index) => {
-                                                if (index <= comment.rating) {
+                                                if (index < comment.rating) {
                                                     return <HiStar className={"text-yellow-500 text-[16px]"} key={index}/>
                                                 } else {
                                                     return <HiOutlineStar className={`text-yellow-500 text-[16px]`} key={index}/>
@@ -582,7 +561,7 @@ export default function ProductInfo () {
                     <p className="font-sf font-[900] text-[30px] mb-[10px] text-stone-800 uppercase">Có thể bạn cũng thích</p>
                     <div className={"border-b border-amber-500 w-[150px] mb-[40px]"}></div>
                     <div className="w-full grid grid-cols-5 gap-[20px]">
-                        {recomendedProducts.slice(0,5).map((product, index) => (
+                        {recomendProducts.slice(0,5).map((product, index) => (
                             <ProductR product={product} key={index}/>
                         ))}
                     </div>

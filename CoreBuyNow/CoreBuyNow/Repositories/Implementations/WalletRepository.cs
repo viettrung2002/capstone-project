@@ -1,4 +1,5 @@
 ﻿using CoreBuyNow.Models;
+using CoreBuyNow.Models.DTOs;
 using CoreBuyNow.Models.Entities;
 using CoreBuyNow.Repositories.Interfaces;
 using LinqToDB;
@@ -8,10 +9,17 @@ namespace CoreBuyNow.Repositories.Implementations;
 
 public class WalletRepository(AppDbContext dbContext) : IWalletRepository
 {
-    public async Task CreateWallet(Guid userId)
+    public async Task CreateWallet(Guid userId, string otp)
     {
+        var wallet1 = dbContext.Wallets.FirstOrDefault(w => w.UserId == userId);
+        if (wallet1 != null) throw new Exception("Wallet already exists");
+        var guid = Guid.NewGuid();
+        var base64 = Convert.ToBase64String(guid.ToByteArray());
+        base64 = base64.Replace("/", "_").Replace("+", "-").TrimEnd('=');
         var wallet = new Wallet
         {
+            Otp = otp,
+            WalletNumber = base64,
             WalletId = Guid.NewGuid(),
             UserId = userId,
             Balance = 0,
@@ -121,12 +129,37 @@ public class WalletRepository(AppDbContext dbContext) : IWalletRepository
         dbContext.Wallets.Update(shopWallet);
         await dbContext.SaveChangesAsync();
     }
-    
+
+    public async Task Recharge(PayOsResponseDto response)
+    {
+        var wallet = dbContext.Wallets.FirstOrDefault(wallet => wallet.UserId == response.UserId);
+        if (wallet == null) throw new Exception("Wallet not found");
+        wallet.Balance += response.Amount;
+        wallet.UpdateDate = response.PaidTime;
+        
+        var depositTransaction = new Transaction
+        {
+            TransactionId = Guid.NewGuid(),
+            WalletId = wallet.WalletId,
+            TransactionType = TransactionType.Deposit,
+            Amount = response.Amount,
+            BalanceAfter = wallet.Balance,
+            Description = "Nap Tien Vao Vi",
+            CreateDate = response.PaidTime,
+        };
+        dbContext.Wallets.Update(wallet);
+        dbContext.Transactions.Add(depositTransaction);
+        await dbContext.SaveChangesAsync();
+    }
+
     public async Task<List<Transaction>> GetTransactions(Guid userId)
     {
         return await dbContext.Transactions
-            .Where(t => t.WalletId == userId)
+            .Include(t=>t.Wallet)
+            .Where(t => t.Wallet.UserId == userId)
             .OrderByDescending(t => t.CreateDate)
             .ToListAsync();
     }
+    
+    
 }

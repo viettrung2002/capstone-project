@@ -5,5 +5,6 @@ export interface Payload {
     voucherId?: string;
     shippingVoucherId?: string;
     shopVoucherId?: string;
+    note?: string;
     items: IProductInBill[];
 }
