@@ -152,7 +152,42 @@ public class VoucherController (IVoucherService voucherService, ILogger<VoucherC
             return BadRequest(e.Message);
         }
     }
-
+    
+    [HttpGet("shop/{shopId:guid}")]
+    public async Task<IActionResult> GetShopVouchers(Guid shopId)
+    {
+        try
+        {
+            return Ok(new
+            {
+                data = await voucherService.GetVoucherShop(shopId)
+            });
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+    
+    [HttpPost("wallet")]
+    [Authorize(Roles = "Customer")]
+    public async Task<IActionResult> SaveVoucher(Guid voucherId)
+    {
+        try
+        {
+            var customerId = User.FindFirst("id")?.Value;
+            if (customerId == null) return Unauthorized();
+            await voucherService.SaveVoucher(voucherId, Guid.Parse(customerId));
+            return Ok(new
+            {
+                message = "Voucher saved successfully"
+            });
+        }
+        catch (Exception e)
+        {
+            return BadRequest(new {message = e.Message});
+        }
+    }
     [HttpGet("customer/shop-voucher/{shopId:guid}")]
     [Authorize(Roles = "Customer")]
     public async Task<IActionResult> GetVoucherShopWallet(Guid shopId)

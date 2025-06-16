@@ -34,7 +34,10 @@ public class CartController (ICartService cartService, ILogger<CartController> l
         }
         catch (Exception e)
         {
-            return BadRequest(e.Message);
+            return BadRequest(new
+            {
+                message = e.Message
+            });
         }
     }
 

@@ -5,6 +5,7 @@ import {HiOutlineSearch} from "react-icons/hi";
 import Cookies from "js-cookie";
 import {useRouter} from "next/navigation";
 import {Bill} from "@/app/types/bill";
+import Image from "next/image";
 
 export default function Page() {
     const [orderStatus, setOrderStatus] = useState(0);
@@ -107,7 +108,7 @@ export default function Page() {
                 </div>
             </div>
 
-            <div className={"w-full h-[40px] bg-gray-200 mt-[10px] flex items-center px-[10px]"}>
+            <div className={"w-full h-[40px] bg-white mt-[10px] flex items-center px-[10px]"}>
                 <HiOutlineSearch className={"text-[22px] mr-[10px] text-gray-700"}/>
                 <input
                     type={"text"}
@@ -131,8 +132,10 @@ export default function Page() {
                             {
                                 bill.items.map((item)=>
                                     <div key={item.itemId} className={"w-full py-[10px] border-gray-200 flex"}>
-                                        <div className={"w-[90px] h-[90px] border border-gray-100"}>
-
+                                        <div className={"w-[90px] h-[90px] border border-gray-100 p-[10px]"}>
+                                            <div className={"h-full w-full relative"}>
+                                                <Image src={item.image} alt={"i"} fill={true}/>
+                                            </div>
                                         </div>
                                         <div className={"h-[90px] flex flex-col items-start py-[3px] pl-[20px] justify-between font-sf"}>
                                             <p className={"text-[16px] text-gray-800"}>{item.productName}</p>

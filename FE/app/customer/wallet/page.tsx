@@ -131,9 +131,12 @@ export default function WalletPage(){
                 ) : hasWallet == 1 ? (
                     <div className={` col-span-3 h-full w-full`}>
                         <div className={"w-full h-full border rounded-[25px] bg-white border-t border-x border-stone-200 p-[20px] flex flex-col justify-between"}>
-                            <div className={"h-[40px] w-full"}>
+                            <div className={"h-[40px] w-full flex justify-between" }>
                                 <button onClick={()=>router.push("/customer/wallet/history")} className={"px-[20px] h-full bg-stone-200 font-sf text-stone-80 text-[15px] rounded-full"}>
                                     Lịch Sử Giao Dịch
+                                </button>
+                                <button onClick={()=>router.push("/customer/wallet/history")} className={"px-[20px] h-full bg-amber-600 font-sf text-white text-[15px] rounded-full"}>
+                                    Chuyển Tiền
                                 </button>
                             </div>
                             <div>

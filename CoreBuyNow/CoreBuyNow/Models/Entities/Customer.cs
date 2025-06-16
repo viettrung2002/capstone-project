@@ -26,7 +26,6 @@ public class Customer
     [Required]
     public Guid? AccountId { get; set; }
     [ForeignKey("AccountId")]
-    [JsonIgnore]
     public Account? Account { get; set; }
     public List<Interaction>? Interactions { get; set; }
     public Guid DefaultAddressId { get; set; }

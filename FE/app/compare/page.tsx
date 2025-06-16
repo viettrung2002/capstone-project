@@ -16,7 +16,6 @@ export default function ComparePage(){
                 }
             }
         }
-
     },[])
     return (
         <div className={"w-full flex flex-col items-center justify-center bg-white font-sf mt-[40px]"}>
@@ -47,13 +46,13 @@ export default function ComparePage(){
                             </div>
 
                             <div className={"h-full aspect-square bg-stone-200 rounded-[25px] relative"}>
-                                <Image src={"/products/product-1.jpg"} alt={"image"} fill={true}/>
+                                <Image src={products[0].mainImage} alt={"image"} fill={true}/>
                             </div>
                         </div>
                         <div className={"col-span-1 h-[260px] border flex p-[20px] rounded-[30px] border-stone-200 relative items-center justify-center "}>
                             <p className={"uppercase absolute top-[-18px] text-[22px] font-[700] bg-white px-[10px]"}>{products[1].productName}</p>
                             <div className={"h-full aspect-square bg-stone-200 rounded-[25px] relative"}>
-                                <Image src={"/products/product-1.jpg"} alt={"image"} fill={true}/>
+                                <Image src={products[1].mainImage} alt={"image"} fill={true}/>
                             </div>
                             <div className={"flex-1 items-start h-full flex flex-col justify-center px-[20px]"}>
                                 <p className={"text-stone-800 font-[500] text-[18px]"}>{products[1].shopName}</p>
@@ -62,21 +61,19 @@ export default function ComparePage(){
                                     <p className={"border-r border-gray-200 pr-[10px]"}>Đã Bán: {products[0].sold}</p>
                                     <p className={" mr-[10px] px-[10px]"}>{products[1].like} Lượt Thích</p>
                                 </div>
-                                <div className={"flex text-yellow-500 items-center justify-center mr-[5px] text-[18px] mt-[10px]"}>
-                                    {Array.from({length: Math.round(products[1].rating)}, (_, index) => (
-                                        <HiStar className={"mb-[1px] "} key={index} />
-                                    ))}
-                                    {(5-Math.round(products[0].rating)) >= 1  ?
-                                        (
-                                            Array.from({length: 5 - Math.round(products[1].rating)}, (_, index) => (
-                                                <HiOutlineStar key={index} />
-                                            ))
-                                        ) : null }
+                                <div className={"flex text-stone-500 items-center justify-center mr-[5px] text-[15px] mt-[10px]"}>
+                                    <p>Chưa có đánh giá</p>
+                                    {/*{Array.from({length: Math.round(products[1].rating)}, (_, index) => (*/}
+                                    {/*    <HiStar className={"mb-[1px] "} key={index} />*/}
+                                    {/*))}*/}
+                                    {/*{(5-Math.round(products[0].rating)) >= 1  ?*/}
+                                    {/*    (*/}
+                                    {/*        Array.from({length: 5 - Math.round(products[1].rating)}, (_, index) => (*/}
+                                    {/*            <HiOutlineStar key={index} />*/}
+                                    {/*        ))*/}
+                                    {/*    ) : null }*/}
                                 </div>
-
                             </div>
-
-
                         </div>
                     </div>
 

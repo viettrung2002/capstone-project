@@ -33,7 +33,7 @@ public class ProductInfoResponseDto
         public Dictionary<string, string> Specifications { get; set; } = new ();
         public bool IsFlashSale { get; set; }
         public int ReviewCount { get; set; }
-        
+        public string? Description { get; set; }
         public int Inventory { get; set; }
     
 }

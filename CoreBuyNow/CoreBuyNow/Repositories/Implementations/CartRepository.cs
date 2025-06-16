@@ -14,6 +14,9 @@ public class CartRepository (AppDbContext dbContext) : ICartRepository
         {
             item.ItemId = Guid.NewGuid();
         }
+        var product = await dbContext.Products.FindAsync(item.ProductId);
+        if (product == null) throw new Exception("Product not found");
+        if (product.Inventory < item.Quantity) throw new Exception("Not enough inventory");
         var item1 = dbContext.ItemInCarts.FirstOrDefault(x => x.ProductId == item.ProductId && x.CustomerId == item.CustomerId);
         if (item1 == null)
         {

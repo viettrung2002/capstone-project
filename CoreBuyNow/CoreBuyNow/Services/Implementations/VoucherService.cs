@@ -51,6 +51,12 @@ public class VoucherService (IVoucherRepository voucherRepository) : IVoucherSer
     {
         return await voucherRepository.GetVoucherShopWallet(customerId, shopId);
     }
+
+    public async Task SaveVoucher(Guid voucherId, Guid customerId)
+    {
+        await voucherRepository.SaveVoucher(voucherId, customerId);
+    }
+
     public async Task<List<VoucherWallet>> GetVoucherAdminWallet(Guid customerId)
     {
         return await voucherRepository.GetVoucherAdminWallet(customerId);

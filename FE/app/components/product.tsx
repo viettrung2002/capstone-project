@@ -2,14 +2,15 @@
 import {HiOutlineStar, HiStar, HiOutlineShoppingCart, HiReceiptPercent, HiMiniArrowPath} from "react-icons/hi2";
 import {} from "react-icons/tb"
 import {TbEdit, TbTrash} from "react-icons/tb";
+import {useState} from "react";
 import Image from "next/image";
 import {useRouter} from "next/navigation";
 import type {IProduct, IProductData} from "@/app/types/product";
 import Cookies from "js-cookie";
 import type {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
+import Nof from "@/app/components/nof"
 
-
-async function AddToCart( productId: string , router: AppRouterInstance ) {
+async function AddToCart( productId: string , router: AppRouterInstance) {
     const token = Cookies.get("token");
     if (!token) {
         router.push("/login");
@@ -23,10 +24,20 @@ async function AddToCart( productId: string , router: AppRouterInstance ) {
             },
             body: JSON.stringify({
                 productId: productId,
+                quantity: 1,
             })
         })
         const data = await response.json();
-        console.log(data);
+        if (response.ok) {
+            console.log(data);
+            alert("Thêm vào giỏ hàng thành công")
+        } else {
+            if (data.message == "Not enough inventory") {
+                alert("Số lượng tồn kho của sản phẩm không đủ")
+            }
+        }
+            console.log(await response.json());
+
     } catch (error) {
         console.log(error)
     }
@@ -34,7 +45,6 @@ async function AddToCart( productId: string , router: AppRouterInstance ) {
 
 export default function Product({product}: {product: IProduct}) {
     const router = useRouter();
-
     return (
         // <div  className={` col-span-1 aspect-[64/100] bg-white `}>
         //     <div
@@ -80,14 +90,19 @@ export default function Product({product}: {product: IProduct}) {
         //
         //     </div>
         // </div>
-    <div  className={` col-span-1  bg-stone-200 rounded-[25px] pb-[10px] border border-stone-100`}>
+    <div className={` col-span-1  bg-stone-200 rounded-[25px] pb-[5px] border border-stone-100`}>
+
         <div
             className={` group relative w-full aspect-square  flex items-center justify-center p-[20px] hover:p-[0px] transition-all duration-200 ease-in-out overflow-hidden rounded-[25px]`}>
             <Image src={"/products/product-1.jpg"} alt={"product_image"} width={1000} height={1000} className={"object-contain"}/>
             <div className={"absolute top-0 right-[0px] font-sf px-[18px] bg-white rounded-bl-full text-[13px]"}>
                 <p>Đã Bán: {product.sold}</p>
             </div>
-            <button onClick={() => AddToCart(product.productId, router )}
+            <button onClick={() => {
+
+                    AddToCart(product.productId, router)
+
+            }}
                     className={`absolute w-[140px] h-[40px] hover:bg-neutral-700 bg-amber-600  rounded-full bottom-[30px] flex items-center justify-center transition-all duration-200 translate-y-[75px] opacity-80 ease-in-out group-hover:opacity-90 group-hover:translate-y-0 `}>
                 <HiOutlineShoppingCart className={`text-cl-button-text text-[20px]`}/>
                 <p className={`ml-[5px] text-cl-button-text font-sf text-[15px] `}>Thêm vào giỏ</p>
@@ -98,9 +113,8 @@ export default function Product({product}: {product: IProduct}) {
                     <p className={`font-sf font-[500] text-[15px]`}>-{product.discount}%</p>
                 </div>) : null}
         </div>
-        <div className={"px-[10px] "}>
-            <div onClick={()=>router.push(`/product/${product.productId}`)} className={` pt-[10px] flex flex-col relative  justify-between items-center overflow-hidden bg-white rounded-[20px]`}>
-
+        <div className={"px-[5px] "}>
+            <div onClick={()=>router.push(`/product/${product.productId}`)} className={` pt-[10px] pb-[5px] flex flex-col relative  justify-between items-center overflow-hidden bg-white rounded-[20px]`}>
                 <p className={`font-sf text-[13px] text-neutral-500 mb-[5px]`}>{product.subCategoryName}</p>
                 <p className={`font-sf text-neutral-700 text-[15px] font-[600] select-none hover:text-amber-600 uppercase`}>{product.productName}</p>
                 <div className={`flex items-center h-[20px] text-[16px] mt-[5px] mb-[5px]`}>
@@ -291,7 +305,7 @@ export function ProductInShop({product}: {product: IProduct}) {
             <div
 
                 className={` group relative w-full aspect-square rounded-[20px] bg-stone-200 flex items-center justify-center p-[20px] hover:p-[0px] transition-all duration-200 ease-in-out overflow-hidden`}>
-                <Image src={"/products/product-1.jpg"} alt={"product_image"} width={1000} height={1000} className={"object-contain"}/>
+                <Image src={product.mainImage} alt={"product_image"} width={1000} height={1000} className={"object-contain"}/>
 
                 <button onClick={() => AddToCart(product.productId, router )} className={`absolute w-[130px] h-[40px] hover:bg-neutral-700 bg-amber-600 rounded-full bottom-[30px] flex items-center justify-center transition-all duration-200 translate-y-[75px] opacity-0 ease-in-out group-hover:opacity-100 group-hover:translate-y-0 `}>
                     <HiOutlineShoppingCart className={`text-cl-button-text text-[20px]`}/>
@@ -339,8 +353,10 @@ export function ProductInSeller ({product, onDelete, onClickEdit}: {product: IPr
     return (
         <div className={"col-span-1 h-[125px] bg-white box-content  flex rounded-[8px] shadow-md"}>
             <div className={"h-full aspect-square  p-[10px]"}>
-                <div className={"w-full h-full flex items-center bg-neutral-200 rounded-[5px] justify-center"}>
-
+                <div className={"w-full h-full flex items-center bg-neutral-200 rounded-[5px] p-[10px] justify-center"}>
+                    <div className={"w-full h-full relative"}>
+                        <Image src={product.mainImage} alt={"i"} fill={true}/>
+                    </div>
                 </div>
             </div>
             <div className={"flex w-[calc(100%-125px)] flex-col  flex-1 font-sf  pr-[10px] py-[10px]"}>

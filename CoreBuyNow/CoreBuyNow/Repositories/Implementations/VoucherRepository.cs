@@ -256,6 +256,25 @@ public class VoucherRepository ( IScheduler scheduler ,AppDbContext dbContext, I
             .Where(v=>v.CustomerId == customerId && (v.Voucher.AdminId != Guid.Empty && v.Voucher.AdminId != null) && v.Quantity>0)
             .ToListAsync();
     }
+
+    public async Task SaveVoucher(Guid voucherId, Guid customerId)
+    {
+        var voucher =  dbContext.Vouchers.FirstOrDefault(v=>v.VoucherId == voucherId);
+        if (voucher == null) throw new Exception("Voucher not found");
+        var customer = dbContext.Customers.FirstOrDefault(c => c.CustomerId == customerId);
+        if (customer == null) throw new Exception("Customer not found");
+        var exitV = dbContext.VoucherWallets.FirstOrDefault(vw => vw.VoucherId == voucherId);
+        if (exitV != null) throw new Exception("Voucher is in wallet");
+        var voucherWallet = new VoucherWallet
+        {
+            VoucherWalletId = Guid.NewGuid(),
+            CustomerId = customerId,
+            Quantity = voucher.PerUserQuantity,
+            VoucherId = voucher.VoucherId
+        };
+        dbContext.VoucherWallets.Add(voucherWallet);
+        await dbContext.SaveChangesAsync();
+    }
     public async Task<List<VoucherWallet>> GetVoucherShopWallet(Guid customerId, Guid shopId)
     {
         return await dbContext.VoucherWallets
@@ -263,7 +282,8 @@ public class VoucherRepository ( IScheduler scheduler ,AppDbContext dbContext, I
             .Where(v=>v.CustomerId == customerId && v.Voucher.ShopId == shopId )
             .ToListAsync();
     }
-
+    
+    
     public async Task IssueVoucher(Guid voucherId)
     {
         var voucher = await dbContext.Vouchers.FindAsync(voucherId);
@@ -277,7 +297,7 @@ public class VoucherRepository ( IScheduler scheduler ,AppDbContext dbContext, I
                 VoucherWalletId = Guid.NewGuid(),
                 CustomerId = id,
                 VoucherId = voucherId,
-                Quantity = 1,
+                Quantity = voucher.PerUserQuantity,
                 Voucher = voucher
             });
         }

@@ -256,8 +256,11 @@ export  default function Cart() {
                                                     </div>
                                                 </div>
                                                 <div className={"col-span-8 flex items-center"}>
-                                                    <div className={"relative w-[80px] h-[80px] bg-stone-200 rounded-[20px] bg-radial mr-[10px]"}>
-                                                        <Image src={"/products/product-1.jpg"} alt={"image"} fill={true}/>
+                                                    <div className={"relative w-[80px] h-[80px] bg-stone-200 rounded-[20px] bg-radial mr-[10px] p-[10px]"}>
+                                                        <div className={"w-full h-full relative"}>
+                                                            <Image src={product.productImage} alt={"image"} fill={true}/>
+                                                        </div>
+
                                                     </div>
                                                     <p className={"font-sf text-stone-700 font-[500] text-[15px]"}>{product.productName}</p>
                                                 </div>

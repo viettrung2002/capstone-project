@@ -140,13 +140,14 @@ export default function ProfilePage() {
                         <div className={"h-[40px] w-full flex items-center justify-end mt-[20px]"}>
                             <p className={"font-sf text-stone-600 text-[15px]"}>Ngày Sinh</p>
                         </div>
-                        <div className={"h-[40px] w-full flex items-center justify-end mt-[20px]"}>
-                            <p className={"font-sf text-stone-600 text-[15px]"}>Địa Chỉ</p>
-                        </div>
+                        {/*<div className={"h-[40px] w-full flex items-center justify-end mt-[20px]"}>*/}
+                        {/*    <p className={"font-sf text-stone-600 text-[15px]"}>Địa Chỉ</p>*/}
+                        {/*</div>*/}
                     </div>
                     <div className={"col-span-5"}>
-                        <div className={"h-[40px] w-full rounded-full"}>
-                            <input onChange={(e)=> setUerName(e.target.value)} type={"text"} value={userName} className={"w-full h-full border border-stone-200 font-sf rounded-full text-stone-800 focus:outline-none px-[20px]"}/>
+                        <div className={"h-[40px] w-full rounded-full flex items-center px-[20px] font-sf border"}>
+
+                            {customer?.account?.userName}
                         </div>
                         <div className={"h-[40px] w-full mt-[20px] rounded-full"}>
                             <input onChange={(e)=> setCustomer( (prevState) => ({
@@ -199,12 +200,12 @@ export default function ProfilePage() {
                                 className={"font-sf"}
                             />
                         </div>
-                        <div className={"h-[40px] w-full mt-[20px] rounded-full"}>
-                            <input onChange={(e)=> setCustomer( (prevState) => ({
-                                ...prevState,
-                                address: e.target.value,
-                            }))} type={"text"} value={customer ? customer.address : ""} className={"w-full h-full border border-stone-200 font-sf rounded-full text-stone-800 focus:outline-none px-[20px]"}/>
-                        </div>
+                        {/*<div className={"h-[40px] w-full mt-[20px] rounded-full"}>*/}
+                        {/*    <input onChange={(e)=> setCustomer( (prevState) => ({*/}
+                        {/*        ...prevState,*/}
+                        {/*        address: e.target.value,*/}
+                        {/*    }))} type={"text"} value={customer ? customer.address : ""} className={"w-full h-full border border-stone-200 font-sf rounded-full text-stone-800 focus:outline-none px-[20px]"}/>*/}
+                        {/*</div>*/}
                         <button onClick={()=> updateCustomer()} className={"px-[25px] py-[8px] bg-amber-600 mt-[20px] hover:bg-stone-700 rounded-full"}>
                             <p className={"font-sf text-stone-50 text-[15px]"}>Lưu</p>
                         </button>

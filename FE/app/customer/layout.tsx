@@ -5,7 +5,8 @@ import {
     HiOutlinePencilSquare,
     HiOutlineUser,
     HiOutlineBell,
-    HiOutlineWallet
+    HiOutlineWallet,
+    HiOutlinePercentBadge
 } from "react-icons/hi2";
 import {useEffect, useState} from "react";
 import Cookies from "js-cookie";
@@ -121,12 +122,15 @@ export default function CustomerLayout({children}: {children: React.ReactNode}) 
                             </div>
                             <p className={` ${activeTab == 5 ? "text-amber-600" : "text-stone-800"} flex font-sf text-[16px] `}>Thông Báo</p>
                         </div>
-                        {/*<div className={"flex h-[35px] pl-[15px] items-center"}>*/}
-                        {/*    <div className={"w-[25px] text-[20px]"}>*/}
-                        {/*        <HiOutlinePercentBadge/>*/}
-                        {/*    </div>*/}
-                        {/*    <p className={` ${activeTab == 5 ? "text-amber-600" : "text-stone-800"} flex font-sf text-[16px] `}>Kho Voucher </p>*/}
-                        {/*</div>*/}
+                        <div onClick={()=> {
+                            setActiveTab(7);
+                            router.push("/customer/voucher");
+                        }} className={"flex h-[35px] pl-[15px] items-center"}>
+                            <div className={"w-[25px] text-[20px]"}>
+                                <HiOutlinePercentBadge/>
+                            </div>
+                            <p className={` ${activeTab == 7 ? "text-amber-600" : "text-stone-800"} flex font-sf text-[16px] `}>Kho Voucher </p>
+                        </div>
                         <div onClick={()=> {
                             setActiveTab(6);
                             router.push("/customer/wallet");

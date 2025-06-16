@@ -11,6 +11,8 @@ import Cookies from "js-cookie";
 import {IComment, ICommentReq} from "@/app/types/comment";
 import {TbArrowDown, TbChevronDown, TbMinus, TbPlus, TbStar, TbStarFilled} from "react-icons/tb";
 import type {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
+import {IVoucher} from "@/app/types/voucher";
+import * as React from "react";
 type Product = {
     id: number;
     category: string;
@@ -36,6 +38,7 @@ export default function ProductInfo () {
     const [recomendProducts, setRecomendProducts] = useState<IProductData[]>([])
     const [showNotification, setShowNotification] = useState<boolean>(false)
     const [showOutOfInventory, setShowOutOfInventory] = useState<boolean>(false)
+    const [shopVouchers, setShopVouchers] = useState<IVoucher[]>([])
     const [newComment, setNewComment] = useState<ICommentReq>({
         content: "",
         rating: 5,
@@ -43,6 +46,44 @@ export default function ProductInfo () {
     })
     const token = Cookies.get("token");
 
+    async function GetShopVouchers( shopId: string) {
+        try {
+            const response = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/voucher/shop/${shopId}`,{
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            })
+            const data = await response.json();
+            if (response.ok) {
+                setShopVouchers(data.data)
+                console.log("SHOP voucher ",data.data)
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    async function SaveVoucher( voucherId: string) {
+        if (!token) {
+            router.push("/login");
+        }
+        try {
+            const response = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/voucher/wallet?voucherId=${voucherId}`,{
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+            })
+            if (response.ok) {
+                const data = await response.json();
+                alert("Lưu thành công voucher!")
+                console.log(data);
+            } else alert("Voucher đã có trong ví!")
+        } catch (error) {
+            console.log(error)
+        }
+    }
     async function AddToCart( productId: string) {
         if (!token) {
             router.push("/login");
@@ -81,7 +122,8 @@ export default function ProductInfo () {
                     }
                 })
                 const data = await response.json();
-                console.log(data);
+                console.log("PRODUCT",data);
+                GetShopVouchers(data.shopId);
                 setProduct(data);
             } catch (error) {
                 console.error(error)
@@ -242,14 +284,14 @@ export default function ProductInfo () {
                         {image.slice(0,3).map((image, index) => (
                         <div key={index} className={"relative col-span-1  w-[150px] flex items-center justify-center rounded-[25px] overflow-hidden"}>
                             <div className={"h-full w-full relative bg-stone-200"}>
-                                <Image src={"/products/product-1.jpg"} alt={"image"}  fill={true} />
+                                <Image src={`/products/samsung-${index+1}.jpg`} alt={"image"}  fill={true} />
                             </div>
                         </div>
                         ))}
                     </div>
                     <div className="flex items-center w-[550px] h-full rounded-[25px] overflow-hidden ">
                         <div className={"w-full h-full relative overflow-hidden bg-stone-200"}>
-                            <Image src={"/products/product-1.jpg"} alt={"image"} width={1000} height={1000}  className={"w-full h-full object-cover"} />
+                            <Image src={product?.mainImage ? product.mainImage : "/products/product-1.jpg"} alt={"image"} width={1000} height={1000} className={"w-full h-full object-cover"} />
                         </div>
                     </div>
                 </div>
@@ -302,14 +344,11 @@ export default function ProductInfo () {
                                     <p className={"font-sf font-[600] text-stone-600 text-[18px]"}>{product?.price}</p>
                                     <div className={"absolute w-full top-[13px] border-b border-stone-600 "}></div>
                                 </div>
-
                             </div>
-
-
                         ): null : null}
                     </div>
                     <div className={"w-full max-h-[70px] flex font-sf text-stone-600 text-[15px] overflow-hidden mt-[5px] "}>
-                        <p className={"line-clamp-3 "}> Lorem ipsum dolor sit amet, consectetur adico laboris niLorem ipsum dolor sit amet, consecteturdunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo </p>
+                        <p className={"line-clamp-3 "}>{product?.description}</p>
                     </div>
                     <div className={"w-full border-b border-stone-200 mt-[10px] mb-[10px] "}>
                     </div>
@@ -438,122 +477,162 @@ export default function ProductInfo () {
                         )}
 
                     </div>
-                    <div className=" rounded-[25px] border border-stone-200 p-[30px] pb-[10px] col-span-2 relative flex flex-col items-center max-h-fit">
-                        <p className="font-sf font-[700] text-[24px] text-stone-800 uppercase absolute top-[-18px] bg-white px-[15px]">Đánh giá sản phẩm</p>
+                    <div className={"col-span-2 "}>
+                        <div className=" rounded-[25px] border border-stone-200 p-[30px] pb-[20px]  relative flex flex-col items-center max-h-fit mb-[30px]">
+                            <p className="font-sf font-[700] text-[24px] text-stone-800 uppercase absolute top-[-18px] bg-white px-[15px]">Voucher của shop</p>
+                            <div className={"w-full grid grid-cols-1"}>
+                                {
 
-                        <div className={"w-full h-[40px] flex items-center justify-between"}>
-                            <div className={"flex items-center"}>
-                                <HiStar className="text-yellow-500 text-[20px] mr-[5px]"/>
-                                <div className="flex items-end">
-                                    <p className="font-sf font-[800] text-[22px] leading-[30px]">{product?.rating}</p>
-                                </div>
+                                    shopVouchers.map((shopVoucher, index) => {
+                                        const now = new Date();
+                                        const startTime = new Date(shopVoucher.startTime);
+                                        const endTime = new Date(shopVoucher.endTime);
+                                        const endTimeFormatted = `${endTime.getHours().toString().padStart(2, "0")}:${endTime.getMinutes().toString().padStart(2, "0")} ${endTime.getDate()}/${endTime.getMonth() + 1}/${endTime.getFullYear()}`;
+                                        if (startTime < now && endTime > now) return (
+                                            <div key={index} className={"col-span-1 rounded-[20px] bg-amber-50 border border-amber-200 h-[100px] overflow-hidden flex justify-between relative"}>
+
+                                                <div className={"flex flex-col justify-center ml-[20px]"}>
+                                                    <p className={"text-[14px] uppercase font-[500] h-[16px] line-clamp-1"}>{shopVoucher.voucherName}</p>
+                                                    <div className={"flex items-baseline h-[18px]"}>
+                                                        <p className={"text-[13px] align-baseline text-gray-600"}>giảm </p>
+                                                        <p className={"text-[16px] align-baseline ml-[5px] text-amber-600 font-[700]"}>{shopVoucher.value}</p>
+                                                    </div>
+                                                    <div className={"flex items-baseline h-[17px]"}>
+                                                        <p className={"text-[13px] text-gray-600"}>cho đơn tối thiểu:</p>
+                                                        <p className={"text-[15px] ml-[5px] text-gray-900 font-[600]"}>{shopVoucher.minPrice}</p>
+                                                    </div>
+
+                                                    <p className={"text-[13px] text-gray-700 mt-[5]"}>Kết thúc: {endTimeFormatted}</p>
+                                                </div>
+                                                <div className={"w-[100px] border-dashed border-l flex justify-center items-center"}>
+                                                    <button onClick={()=> SaveVoucher(shopVoucher.voucherId)} className={"w-[80px] h-[30px] bg-amber-600 text-white font-[15px] rounded-full"}>
+                                                        Lưu
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )
+                                    })
+                                }
                             </div>
-                            <div className={"flex h-full items-center relative"}>
-                                <div onClick={()=>setOpenFilterComment(!openFilterComment)}
-                                        className={`${openFilterComment? " top-0" : "h-full"} flex flex-col items-center absolute w-[125px] rounded-[20px] bg-stone-200 font-sf text-stone-800 font-[500] text-[15px] mr-[10px] left-[-135px] `}>
-                                    <button className={"h-[40px] w-full flex items-center justify-between px-[20px] pr-[15px]"}>
-                                        <p>{star == 0 ? "Mới Nhất" : star == 1 ? "Từ 1 Sao" : star == 2 ? "Từ 2 Sao" : star == 3 ? "Từ 3 Sao" : star == 4 ? "Từ 4 Sao" : "Từ 5 Sao" }</p>
-                                        <TbChevronDown className={"text-[20px]"}/>
-                                    </button>
-                                    {openFilterComment && star != 0 ? (
-                                        <button onClick={()=> {
-                                            setStar(0);
-                                            setOpenFilterComment(!openFilterComment);
-                                        }} className={"h-[40px] w-full flex items-center justify-center px-[20px] pr-[15px]"}>
-                                            <p>Mới Nhất</p>
-                                        </button>
-                                    ): null}
-                                    {openFilterComment && (
-                                        <button onClick={()=> {
-                                            setStar(5);
-                                            setOpenFilterComment(!openFilterComment);
-                                        }} className={"h-[40px] w-full flex items-center justify-center px-[20px] pr-[15px]"}>
-                                            <p>Từ 5 Sao</p>
-                                        </button>
-                                    )}
-                                    {openFilterComment && (
-                                        <button onClick={()=> {
-                                            setStar(4);
-                                            setOpenFilterComment(!openFilterComment);
-                                        }} className={"h-[40px] w-full flex items-center justify-center px-[20px] pr-[15px]"}>
-                                            <p>Từ 4 Sao</p>
-                                        </button>
-                                    )}
-                                    {openFilterComment && (
-                                        <button onClick={()=> {
-                                            setStar(3);
-                                            setOpenFilterComment(!openFilterComment);
-                                        }} className={"h-[40px] w-full flex items-center justify-center px-[20px] pr-[15px]"}>
-                                            <p>Từ 3 Sao</p>
-                                        </button>
-                                    )}
-                                    {openFilterComment && (
-                                        <button onClick={()=> {
-                                            setStar(2);
-                                            setOpenFilterComment(!openFilterComment);
-                                        }} className={"h-[40px] w-full flex items-center justify-center px-[20px] pr-[15px]"}>
-                                            <p>Từ 2 Sao</p>
-                                        </button>
-                                    )}
-                                    {openFilterComment && (
-                                        <button onClick={()=> {
-                                            setStar(1);
-                                            setOpenFilterComment(!openFilterComment);
-                                        }} className={"h-[40px] w-full flex items-center justify-center px-[20px] pr-[15px]"}>
-                                            <p>Từ 1 Sao</p>
-                                        </button>
-                                    )}
-
-                                </div>
-                                <button onClick={()=>setShowPostComment(true)} className={"flex h-full px-[20px] items-center justify-center rounded-[20px] bg-stone-800 font-sf text-white font-[500] text-[15px]"}>
-                                    <p>Viết Bình Luận</p>
-                                </button>
-                            </div>
-
                         </div>
+                        <div className=" rounded-[25px] border border-stone-200 p-[30px] pb-[10px] relative flex flex-col items-center max-h-fit">
+                            <p className="font-sf font-[700] text-[24px] text-stone-800 uppercase absolute top-[-18px] bg-white px-[15px]">Đánh giá sản phẩm</p>
 
-
-                        <div className={`w-full gap-[20px] mt-[20px]`}>
-                            {comment.map((comment) => (
-                                <div key={comment.commentId} className="row-span-1 bg-stone-100 min-h-[100px] rounded-[20px] flex px-[23px] py-[18px] mb-[20px]">
-                                    <div className={`flex-1 flex flex-col w-[calc(100%-60px)] `}>
-                                        <div className={` flex` }>
-                                            {[...Array(5)].map((_, index) => {
-                                                if (index < comment.rating) {
-                                                    return <HiStar className={"text-yellow-500 text-[16px]"} key={index}/>
-                                                } else {
-                                                    return <HiOutlineStar className={`text-yellow-500 text-[16px]`} key={index}/>
-                                                }
-                                            })}
-                                        </div>
-                                        {/*Ten*/}
-                                        <div className={``}>
-                                            <p className={`font-sf text-stone-800 font-[600] text-[15px] mt-[4px]`}>{comment.customerName}</p>
-                                        </div>
-                                        {/*So sao danh gia*/}
-
-                                        <div className={`flex-1 `}>
-                                            <p className={`font-sf text-stone-500 text-[15px] font-[400] `}>{`"${comment.content}"`}</p>
-                                        </div>
-                                        {/*Ngay tao*/}
-                                        <div className={`mt-[3px]`}>
-                                            <p className={`font-sf text-[12px] font-[600] text-stone-600`}>{new Date(comment.createDate).toLocaleString("vi-VN", {
-                                                hour: "2-digit",
-                                                minute: "2-digit",
-                                                day: "2-digit",
-                                                month: "2-digit",
-                                                year: "numeric",
-                                            })}</p>
-                                        </div>
+                            <div className={"w-full h-[40px] flex items-center justify-between"}>
+                                <div className={"flex items-center"}>
+                                    <HiStar className="text-yellow-500 text-[20px] mr-[5px]"/>
+                                    <div className="flex items-end">
+                                        <p className="font-sf font-[800] text-[22px] leading-[30px]">{product?.rating}</p>
+                                    </div>
+                                </div>
+                                <div className={"flex h-full items-center relative"}>
+                                    <div onClick={()=>setOpenFilterComment(!openFilterComment)}
+                                         className={`${openFilterComment? " top-0" : "h-full"} flex flex-col items-center absolute w-[125px] rounded-[20px] bg-stone-200 font-sf text-stone-800 font-[500] text-[15px] mr-[10px] left-[-135px] `}>
+                                        <button className={"h-[40px] w-full flex items-center justify-between px-[20px] pr-[15px]"}>
+                                            <p>{star == 0 ? "Mới Nhất" : star == 1 ? "Từ 1 Sao" : star == 2 ? "Từ 2 Sao" : star == 3 ? "Từ 3 Sao" : star == 4 ? "Từ 4 Sao" : "Từ 5 Sao" }</p>
+                                            <TbChevronDown className={"text-[20px]"}/>
+                                        </button>
+                                        {openFilterComment && star != 0 ? (
+                                            <button onClick={()=> {
+                                                setStar(0);
+                                                setOpenFilterComment(!openFilterComment);
+                                            }} className={"h-[40px] w-full flex items-center justify-center px-[20px] pr-[15px]"}>
+                                                <p>Mới Nhất</p>
+                                            </button>
+                                        ): null}
+                                        {openFilterComment && (
+                                            <button onClick={()=> {
+                                                setStar(5);
+                                                setOpenFilterComment(!openFilterComment);
+                                            }} className={"h-[40px] w-full flex items-center justify-center px-[20px] pr-[15px]"}>
+                                                <p>Từ 5 Sao</p>
+                                            </button>
+                                        )}
+                                        {openFilterComment && (
+                                            <button onClick={()=> {
+                                                setStar(4);
+                                                setOpenFilterComment(!openFilterComment);
+                                            }} className={"h-[40px] w-full flex items-center justify-center px-[20px] pr-[15px]"}>
+                                                <p>Từ 4 Sao</p>
+                                            </button>
+                                        )}
+                                        {openFilterComment && (
+                                            <button onClick={()=> {
+                                                setStar(3);
+                                                setOpenFilterComment(!openFilterComment);
+                                            }} className={"h-[40px] w-full flex items-center justify-center px-[20px] pr-[15px]"}>
+                                                <p>Từ 3 Sao</p>
+                                            </button>
+                                        )}
+                                        {openFilterComment && (
+                                            <button onClick={()=> {
+                                                setStar(2);
+                                                setOpenFilterComment(!openFilterComment);
+                                            }} className={"h-[40px] w-full flex items-center justify-center px-[20px] pr-[15px]"}>
+                                                <p>Từ 2 Sao</p>
+                                            </button>
+                                        )}
+                                        {openFilterComment && (
+                                            <button onClick={()=> {
+                                                setStar(1);
+                                                setOpenFilterComment(!openFilterComment);
+                                            }} className={"h-[40px] w-full flex items-center justify-center px-[20px] pr-[15px]"}>
+                                                <p>Từ 1 Sao</p>
+                                            </button>
+                                        )}
 
                                     </div>
-
-
+                                    {/*<button onClick={()=>setShowPostComment(true)} className={"flex h-full px-[20px] items-center justify-center rounded-[20px] bg-stone-800 font-sf text-white font-[500] text-[15px]"}>*/}
+                                    {/*    <p>Viết Bình Luận</p>*/}
+                                    {/*</button>*/}
                                 </div>
-                            ))}
+
+                            </div>
+
+
+                            <div className={`w-full gap-[20px] mt-[20px]`}>
+                                {comment.map((comment) => (
+                                    <div key={comment.commentId} className="row-span-1 bg-stone-100 min-h-[100px] rounded-[20px] flex px-[23px] py-[18px] mb-[20px]">
+                                        <div className={`flex-1 flex flex-col w-[calc(100%-60px)] `}>
+                                            <div className={` flex` }>
+                                                {[...Array(5)].map((_, index) => {
+                                                    if (index < comment.rating) {
+                                                        return <HiStar className={"text-yellow-500 text-[16px]"} key={index}/>
+                                                    } else {
+                                                        return <HiOutlineStar className={`text-yellow-500 text-[16px]`} key={index}/>
+                                                    }
+                                                })}
+                                            </div>
+                                            {/*Ten*/}
+                                            <div className={``}>
+                                                <p className={`font-sf text-stone-800 font-[600] text-[15px] mt-[4px]`}>{comment.customerName}</p>
+                                            </div>
+                                            {/*So sao danh gia*/}
+
+                                            <div className={`flex-1 `}>
+                                                <p className={`font-sf text-stone-500 text-[15px] font-[400] `}>{`"${comment.content}"`}</p>
+                                            </div>
+                                            {/*Ngay tao*/}
+                                            <div className={`mt-[3px]`}>
+                                                <p className={`font-sf text-[12px] font-[600] text-stone-600`}>{new Date(comment.createDate).toLocaleString("vi-VN", {
+                                                    hour: "2-digit",
+                                                    minute: "2-digit",
+                                                    day: "2-digit",
+                                                    month: "2-digit",
+                                                    year: "numeric",
+                                                })}</p>
+                                            </div>
+
+                                        </div>
+
+
+                                    </div>
+                                ))}
+                            </div>
+
                         </div>
-                        
                     </div>
+
                     
                     
                 </div>

@@ -10,6 +10,7 @@ import Image from "next/image";
 import {IVoucher, IVoucherW} from "@/app/types/voucher";
 import {Payload} from "@/app/types/payload";
 import {TbCheck, TbMapPin, TbTicket, TbX} from "react-icons/tb";
+import {IAddress, IAddressResponse} from "@/app/types/address";
 export default function Bill() {
     const router = useRouter();
     const [customer, setCustomer] = useState<ICustomer>()
@@ -30,7 +31,9 @@ export default function Bill() {
     const [billComplete, setBillComplete] = useState<boolean>(false)
     const [showInsufficientInventory, setShowInsufficientInventory] = useState<boolean>(false)
     const [otp, setOtp] = useState<string[]>(["", "", "", "","",""]);
-
+    const [addresses, setAddresses] = useState<IAddressResponse[]>([]);
+    const [selectedAddress, setSelectedAddress] = useState<IAddressResponse>();
+    const [openAddress, setOpenAddress] = useState<boolean>(false)
     // 👇 Dùng đúng kiểu Ref cho TypeScript
     const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
 
@@ -301,6 +304,40 @@ export default function Bill() {
         } else alert("Vui lòng nhập đủ OTP")
 
     }
+
+    const GetAddresses = async () => {
+        const token = Cookies.get("token");
+        if (!token) {
+            router.push("/login");
+            return;
+        }
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/address/user`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                }
+            });
+            if (response.ok){
+                const data = await response.json();
+                console.log(data.data);
+                setAddresses(data.data);
+                data.data.forEach((item : IAddressResponse) => {
+                    if (item.isDefault) {
+                        setSelectedAddress(item);
+                    }
+                })
+                setOpenAddress(true)
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    useEffect(() => {
+        GetAddresses();
+    }, []);
     if (billComplete)
         return (
             <div className={"flex justify-center items-center flex-col w-full h-screen pb-[80px]"}>
@@ -321,8 +358,54 @@ export default function Bill() {
         )
     else
         return (
-            <div className="w-full flex flex-col justify-center items-center bg-white relative">
 
+            <div className="w-full flex flex-col justify-center items-center bg-white relative pb-[20px] font-sf">
+
+                <div className={`${openAddress ? "visible" : "hidden"} fixed w-screen h-screen top-0 left-0 bg-black/20 z-50 flex justify-center items-center `}>
+                    <div className={" w-[500px] bg-white rounded-[25px] pb-[10px]"}>
+                        <div className={"h-[40px] border-b flex justify-center items-center"}>
+                            Địa Chỉ Của Tôi
+                        </div>
+
+                        <div className={"px-[20px] h-[360px] overflow-y-auto"}>
+                            {
+                                addresses.map((address) => {
+                                    return (
+                                        <div key={address.addressId} className={`${selectedAddress == address && "border border-amber-600 "}  w-full rounded-[20px] bg-stone-50  flex justify-between items-center px-[20px] py-[10px] mt-[20px]`}>
+                                            <div onClick={()=> address?.addressId && setSelectedAddress(address) } className={"flex-1 flex flex-col"}>
+                                                <div className={"flex items-center "}>
+                                                    <p className={"pr-[10px] border-r  flex justify-center items-center text-[16px] font-[500]"}>{address.name}</p>
+                                                    <p className={"pl-[10px] flex justify-center items-center text-[15px] mt-[1px] text-stone-700"}>{address.phoneNumber}</p>
+                                                </div>
+                                                <p className={"text-[15px] text-stone-700"}>{address.streetAddress}</p>
+                                                <p className={"text-[15px] text-stone-700"}>{address.ward.wardName}, {address.district.districtName}, {address.province.provinceName}</p>
+
+                                                {
+                                                    address.isDefault == true &&
+                                                    <div className={"w-[100px] py-[0px] rounded-full border border-amber-600 text-[14px] text-amber-600 flex justify-center items-center mt-[3px]"}>
+                                                        Mặc Định
+                                                    </div>
+                                                }
+
+                                            </div>
+                                            <div className={"flex flex-col text-[15px] h-full items-center justify-center"}>
+                                                <button>Cập Nhật</button>
+                                            </div>
+                                        </div>
+                                    )
+                                })
+                            }
+                        </div>
+                        <div className={"h-[40px] flex justify-end items-center px-[20px]"}>
+                            <button onClick={()=>setOpenAddress(false)} className={"h-full px-[20px] flex items-center justify-center bg-stone-200 text-[15px] rounded-full"}>
+                                Trở Lại
+                            </button>
+                            <button className={"h-full px-[20px] flex items-center justify-center bg-amber-600 text-white text-[15px] ml-[10px] rounded-full"}>
+                                Xác Nhận
+                            </button>
+                        </div>
+                    </div>
+                </div>
                 {showInsufficientInventory && (
                     <div className={"absolute top-[-70px] border border-stone-200 py-[20px] px-[20px] flex flex-col z-50 bg-white rounded-[25px] shadow-md "}>
                         <p>Số lượng sản phẩm trong kho còn lại không đủ</p>
@@ -343,10 +426,12 @@ export default function Bill() {
                         <p className={"text-[18px]"}>ĐỊA CHỈ NHẬN HÀNG</p>
                     </div>
                     <div className="flex font-sf items-end  mt-[10px]">
-                        <p className={"font-[500] text-[17px] mr-[10px] "}>{customer?.customerName}</p>
-                        {customer?.phoneNumber == null ? <p className={"text-amber-600 text-[14px] mb-[2px]"}>Thêm số điện thoại?</p> : <p className={""}>{customer.phoneNumber}</p>}
-                        <p className={"text-[16px] ml-[10px] mr-[10px] mb-[1px]"}>Địa chỉ: {customer?.address}</p>
-                        <button className={"text-amber-600 text-[14px]  mb-[2px]"}>
+                        <p className={"font-[500] text-[17px] mr-[10px] "}>{selectedAddress?.name}</p>
+                        <p className={"text-amber-600 text-[15px] mb-[1px]"}>{selectedAddress?.phoneNumber}</p>
+                        <p className={"text-[16px] ml-[10px] mr-[10px] mb-[1px]"}>Địa chỉ: {selectedAddress?.streetAddress}, {selectedAddress?.ward.wardName}, {selectedAddress?.district.districtName}, {selectedAddress?.province.provinceName}</p>
+                        <button onClick={()=> {
+                            setOpenAddress(true)
+                        }} className={"text-amber-600 text-[14px]  mb-[2px]"}>
                             Thay đổi địa chỉ
                         </button>
                     </div>
@@ -378,8 +463,11 @@ export default function Bill() {
                                                 <div key={product.itemId} className={"w-full px-[20px]"}>
                                                     <div className={"grid grid-cols-21 w-full border-b border-stone-200 py-[20px] "}>
                                                         <div className={"col-span-10 flex items-center"}>
-                                                            <div className={"relative w-[80px] h-[80px] bg-stone-200 rounded-[20px] mr-[10px]"}>
-                                                                <Image src={"/products/product-1.jpg"} alt={"image"} fill={true}/>
+                                                            <div className={"relative w-[80px] h-[80px] bg-stone-200 rounded-[20px] mr-[10px] p-[10px]"}>
+                                                                <div className={"w-full h-full relative"}>
+                                                                    <Image src={product.productImage} alt={"image"} fill={true}/>
+                                                                </div>
+
                                                             </div>
                                                             <p className={"font-sf text-stone-600 text-[15px]"}>{product.productName}</p>
                                                         </div>
@@ -564,8 +652,8 @@ export default function Bill() {
 
                             {shopVouchers.map((v) => (
                                 <div key={v.voucherWalletId} className={"h-[100px] mb-[20px] flex"}>
-                                    <div className={"h-full aspect-square bg-stone-300 rounded-l-[20px]"}>
-
+                                    <div className={"h-full aspect-square bg-stone-300 rounded-l-[20px] flex items-center justify-center"}>
+                                        <p className={"font-fre ml-[5px] text-text font-[800] text-amber-600 text-[17px]"}>BuyNow</p>
                                     </div>
                                     <div className={"flex-1 border-y border-r border-stone-200 flex justify-between px-[20px] rounded-r-[20px]  items-center"}>
                                         <div>

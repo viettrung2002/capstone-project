@@ -43,8 +43,8 @@ export default function VoucherActivePage() {
             {vouchers.map((voucher: IVoucher) => (
                 new Date(voucher.startTime).getTime() <= Date.now() && new Date(voucher.endTime).getTime() >= Date.now() ?
                     <div key={voucher.voucherId} className={"col-span-1 h-[100px] border-stone-200 flex border rounded-[20px] overflow-hidden"}>
-                        <div className={"h-full aspect-square  bg-stone-200"}>
-
+                        <div className={"h-full aspect-square  bg-stone-200 flex justify-center items-center font-fre text-[16px] font-[800]"}>
+                            BuyNow
                         </div>
                         <div className={"flex-1 font-sf pl-[15px] flex flex-col justify-center"}>
                             <p className={"text-[14px] uppercase font-[500]"}>{voucher.voucherName}</p>

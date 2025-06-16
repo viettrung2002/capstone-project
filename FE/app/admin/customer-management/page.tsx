@@ -6,6 +6,7 @@ import Cookies from "js-cookie";
 import {TbLock, TbLockOpen2, TbSearch} from "react-icons/tb";
 import {ICustomerInAdminPage} from "@/app/types/account";
 import {MdLockReset} from "react-icons/md";
+import Image from "next/image";
 
 export default function CustomerManagementPage() {
     const router = useRouter();
@@ -111,8 +112,8 @@ export default function CustomerManagementPage() {
                     customers.map( (customer) =>
                         <div key={customer.customerId} className={"grid grid-cols-8 h-[60px]  mt-[10px]"}>
                             <div className={"h-full col-span-1 flex justify-center items-center   "}>
-                                <div className={"h-full aspect-square rounded-full bg-stone-200"}>
-
+                                <div className={"h-full aspect-square rounded-full bg-stone-200 relative overflow-hidden"}>
+                                    <Image src={customer?.avatar ? customer.avatar : "/logo/avatar.png"} alt={"a"} fill={true}/>
                                 </div>
                             </div>
                             <div className={"h-full col-span-2 flex justify-start items-center font-[400] text-[15px]"}>{customer.customerName}</div>

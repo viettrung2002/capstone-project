@@ -48,7 +48,7 @@ export default function Compare() {
                 {products.map((product, index) => (
                     <div key={index} className={"h-[40px] w-[40px] flex items-center mr-[2px] ml-[2px] group relative transition duration-200"}>
                         <div className={"h-[40px] w-[40px] rounded-full bg-stone-400 hover:scale-150 relative origin-bottom transition duration-200 "}>
-                            <Image src={"/products/product-1.jpg"} alt={"image"} fill={true}/>
+                            <Image src={product.mainImage} alt={"image"} fill={true}/>
                             <button onClick={()=> {
                                 localStorage.removeItem(product.productId);
                                 window.dispatchEvent(new Event("localStorageChanged"));

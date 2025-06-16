@@ -38,7 +38,7 @@ public class AccountRepository(AppDbContext dbContext, IConfiguration configurat
         return await dbContext.Accounts.FindAsync(id);
     }
     
-
+    
     public async Task<AccountResponseDto<Shop>> Login(string username, string password)
     {
         var user = dbContext.Accounts.FirstOrDefault(x => x.UserName == username);

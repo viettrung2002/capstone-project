@@ -16,4 +16,5 @@ public class Notification
     public bool Read {set;get;}
     [Required]
     public Guid BillId {set;get;}
+    public Bill? Bill {set;get;}
 }

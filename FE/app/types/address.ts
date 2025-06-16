@@ -7,6 +7,7 @@ export interface IAddress {
     streetAddress?: string;
     phoneNumber?: string;
     name?: string;
+
 }
 
 export interface IProvince {

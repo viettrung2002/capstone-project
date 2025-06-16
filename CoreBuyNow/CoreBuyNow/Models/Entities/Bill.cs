@@ -25,9 +25,9 @@ public class Bill
     public List<ItemInBill> Items { get; set; } = [];
     [StringLength(1500)]
     public string? Note { get; set; }
-
+    public Guid AddressId { get; set; }
+    public Address? Address { get; set; }
     public PaymentType PaymentType { get; set; } = PaymentType.Cod;
-
 }
 
 public enum OrderStatus

@@ -9,6 +9,7 @@ export interface ICustomer {
     gender?: boolean;
     phoneNumber?: string;
     interation?: string;
+    account?: IAccount;
 }
 
 export interface ICustomerInAdminPage {
@@ -19,4 +20,11 @@ export interface ICustomerInAdminPage {
     phoneNumber?: string;
     totalSpending?: number;
     completeOrderCount?: number;
+}
+
+export interface IAccount {
+    accountId: string;
+    password: string;
+    role: string;
+    userName: string;
 }

@@ -117,7 +117,7 @@ export default function Navbar() {
     if (!mounted) return <div>Loadinggg</div>;
     return (
         role != "Shop" && role != "Admin"  ?
-            (<div className={`w-full relative h-[70px] z-20  ${pathname == '/' ? null : "bg-white shadow-[0px_0px_20px_rgba(0,0,0,0.1)]"} `}>
+            (<div className={`w-full relative h-[70px] z-20 ${pathname == '/' ? null : "bg-white shadow-[0px_0px_20px_rgba(0,0,0,0.1)]"} `}>
                 <nav className=" w-full h-[70px]  items-center flex-row flex justify-center  pb-[0px]">
                     <div className="w-full flex items-center justify-between px-[20px]">
                         <div className="flex h-full items-center flex-row">
@@ -203,6 +203,8 @@ export default function Navbar() {
                                             }} key={notification.notificationId} className={`w-full py-[10px] flex px-[20px] items-start text-start flex-col ${!notification.read && "bg-amber-100"}`}>
                                                 <p className={"font-sf text-stone-800 font-[500] text-[15px]"}>{notification.title}</p>
                                                 <p className={"font-sf text-stone-700 font-[400] text-[14px]"}> {notification.content}</p>
+                                                <p className={"font-sf text-stone-800 font-[500] text-[14px]"}> {new Date(notification.createdDate).getHours()}:{new Date(notification.createdDate).getMinutes()}, {new Date(notification.createdDate).getDate()}/{new Date(notification.createdDate).getMonth()}/{new Date(notification.createdDate).getFullYear()}</p>
+
                                             </div>
                                         ))}
                                         <button className={"w-full h-[30px] font-sf text-[15px] text-stone-600 flex items-center justify-center px-[20px] border-t"}>

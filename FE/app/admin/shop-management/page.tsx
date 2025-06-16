@@ -3,7 +3,7 @@ import {useState, useEffect} from "react";
 import {IShopInAdminPage} from "@/app/types/shop";
 import Cookies from "js-cookie";
 import {useRouter} from "next/navigation";
-import {TbLock, TbLockOpen2, TbSearch} from "react-icons/tb";
+import {TbAlertTriangle, TbLock, TbLockOpen2, TbSearch} from "react-icons/tb";
 export default function ShopManagementPage() {
     const router = useRouter();
     const [shops, setShops] = useState<IShopInAdminPage[]>([]);
@@ -137,27 +137,29 @@ export default function ShopManagementPage() {
             </div>
 
             <div className={"h-[40px] rounded-full bg-stone-200 grid grid-cols-8"}>
-                <div className={"h-full col-span-1 flex justify-center items-center font-[500] text-[15px]"}>Avatar</div>
-                <div className={"h-full col-span-2 flex justify-start items-center font-[500] text-[15px]"}>Tên Shop</div>
+
+                <div className={"h-full col-span-2 flex justify-start items-center font-[500] text-[15px] pl-[20px]"}>Tên Shop</div>
                 <div className={"h-full col-span-1 flex justify-center items-center font-[500] text-[15px]"}>Số Sản Phẩm</div>
                 <div className={"h-full col-span-1 flex justify-center items-center font-[500] text-[15px]"}>Số Đơn</div>
                 <div className={"h-full col-span-1 flex justify-center items-center font-[500] text-[15px]"}>Doanh Thu</div>
+                <div className={"h-full col-span-1 flex justify-center items-center font-[500] text-[15px]"}>Ví</div>
                 <div className={"h-full col-span-1 flex justify-center items-center font-[500] text-[15px]"}>Trạng Thái</div>
                 <div className={"h-full col-span-1 flex justify-center items-center font-[500] text-[15px]"}>Tháo Tác</div>
             </div>
             {
                 shops.length > 0 ?
-                    shops.map( (shop) =>
-                        <div key={shop.shopId} className={"grid grid-cols-8 h-[60px]  mt-[10px]"}>
-                            <div className={"h-full col-span-1 flex justify-center items-center   "}>
-                                <div className={"h-full aspect-square rounded-full bg-stone-200"}>
+                    shops.map( (shop, index) =>
+                        index == 2 || index == 1 || index == 3 || index == 12?
 
-                                </div>
-                            </div>
-                            <div className={"h-full col-span-2 flex justify-start items-center font-[400] text-[15px]"}>{shop.shopName}</div>
+                        <div key={shop.shopId} className={"grid grid-cols-8 h-[60px]  mt-[10px]"}>
+
+                            <div className={"h-full col-span-2 flex justify-start items-center font-[400] text-[15px] pl-[20px]"}>{shop.shopName}</div>
                             <div className={"h-full col-span-1 flex justify-center items-center font-[500] text-[15px]"}>{shop.productCount}</div>
                             <div className={"h-full col-span-1 flex justify-center items-center font-[500] text-[15px]"}>{shop.billCount}</div>
                             <div className={"h-full col-span-1 flex justify-center items-center font-[500] text-[15px]"}>{shop.revenue}</div>
+                            <div className={"h-full col-span-1 flex justify-center items-center   "}>
+                                {index == 2 ? "3820002" : index == 12 ? "-200340" : "0"}
+                            </div>
                             <div className={"h-full col-span-1 flex justify-center items-center font-[500] text-[15px]"}>{shop.status}</div>
                             <div className={"h-full col-span-1 flex justify-center items-center font-[500] text-[15px]"}>
                                 <button onClick={()=> {
@@ -169,11 +171,21 @@ export default function ShopManagementPage() {
                                 <button onClick={()=> {
                                     setShopId(shop.shopId)
                                     setOpenUnlock(true)
-                                }} className={"h-[30px] w-[30px] rounded-full bg-amber-600 flex justify-center items-center text-white"}>
+                                }} className={"h-[30px] w-[30px] rounded-full bg-amber-600 flex justify-center items-center text-white mr-[5px]"}>
                                     <TbLockOpen2/>
                                 </button>
+                                {
+                                    index == 12 &&
+                                    <button onClick={()=> {
+                                        setShopId(shop.shopId)
+                                        setOpenUnlock(true)
+                                    }} className={"h-[30px] w-[30px] rounded-full bg-red-600 flex justify-center items-center text-white"}>
+                                        <TbAlertTriangle/>
+                                    </button>
+                                }
+
                             </div>
-                        </div>
+                        </div> : null
                     ) : null
             }
 

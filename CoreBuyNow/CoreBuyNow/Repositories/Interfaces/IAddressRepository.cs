@@ -6,6 +6,8 @@ namespace CoreBuyNow.Repositories.Interfaces;
 public interface IAddressRepository
 {
     Task AddAddress(Address address);
+    
+    Task SetDefaultAddressId(Guid addressId, Guid customerId);
     Task UpdateAddress(Address address);
     Task DeleteAddress(Guid addressId);
     Task<List<Ward>> GetWardsByDistrictId(Guid districtId);

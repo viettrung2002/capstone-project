@@ -128,6 +128,7 @@ public class ProductRepository(AppDbContext dbContext, ILogger<ProductRepository
                 Specifications = p.Specifications,
                 IsFlashSale = p.IsFlashSale,
                 Inventory = p.Inventory,
+                Description = p.Description
             })
             .FirstOrDefaultAsync();
         return res;
@@ -182,7 +183,7 @@ public class ProductRepository(AppDbContext dbContext, ILogger<ProductRepository
 
         if (filter.MaxPrice.HasValue && filter.MaxPrice > 0)
             query = query.Where(p => p.Price <= filter.MaxPrice.Value);
-
+            
         if (filter.SubCategoryId != null && filter.SubCategoryId != Guid.Empty)
         {
             logger.LogInformation("SubCategoryId {id}", filter.SubCategoryId);
@@ -217,6 +218,7 @@ public class ProductRepository(AppDbContext dbContext, ILogger<ProductRepository
         {
             
             var items = await query
+                .OrderByDescending(p => p.Like)
                 .Take(10)
                 .Select(p => new ProductResponseDto {
                     ProductId = p.ProductId,
@@ -226,7 +228,7 @@ public class ProductRepository(AppDbContext dbContext, ILogger<ProductRepository
                     Rating = p.Rating,
                     Sold = p.Sold,
                     Discount = p.Discount,
-                    ReviewCount = dbContext.Comments.Where(c=>c.ProductId == p.ProductId).Count(),
+                    ReviewCount = dbContext.Comments.Count(c => c.ProductId == p.ProductId),
                     Price = p.Price,
                     Inventory = p.Inventory,
                     

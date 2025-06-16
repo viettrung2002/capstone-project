@@ -16,6 +16,6 @@ public interface IVoucherRepository
     Task<List<Voucher>> GetVoucherShop(Guid shopId);
     Task<List<VoucherWallet>> GetVoucherShopWallet(Guid customerId, Guid shopId);
     Task<List<VoucherWallet>> GetVoucherAdminWallet(Guid customerId);
-    
+    Task SaveVoucher(Guid voucherId, Guid customerId);
     Task IssueVoucher(Guid voucherId);
 }

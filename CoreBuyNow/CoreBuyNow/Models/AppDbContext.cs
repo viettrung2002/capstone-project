@@ -46,10 +46,10 @@ public class AppDbContext : DbContext
                 .OnDelete(DeleteBehavior.SetNull);
         });
         
-        modelBuilder.Entity<CustomerInteraction>()
-            .HasIndex(ui => ui.UserId);
-        modelBuilder.Entity<CustomerInteraction>()
-            .HasIndex(ui => ui.ProductId);
+        // modelBuilder.Entity<CustomerInteraction>()
+        //     .HasIndex(ui => ui.UserId);
+        // modelBuilder.Entity<CustomerInteraction>()
+        //     .HasIndex(ui => ui.ProductId);
         
     }
     public DbSet<Account> Accounts { get; set; }
@@ -63,7 +63,7 @@ public class AppDbContext : DbContext
     public DbSet<Interaction> Interactions { get; set; }
     public DbSet<VoucherWallet> VoucherWallets { get; set; }
     public DbSet<Admin> Admins { get; set; }
-    public DbSet<CustomerInteraction> CustomerInteractions { get; set; }
+    // public DbSet<CustomerInteraction> CustomerInteractions { get; set; }
     public DbSet<Notification> Notifications { get; set; }
     public DbSet<Wallet> Wallets { get; set; }
     public DbSet<Transaction> Transactions { get; set; }

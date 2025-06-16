@@ -4,6 +4,7 @@ import {useParams} from "next/navigation";
 import {useState, useEffect} from "react";
 import {IBillInfo, ItemInBill} from "@/app/types/bill";
 import {IVoucher} from "@/app/types/voucher";
+import Image from "next/image";
 
 export default function OrderDetailsPage() {
     const {id} = useParams();
@@ -171,25 +172,34 @@ export default function OrderDetailsPage() {
                 </div>
                 <div className={"w-full border-t h-[55px] mt-[40px] flex items-center justify-between px-[50px] text-[15px]"}>
                     <p>Cảm ơn bạn đã mua hàng!</p>
-                    <button className={"h-[35px] px-[20px] rounded-full bg-amber-600 text-white"}>
-                        <p>Mua Lại</p>
-                    </button>
+                    <div className={"flex"}>
+                        <button className={"h-[35px] px-[20px] rounded-full bg-amber-600 text-white"}>
+                            <p>Mua Lại</p>
+                        </button>
+                        <button className={"h-[35px] px-[20px] rounded-full bg-stone-800 text-white ml-[10px]"}>
+                            <p>Đánh Giá Sản Phẩm</p>
+                        </button>
+                    </div>
+
+
                 </div>
             </div>
             <div className={"grid grid-cols-3 w-full gap-[20px]  mt-[20px] "}>
                 <div className={"col-span-1 rounded-[25px] border relative py-[20px] px-[20px] max-h-fit"}>
                     <p className={"absolute top-[-14px] px-[8px] bg-white left-[15px]"}>Địa Chỉ Nhận Hàng</p>
-                    <p className={"font-[500] text-[15px]"}>Nguyen Viet Trung</p>
+                    <p className={"font-[500] text-[15px]"}>Viet Trung</p>
                     <p className={"text-[14px] text-stone-700 mt-[5px]"}>0934413090</p>
-                    <p className={"text-[14px] text-stone-700 mt-[5px]"}>Số 11, Trổng 9, Thạch Bàn, An Thủy, Lệ Thủy, Quảng Bình</p>
+                    <p className={"text-[14px] text-stone-700 mt-[5px]"}>Đội 3 Thạch Bàn, An Thủy, Lệ Thủy, Quảng Bình</p>
                 </div>
                 <div className={"col-span-2 rounded-[25px] border relative pt-[5px]"}>
                     <p className={"absolute top-[-14px] px-[8px] bg-white left-[15px]"}>Asus Official Store</p>
                     {
                         bill.items.map((item) => (
                             <div key={item.itemId} className={"flex py-[10px] px-[10px]"}>
-                                <div className={"h-[80px] w-[80px] rounded-[20px] bg-stone-200"}>
-
+                                <div className={"h-[80px] w-[80px] rounded-[20px] bg-stone-200 p-[10px]"}>
+                                    <div className={"w-full h-full relative"}>
+                                        <Image src={item.image} alt={"img"} fill={true}/>
+                                    </div>
                                 </div>
                                 <div className={"flex-1 px-[10px] flex flex-col justify-center"}>
                                     <p className={"text-[15px] text-stone-800"}>{item.productName}</p>

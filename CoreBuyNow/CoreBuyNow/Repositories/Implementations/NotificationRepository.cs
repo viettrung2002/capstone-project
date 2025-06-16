@@ -22,7 +22,7 @@ public class NotificationRepository (AppDbContext dbContext) : INotificationRepo
 
     public async Task<List<Notification>> GetNotifications(Guid userId)
     {
-        var notifications = await dbContext.Notifications.Where(n => n.UserId == userId).OrderByDescending(n => n.CreatedDate).ToListAsync();
+        var notifications = await dbContext.Notifications.Include(n=>n.Bill).ThenInclude(b=>b.Items).Where(n => n.UserId == userId).OrderByDescending(n => n.CreatedDate).ToListAsync();
         return notifications;
     }
     public async Task ReadNotifications(Guid notificationId)

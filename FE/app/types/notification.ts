@@ -1,3 +1,5 @@
+import {IBillInfo} from "@/app/types/bill";
+
 export interface INotification {
     notificationId: string;
     title: string;
@@ -6,4 +8,5 @@ export interface INotification {
     customerId: string;
     read: boolean;
     createdDate: string;
+    bill: IBillInfo
 }

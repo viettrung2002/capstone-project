@@ -362,7 +362,15 @@ public class BillRepository (AppDbContext dbContext, ILogger<BillRepository> log
 
     public async Task<Bill> GetBill(Guid billId)
     {
-        var bill = await dbContext.Bills.Include(b => b.Items).FirstOrDefaultAsync(b => b.BillId == billId);
+        var bill = await dbContext.Bills
+            .Include(b => b.Items)
+            .Include(b=>b.Address)
+            .ThenInclude(a => a.Province)
+            .Include(b=>b.Address)
+            .ThenInclude(a => a.District)
+            .Include(b=>b.Address)
+            .ThenInclude(a => a.Ward)
+            .FirstOrDefaultAsync(b => b.BillId == billId);
         if (bill == null ) throw new Exception ("Bill not found");
         return bill;
     }

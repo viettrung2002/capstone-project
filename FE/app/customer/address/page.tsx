@@ -17,6 +17,7 @@ export default function AddressPage( ) {
     const [wardName, setwardName] = useState<string>("");
     const [wards, setWards] = useState<IWard[]>([]);
     const [addresses, setAddresses] = useState<IAddressResponse[]>([]);
+    const [reload, setReload] = useState<boolean>(true);
     const router = useRouter();
     useEffect(() => {
         console.log(address);
@@ -117,8 +118,36 @@ export default function AddressPage( ) {
             console.log(error);
         }
     }
+
+    const SetDefault = async (id: string) => {
+        const token = Cookies.get("token");
+        if (!token) {
+            router.push("/login");
+            return;
+        }
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/address/default?addressId=${id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                }
+            });
+            if (response.ok){
+                const data = await response.json();
+                alert("Cập nhật địa chỉ mặc định thành công");
+                setReload(!reload);
+                console.log(data);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
     useEffect(() => {
         GetAddreses()
+
+    }, [reload]);
+    useEffect(() => {
         GetProvinces();
     }, []);
     return (
@@ -156,7 +185,7 @@ export default function AddressPage( ) {
                                 </div>
                                 <div className={"flex flex-col text-[15px] h-full items-center justify-center"}>
                                     <button>Cập Nhật</button>
-                                    <button className={"px-[20px] py-[3px] rounded-full border text-[15px] mt-[10px] bg-stone-200"}>
+                                    <button onClick={()=> address?.addressId && SetDefault(address.addressId)} className={"px-[20px] py-[3px] rounded-full border text-[15px] mt-[10px] bg-stone-200"}>
                                         Thiết Lập Mặc Định
                                     </button>
                                 </div>

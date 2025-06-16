@@ -51,14 +51,13 @@ namespace CoreBuyNow.Repositories.Implementations
 
         public async Task<Customer?> GetCustomerById(Guid id)
         {
-            return await dbContext.Customers.FindAsync(id);
+            return await dbContext.Customers.Include(c=>c.Account).FirstOrDefaultAsync(c => c.CustomerId == id);
         }
 
         public async Task<Customer> GetCustomerByAccountId(Guid accountId)
         {
             return await dbContext.Customers.FindAsync(accountId);
         }
-
 
         public async Task RecordInteraction(Guid userId, Guid productId, ActionType action)
         {

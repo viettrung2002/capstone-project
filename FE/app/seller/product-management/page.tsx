@@ -233,7 +233,7 @@ export default function Page() {
                                     (
                                         <div className={"w-full mt-[20px]"}>
                                             <div className={"w-full flex flex-col items-center justify-center font-sf"}>
-                                                <div className="w-[130px] h-[130px] bg-stone-200 rounded-[25px]">
+                                                <div className="w-[130px] h-[130px] bg-stone-200 rounded-[25px] p-[10px]">
 
                                                 </div>
                                                 <div className={"w-full grid grid-cols-6 mt-[20px] gap-[20px]"}>

@@ -36,6 +36,23 @@ public class AddressController (AddressImporter addressImporter, IAddressReposit
             return BadRequest(e.Message);
         }
     }
+    
+    [HttpPut("default")]
+    [Authorize(Roles = "Customer")]
+    public async Task<IActionResult> SetDefaultAddress(Guid addressId)
+    {
+        try
+        {
+            var id = User.FindFirst("id")?.Value;
+            if (string.IsNullOrEmpty(id)) return Unauthorized();
+            await addressRepository.SetDefaultAddressId(addressId, Guid.Parse(id));
+            return Ok(new { message = "Address imported successfully" });
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
     [HttpPut]
     public async Task<IActionResult> UpdateAddress([FromBody] Address address)
     {

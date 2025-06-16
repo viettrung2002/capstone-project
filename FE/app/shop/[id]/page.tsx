@@ -10,6 +10,7 @@ import {IShopInShop} from "@/app/types/shop";
 import {useRouter} from "next/navigation";
 import Cookies from "js-cookie";
 import {IProduct} from "@/app/types/product";
+import Image from "next/image";
 
 
 export default function Shop() {
@@ -95,11 +96,11 @@ export default function Shop() {
             <div className={"w-full mb-[20px]"}>
                 <div className={"w-full  bg-white flex justify-center "}>
                     <div className={"w-[1300px]  h-full border border-stone-200 rounded-[25px] flex pt-[30px] px-[30px] flex-col "}>
-                        <div className="flex h-[70px] w-full">
-                            <div className=" h-full flex items-center">
+                        <div className="flex h-[70px] w-full items-center">
+                            <div className=" h-full flex items-center border-r">
                                 {/*Hinh anh dai dien shop*/}
-                                <div className="h-full aspect-square rounded-full bg-stone-200">
-
+                                <div className="h-full aspect-square rounded-full bg-stone-200 relative overflow-hidden">
+                                    <Image src={"/logo/shop.png"} alt={"f"} fill={true}/>
                                 </div>
                                 {/*Ten shop*/}
                                 <div className="px-[20px]">
@@ -109,30 +110,19 @@ export default function Shop() {
                                         <p className={"font-sf font-[400] text-[15px] text-stone-700  leading-5"}>{shop?.rating}/5</p>
                                     </div>
                                 </div>
-                                <div className="flex px-[20px] border-l border-stone-200">
-                                    <button className={'px-[15px] flex  justify-center items-center py-[5px] bg-amber-600  text-stone-50  hover:bg-stone-700 rounded-full'}>
-                                        <p className={"font-sf text-[15px]"}>Theo dõi</p>
-                                    </button>
-                                </div>
-
                             </div>
-                            <div className=" h-[70px] border-l border-stone-300 flex px-[30px]">
-                                <div className="w-[220px] h-full grid grid-rows-2 gap-[5px]">
-                                    <div className={"row-span-1  flex items-center"}>
+                            <div className=" h-[30px] border-stone-300 flex px-[30px]">
+
+                                    <div className={"row-span-1  flex items-center mr-[20px]"}>
                                         <p className={"font-sf text-stone-800 text-[15px]"}>Sản phẩm: </p>
                                         <p className={"font-sf tebg-amber-600 text-[15px] ml-[5px]"}>{shop?.productCount}</p>
                                     </div>
-                                    <div className={"row-span-1  flex items-center"}>
+                                    <div className={"row-span-1  flex items-center  border-l px-[20px]"}>
                                         <p className={"font-sf text-stone-800 text-[15px]"}>Đánh giá: </p>
                                         <p className={"font-sf tebg-amber-600 text-[15px] ml-[5px]"}>{shop?.rating} ({shop?.ratingCount} đánh giá)</p>
                                     </div>
-                                </div>
-                                <div className=" h-full grid grid-rows-2 gap-[5px]">
-                                    <div className={"row-span-1  flex items-center"}>
-                                        <p className={"font-sf text-stone-800 text-[15px]"}>Người theo dõi: </p>
-                                        <p className={"font-sf tebg-amber-600 text-[15px] ml-[5px]"}>{shop?.follower}</p>
-                                    </div>
-                                    <div className={"row-span-1  flex items-center"}>
+
+                                    <div className={"row-span-1  flex items-center border-l px-[20px]"}>
                                         <p className={"font-sf text-stone-800 text-[15px]"}>Tham gia: </p>
                                         <p className={"font-sf tebg-amber-600 text-[15px] ml-[5px]"}>{shop? new Date(shop.createdDate).toLocaleString("vi-VN", {
                                             hour: "2-digit",
@@ -142,10 +132,10 @@ export default function Shop() {
                                             year: "numeric",
                                         }): null}</p>
                                     </div>
-                                </div>
+
                             </div>
                         </div>
-                        <div className={"h-[35px] w-full mt-[30px] grid grid-cols-6 gap-[15px] "}>
+                        <div className={"h-[35px] w-full mt-[10px] grid grid-cols-6 gap-[15px] "}>
                             <div onClick={()=> setCateActive("")} className={`${catActive == "" ? "border-b border-amber-600" : null} col-span-1 justify-center items-center flex`}>
                                 <p onClick={()=> setSubCategoryId("00000000-0000-0000-0000-000000000000")} className={"font-sf text-stone-800 text-[15px]"}>Tất cả</p>
                             </div>
@@ -220,7 +210,7 @@ export default function Shop() {
                 <div className={" w-full  mb-[30px]"}>
                     <p className={'font-sf text-stone-800 text-[16px] mt-[30px] mb-[10px]'}>SẢN PHẨM BÁN CHẠY</p>
                     <div className={"grid grid-cols-6 gap-[15px]"}>
-                        {products.slice(4,10).map((product) => (
+                        {products.slice(0,6).map((product) => (
                             <ProductInShop key={product.productId} product={product}/>
                         ))}
                     </div>

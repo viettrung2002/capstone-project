@@ -1,7 +1,7 @@
 'use client'
 
 
-import {Calendar} from "@/components/ui/calendar";
+
 import * as React from "react";
 import {useState} from "react";
 import Cookies from "js-cookie";
@@ -130,60 +130,60 @@ export default function CreateVoucherPage() {
                     <button onClick={()=>setShowDatePicker(!showDatePicker)} className={"w-[180px] h-[40px] border rounded-full bg-stone-200"}>
                         {startDate.getTime() != new Date(0).getTime() ? `${startDate.getHours()}:${startDate.getMinutes()}, ${startDate.getDate()}-${startDate.getMonth()}-${startDate.getFullYear()}` : "Chọn Ngày và Giờ"}
                     </button>
-                    {showDatePicker && (
-                        <div className={"absolute top-[45px] bg-stone-100 rounded-[20px] pb-[10px] z-50"}>
-                            <Calendar
-                                mode="single"
-                                selected={startDate}
-                                onSelect={(date) => {
-                                    if (date) setStartDate(date);
-                                }}
-                                initialFocus
-                            />
-                            <div className={"w-full h-[40px] mt-[10px] relative flex justify-between px-[10px] items-center"}>
-                                <button onClick={()=>setOpenHour(!openHour)} className={"h-full w-[105px] flex items-center justify-center bg-stone-200 rounded-full"}>
-                                    {startDate.getHours() == 0 ? "00" : "Giờ"}
-                                </button>
+                    {/*{showDatePicker && (*/}
+                    {/*    <div className={"absolute top-[45px] bg-stone-100 rounded-[20px] pb-[10px] z-50"}>*/}
+                    {/*        <Calendar*/}
+                    {/*            mode="single"*/}
+                    {/*            selected={startDate}*/}
+                    {/*            onSelect={(date) => {*/}
+                    {/*                if (date) setStartDate(date);*/}
+                    {/*            }}*/}
+                    {/*            initialFocus*/}
+                    {/*        />*/}
+                    {/*        <div className={"w-full h-[40px] mt-[10px] relative flex justify-between px-[10px] items-center"}>*/}
+                    {/*            <button onClick={()=>setOpenHour(!openHour)} className={"h-full w-[105px] flex items-center justify-center bg-stone-200 rounded-full"}>*/}
+                    {/*                {startDate.getHours() == 0 ? "00" : "Giờ"}*/}
+                    {/*            </button>*/}
 
-                                {openHour && (
-                                    <div className={"absolute w-[100px] h-[130px] left-[-1px] border border-stone-200 bottom-[-131px] bg-white overflow-y-auto z-10"}>
-                                        {Array.from({ length: 24 }).map((_, index) => (
-                                            <div key={index} onClick={()=> {
-                                                if (startDate) {
-                                                    const updated = new Date(startDate);
-                                                    updated.setHours(index + 1);
-                                                    setStartDate(updated);
-                                                }
-                                            }} className=" px-[15px] py-[2px] bg-white border-stone-100 border-b font-sf text-[15px]">
-                                                {index + 1}
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                                <p className={"text-[20px] mb-[2px]"}>:</p>
-                                <button onClick={()=>setOpenMinute(!openMinute)} className={"h-full w-[105px] flex items-center justify-center relative bg-stone-200 rounded-full"}>
-                                    {startDate.getMinutes() == 0 ? "00" : "Phút"}
-                                </button>
+                    {/*            {openHour && (*/}
+                    {/*                <div className={"absolute w-[100px] h-[130px] left-[-1px] border border-stone-200 bottom-[-131px] bg-white overflow-y-auto z-10"}>*/}
+                    {/*                    {Array.from({ length: 24 }).map((_, index) => (*/}
+                    {/*                        <div key={index} onClick={()=> {*/}
+                    {/*                            if (startDate) {*/}
+                    {/*                                const updated = new Date(startDate);*/}
+                    {/*                                updated.setHours(index + 1);*/}
+                    {/*                                setStartDate(updated);*/}
+                    {/*                            }*/}
+                    {/*                        }} className=" px-[15px] py-[2px] bg-white border-stone-100 border-b font-sf text-[15px]">*/}
+                    {/*                            {index + 1}*/}
+                    {/*                        </div>*/}
+                    {/*                    ))}*/}
+                    {/*                </div>*/}
+                    {/*            )}*/}
+                    {/*            <p className={"text-[20px] mb-[2px]"}>:</p>*/}
+                    {/*            <button onClick={()=>setOpenMinute(!openMinute)} className={"h-full w-[105px] flex items-center justify-center relative bg-stone-200 rounded-full"}>*/}
+                    {/*                {startDate.getMinutes() == 0 ? "00" : "Phút"}*/}
+                    {/*            </button>*/}
 
-                                {openMinute && (
-                                    <div className={"absolute w-[100px] h-[130px] right-[-0px] border border-stone-200 bottom-[-131px] bg-white overflow-y-auto z-10"}>
-                                        {Array.from({ length: 6 }).map((_, index) => (
-                                            <div key={index} onClick={()=> {
-                                                if (startDate) {
-                                                    const updated = new Date(startDate);
-                                                    updated.setMinutes(index * 10);
-                                                    setStartDate(updated);
-                                                }
-                                            }} className=" px-[15px] py-[2px] bg-white border-stone-100 border-b font-sf text-[15px]">
-                                                {index == 0 ? "00" : index*10}
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
+                    {/*            {openMinute && (*/}
+                    {/*                <div className={"absolute w-[100px] h-[130px] right-[-0px] border border-stone-200 bottom-[-131px] bg-white overflow-y-auto z-10"}>*/}
+                    {/*                    {Array.from({ length: 6 }).map((_, index) => (*/}
+                    {/*                        <div key={index} onClick={()=> {*/}
+                    {/*                            if (startDate) {*/}
+                    {/*                                const updated = new Date(startDate);*/}
+                    {/*                                updated.setMinutes(index * 10);*/}
+                    {/*                                setStartDate(updated);*/}
+                    {/*                            }*/}
+                    {/*                        }} className=" px-[15px] py-[2px] bg-white border-stone-100 border-b font-sf text-[15px]">*/}
+                    {/*                            {index == 0 ? "00" : index*10}*/}
+                    {/*                        </div>*/}
+                    {/*                    ))}*/}
+                    {/*                </div>*/}
+                    {/*            )}*/}
 
-                            </div>
-                        </div>
-                    )}
+                    {/*        </div>*/}
+                    {/*    </div>*/}
+                    {/*)}*/}
 
 
                 </div>
@@ -191,60 +191,60 @@ export default function CreateVoucherPage() {
                     <button onClick={()=>setShowEndDatePicker(!showEndDatePicker)} className={"w-[180px] h-[40px] border rounded-full bg-stone-200"}>
                         {endDate.getTime() != new Date(0).getTime() ? `${endDate.getHours()}:${endDate.getMinutes()}, ${endDate.getDate()}-${endDate.getMonth()}-${endDate.getFullYear()}` : "Chọn Ngày và Giờ"}
                     </button>
-                    {showEndDatePicker && (
-                        <div className={"absolute top-[45px] bg-stone-100 rounded-[20px] pb-[10px] z-50"}>
-                            <Calendar
-                                mode="single"
-                                selected={endDate}
-                                onSelect={(date) => {
-                                    if (date) setEndDate(date);
-                                }}
-                                initialFocus
-                            />
-                            <div className={"w-full h-[40px] mt-[10px] relative flex justify-between px-[10px] items-center"}>
-                                <button onClick={()=>setOpenHour(!openHour)} className={"h-full w-[105px] flex items-center justify-center bg-stone-200 rounded-full"}>
-                                    {endDate.getHours() == 0 ? "00" : "Giờ"}
-                                </button>
+                    {/*{showEndDatePicker && (*/}
+                    {/*    <div className={"absolute top-[45px] bg-stone-100 rounded-[20px] pb-[10px] z-50"}>*/}
+                    {/*        <Calendar*/}
+                    {/*            mode="single"*/}
+                    {/*            selected={endDate}*/}
+                    {/*            onSelect={(date) => {*/}
+                    {/*                if (date) setEndDate(date);*/}
+                    {/*            }}*/}
+                    {/*            initialFocus*/}
+                    {/*        />*/}
+                    {/*        <div className={"w-full h-[40px] mt-[10px] relative flex justify-between px-[10px] items-center"}>*/}
+                    {/*            <button onClick={()=>setOpenHour(!openHour)} className={"h-full w-[105px] flex items-center justify-center bg-stone-200 rounded-full"}>*/}
+                    {/*                {endDate.getHours() == 0 ? "00" : "Giờ"}*/}
+                    {/*            </button>*/}
 
-                                {openHour && (
-                                    <div className={"absolute w-[100px] h-[130px] left-[-1px] border border-stone-200 bottom-[-131px] bg-white overflow-y-auto z-10"}>
-                                        {Array.from({ length: 24 }).map((_, index) => (
-                                            <div key={index} onClick={()=> {
-                                                if (startDate) {
-                                                    const updated = new Date(startDate);
-                                                    updated.setHours(index + 1);
-                                                    setEndDate(updated);
-                                                }
-                                            }} className=" px-[15px] py-[2px] bg-white border-stone-100 border-b font-sf text-[15px]">
-                                                {index + 1}
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                                <p className={"text-[20px] mb-[2px]"}>:</p>
-                                <button onClick={()=>setOpenMinute(!openMinute)} className={"h-full w-[105px] flex items-center justify-center relative bg-stone-200 rounded-full"}>
-                                    {endDate.getMinutes() == 0 ? "00" : "Phút"}
-                                </button>
+                    {/*            {openHour && (*/}
+                    {/*                <div className={"absolute w-[100px] h-[130px] left-[-1px] border border-stone-200 bottom-[-131px] bg-white overflow-y-auto z-10"}>*/}
+                    {/*                    {Array.from({ length: 24 }).map((_, index) => (*/}
+                    {/*                        <div key={index} onClick={()=> {*/}
+                    {/*                            if (startDate) {*/}
+                    {/*                                const updated = new Date(startDate);*/}
+                    {/*                                updated.setHours(index + 1);*/}
+                    {/*                                setEndDate(updated);*/}
+                    {/*                            }*/}
+                    {/*                        }} className=" px-[15px] py-[2px] bg-white border-stone-100 border-b font-sf text-[15px]">*/}
+                    {/*                            {index + 1}*/}
+                    {/*                        </div>*/}
+                    {/*                    ))}*/}
+                    {/*                </div>*/}
+                    {/*            )}*/}
+                    {/*            <p className={"text-[20px] mb-[2px]"}>:</p>*/}
+                    {/*            <button onClick={()=>setOpenMinute(!openMinute)} className={"h-full w-[105px] flex items-center justify-center relative bg-stone-200 rounded-full"}>*/}
+                    {/*                {endDate.getMinutes() == 0 ? "00" : "Phút"}*/}
+                    {/*            </button>*/}
 
-                                {openMinute && (
-                                    <div className={"absolute w-[100px] h-[130px] right-[-0px] border border-stone-200 bottom-[-131px] bg-white overflow-y-auto z-10"}>
-                                        {Array.from({ length: 6 }).map((_, index) => (
-                                            <div key={index} onClick={()=> {
-                                                if (startDate) {
-                                                    const updated = new Date(startDate);
-                                                    updated.setMinutes(index * 10);
-                                                    setEndDate(updated);
-                                                }
-                                            }} className=" px-[15px] py-[2px] bg-white border-stone-100 border-b font-sf text-[15px]">
-                                                {index == 0 ? "00" : index*10}
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
+                    {/*            {openMinute && (*/}
+                    {/*                <div className={"absolute w-[100px] h-[130px] right-[-0px] border border-stone-200 bottom-[-131px] bg-white overflow-y-auto z-10"}>*/}
+                    {/*                    {Array.from({ length: 6 }).map((_, index) => (*/}
+                    {/*                        <div key={index} onClick={()=> {*/}
+                    {/*                            if (startDate) {*/}
+                    {/*                                const updated = new Date(startDate);*/}
+                    {/*                                updated.setMinutes(index * 10);*/}
+                    {/*                                setEndDate(updated);*/}
+                    {/*                            }*/}
+                    {/*                        }} className=" px-[15px] py-[2px] bg-white border-stone-100 border-b font-sf text-[15px]">*/}
+                    {/*                            {index == 0 ? "00" : index*10}*/}
+                    {/*                        </div>*/}
+                    {/*                    ))}*/}
+                    {/*                </div>*/}
+                    {/*            )}*/}
 
-                            </div>
-                        </div>
-                    )}
+                    {/*        </div>*/}
+                    {/*    </div>*/}
+                    {/*)}*/}
 
 
                 </div>

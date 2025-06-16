@@ -6,6 +6,7 @@ import {ICategory, ISubCategoryAttribure, SubCategory} from "@/app/types/ subCat
 import Cookies from "js-cookie";
 import {useParams, useRouter} from "next/navigation";
 import Image from "next/image";
+import {TbPlus} from "react-icons/tb";
 export default function Page() {
     const [openCategory, setOpenCategory] = useState<boolean>(false);
     const [categories, setCategories] = useState<ICategory[]>([]);
@@ -19,6 +20,7 @@ export default function Page() {
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [uploading, setUploading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [inventory, setInventory] = useState(0)
     const [description, setDescription] = useState<string>("");
     const [urlImage, setUrlImage] = useState("")
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -139,10 +141,11 @@ export default function Page() {
             <div className={"col-span-1 border-r border-gray-200 flex flex-col"}>
                 {/*HINH ANH*/}
                 <div className={"w-full flex items-center justify-center font-sf"}>
-                    <div className={"w-[120px] h-[120px] bg-gray-200 mr-[15px] relative"}>
-                        {previewUrl && (
-                            <Image src={previewUrl} fill={true} alt="Preview"  />
-                        )}
+                    <div className={"w-[120px] h-[120px] bg-gray-200 mr-[15px] relative flex items-center justify-center"}>
+                        {previewUrl ? (
+                            <Image src={previewUrl} fill={true} alt="Preview" />
+                        ) : <TbPlus className={"text-gray-500 text-[40px]"}/>}
+
                     </div>
                     <div className={"flex items-center flex-col justify-center"}>
                         <input
@@ -152,17 +155,17 @@ export default function Page() {
                             accept="image/*"
                             className="hidden"
                         />
-                        <button onClick={() => fileInputRef.current?.click()} className={"px-[15px] py-[5px] bg-blue-500 text-gray-50 text-[15px] hover:shadow-md mt-[5px] rounded-full"}>
-                            <p>Chọn Ảnh</p>
-                        </button>
-                        <button onClick={handleUpload}
-                                disabled={uploading}
-                                className={"px-[15px] py-[5px] bg-blue-500 text-gray-50 text-[15px] hover:shadow-md mt-[5px] rounded-full"}>
-                            <p>{uploading ? 'Đang tải ...' : 'Tải lên'}</p>
-                        </button>
-                        {/*<p className={"text-gray-600 text-[14px] mt-[10px]"}>Dung lượng tối đa 5 MB</p>*/}
-                        {/*<p className={"text-gray-600 text-[14px]"}>Định Dạng: .JPEG, .PNG</p>*/}
-                        <p className={"text-gray-600 text-[14px]"}>Tỉ lệ hình ảnh: 1x1</p>
+                        {/*<button onClick={() => fileInputRef.current?.click()} className={"px-[15px] py-[5px] bg-blue-500 text-gray-50 text-[15px] hover:shadow-md mt-[5px] rounded-full"}>*/}
+                        {/*    <p>Chọn Ảnh</p>*/}
+                        {/*</button>*/}
+                        {/*<button onClick={handleUpload}*/}
+                        {/*        disabled={uploading}*/}
+                        {/*        className={"px-[15px] py-[5px] bg-blue-500 text-gray-50 text-[15px] hover:shadow-md mt-[5px] rounded-full"}>*/}
+                        {/*    <p>{uploading ? 'Đang tải ...' : 'Tải lên'}</p>*/}
+                        {/*</button>*/}
+                        {/*/!*<p className={"text-gray-600 text-[14px] mt-[10px]"}>Dung lượng tối đa 5 MB</p>*!/*/}
+                        {/*/!*<p className={"text-gray-600 text-[14px]"}>Định Dạng: .JPEG, .PNG</p>*!/*/}
+                        {/*<p className={"text-gray-600 text-[14px]"}>Tỉ lệ hình ảnh: 1x1</p>*/}
                     </div>
                 </div>
 
@@ -176,11 +179,18 @@ export default function Page() {
                         </div>
 
                         <div className={"h-[40px] flex items-center justify-center text-gray-800 text-[15px] mt-[20px]"}>
-                            <p>Giá tiền</p>
+                            <p>Giá Tiền</p>
+                        </div>
+                        <div className={"h-[40px] flex items-center justify-center text-gray-800 text-[15px] mt-[20px]"}>
+                            <p>Số Lượng Trong Kho</p>
+                        </div>
+                        <div className={"h-[60px] flex items-center justify-center text-gray-800 text-[15px] mt-[20px]"}>
+                            <p>Hình Ảnh Phụ</p>
                         </div>
                         <div className={"h-[40px] flex items-center justify-center text-gray-800 text-[15px] mt-[20px]"}>
                             <p>Mô Tả</p>
                         </div>
+
 
                     </div>
                     <div className={"col-span-4 pr-[20px]"}>
@@ -233,6 +243,20 @@ export default function Page() {
                                 className={"h-[40px] w-2/5 border border-gray-200 focus:outline-none rounded-[8px] text-[15px]  px-[10px]"}
                             />
                             <p className={"text-[15px] ml-[10px] text-gray-600"}>VND</p>
+                        </div>
+                        <div className={"h-[40px] mt-[20px] flex items-center"}>
+                            <input
+                                type={"number"}
+                                value={inventory}
+                                onChange={(e)=> setInventory(Number(e.target.value))}
+                                className={"h-[40px] w-2/5 border border-gray-200 focus:outline-none rounded-[8px] text-[15px]  px-[10px]"}
+                            />
+                            <p className={"text-[15px] ml-[10px] text-gray-600"}>Sản phẩm</p>
+                        </div>
+                        <div className={"h-[60px] mt-[20px] flex items-center"}>
+                            <div className={"h-[60px] w-[60px] border text-gray-500 text-[30px] flex justify-center items-center"}>
+                                <TbPlus/>
+                            </div>
                         </div>
                         <textarea
 

@@ -4,6 +4,7 @@ import {useEffect, useState} from "react";
 import {INotification} from "@/app/types/notification";
 import Cookies from "js-cookie";
 import {useRouter} from "next/navigation";
+import Image from "next/image";
 export default function NotificationPage () {
     const [notifications, setNotifications] = useState<INotification[]>([]);
     const token = Cookies.get("token");
@@ -60,8 +61,10 @@ export default function NotificationPage () {
             </div>
             {notifications.map((notification) => (
                 <div onClick={()=>ReadNotification(notification)} key={notification.notificationId} className={`h-[120px] w-full px-[10px] flex items-center ${!notification.read && "bg-amber-100"}`}>
-                    <div className={"h-[100px] aspect-square rounded-[20px] bg-stone-200"}>
-
+                    <div className={"h-[100px] aspect-square rounded-[20px] bg-stone-200 p-[10px]"}>
+                        <div className={"w-full h-full relative"}>
+                            <Image src={notification.bill.items[0].image} alt={"i"} fill={true}/>
+                        </div>
                     </div>
                     <div className={"h-[100px] flex-1 flex px-[20px] flex-col justify-center"}>
                         <p className={"font-[500] text-[15px]"}>{notification.title}</p>

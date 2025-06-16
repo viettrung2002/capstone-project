@@ -4,6 +4,7 @@ import {useEffect, useState} from "react";
 import {Bill} from "@/app/types/bill";
 import Cookies from "js-cookie";
 import {useRouter} from "next/navigation";
+import Image from "next/image";
 export default function OrderPage() {
     const [bills, setBills] = useState<Bill[]>([]);
     const [orderStatus, setOrderStatus] = useState(0);
@@ -188,8 +189,10 @@ export default function OrderPage() {
                             {
                                 bill.items.map((item)=>
                                     <div key={item.itemId} className={"w-full py-[10px] border-stone-200 flex"}>
-                                        <div className={"w-[90px] h-[90px] bg-stone-200 rounded-[20px]"}>
-
+                                        <div className={"w-[90px] h-[90px] bg-stone-200 rounded-[20px] p-[10px]"}>
+                                            <div className={"w-full h-full relative"}>
+                                                <Image src={item.image} alt={"iam"} fill={ true}/>
+                                            </div>
                                         </div>
                                         <div className={"h-[90px] flex flex-col items-start py-[3px] pl-[20px] justify-between font-sf"}>
                                             <p className={"text-[16px] text-stone-800"}>{item.productName}</p>

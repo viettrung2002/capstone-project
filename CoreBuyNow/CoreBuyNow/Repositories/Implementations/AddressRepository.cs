@@ -11,8 +11,23 @@ public class AddressRepository (AppDbContext dbContext, ILogger<AddressRepositor
     public async Task AddAddress(Address address)
     {
         if (address.AddressId == Guid.Empty) address.AddressId = Guid.NewGuid();
+        var user = dbContext.Customers.FirstOrDefault(c=>c.CustomerId == address.UserId);
+        if (user == null) throw new NullReferenceException("User does not exist");
+        if (user.DefaultAddressId == Guid.Empty) user.DefaultAddressId = Guid.NewGuid();
+        dbContext.Customers.Update(user);
         dbContext.Addresses.Add(address);
         await dbContext.SaveChangesAsync();
+    }
+
+    public Task SetDefaultAddressId(Guid addressId, Guid customerId)
+    {
+        var address = dbContext.Addresses.FirstOrDefault(a => a.AddressId == addressId);
+        if (address == null) throw new Exception("Address does not exist");
+        var customer = dbContext.Customers.FirstOrDefault(c => c.CustomerId == customerId);
+        if (customer == null) throw new Exception("Customer does not exist");
+        customer.DefaultAddressId = addressId;
+        dbContext.Customers.Update(customer);
+        return dbContext.SaveChangesAsync();
     }
 
     public Task UpdateAddress(Address address)

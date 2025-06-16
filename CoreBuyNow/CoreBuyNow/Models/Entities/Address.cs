@@ -10,18 +10,18 @@ public class Address
      public Guid AddressId { get; set; }
      public Guid UserId { get; set; }
      public Guid ProvinceId { get; set; }
-     [JsonIgnore]
+     
      public Province? Province { get; set; }
      public Guid DistrictId { get; set; }
-     [JsonIgnore]
+     
      public District? District { get; set; }
      public Guid WardId { get; set; }
-     [JsonIgnore]
+     
      public Ward? Ward { get; set; }
      [StringLength(500)]
-     public string StreetAddress { get; set; }
-     public string Name {set; get;}
-     public string PhoneNumber { get; set; }
+     public string? StreetAddress { get; set; }
+     public string? Name {set; get;}
+     public string? PhoneNumber { get; set; }
 }
 public class Province
 {
