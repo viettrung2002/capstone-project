@@ -4,7 +4,7 @@ import {HiChevronDown, HiChevronUp} from "react-icons/hi2";
 import {useState, useEffect, useRef} from "react";
 import {ICategory, ISubCategoryAttribure, SubCategory} from "@/app/types/ subCategory";
 import Cookies from "js-cookie";
-import {useParams, useRouter} from "next/navigation";
+import { useRouter} from "next/navigation";
 import Image from "next/image";
 import {TbPlus} from "react-icons/tb";
 export default function Page() {
@@ -18,11 +18,15 @@ export default function Page() {
     const [spec, setSpec] = useState<Record<string, string>>({})
     const [file, setFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-    const [uploading, setUploading] = useState(false);
+
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [inventory, setInventory] = useState(0)
     const [description, setDescription] = useState<string>("");
-    const [urlImage, setUrlImage] = useState("")
+
+    const [extraImages, setExtraImages] = useState<File[]>([]);
+    const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+    const extraFileInputRef = useRef<HTMLInputElement>(null);
+
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = e.target.files?.[0];
         if (selectedFile) {
@@ -30,36 +34,57 @@ export default function Page() {
             setPreviewUrl(URL.createObjectURL(selectedFile));
         }
     };
+    const handleExtraImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files;
+        if (files && files.length > 0) {
+            const fileArray = Array.from(files);
+            const newPreviews = fileArray.map((file) => URL.createObjectURL(file));
 
-    const handleUpload = async () => {
-        if (!file) {
-            console.log("No file");
-            return;
-        };
-
-        const formData = new FormData();
-        formData.append('image', file); // Key 'image' phải khớp với .NET API
-
-        try {
-            setUploading(true);
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload`, {
-                method: 'POST',
-                body: formData,
-                // Không cần headers: Content-Type sẽ tự động là 'multipart/form-data'
-            });
-
-            if (!response.ok) throw new Error('Upload failed');
-            const data = await response.json();
-            console.log("URL",data);
-            setUrlImage(data.imageUrl);
-            alert(`Upload thành công! URL: ${data.imageUrl}`);
-        } catch (error) {
-            console.error('Lỗi:', error);
-            alert('Upload thất bại');
-        } finally {
-            setUploading(false);
+            setExtraImages((prev) => [...prev, ...fileArray]);
+            setPreviewUrls((prev) => [...prev, ...newPreviews]);
         }
+        console.log(extraImages.length);
     };
+
+    const removeExtraImage = (index: number) => {
+        const newExtraImages = [...extraImages];
+        const newPreviewUrls = [...previewUrls];
+
+        newExtraImages.splice(index, 1);   // Xoá file
+        newPreviewUrls.splice(index, 1);   // Xoá preview
+
+        setExtraImages(newExtraImages);
+        setPreviewUrls(newPreviewUrls);
+    };
+    // const handleUpload = async () => {
+    //     if (!file) {
+    //         console.log("No file");
+    //         return;
+    //     };
+    //
+    //     const formData = new FormData();
+    //     formData.append('image', file); // Key 'image' phải khớp với .NET API
+    //
+    //     try {
+    //         setUploading(true);
+    //         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload`, {
+    //             method: 'POST',
+    //             body: formData,
+    //             // Không cần headers: Content-Type sẽ tự động là 'multipart/form-data'
+    //         });
+    //
+    //         if (!response.ok) throw new Error('Upload failed');
+    //         const data = await response.json();
+    //         console.log("URL",data);
+    //         setUrlImage(data.imageUrl);
+    //         alert(`Upload thành công! URL: ${data.imageUrl}`);
+    //     } catch (error) {
+    //         console.error('Lỗi:', error);
+    //         alert('Upload thất bại');
+    //     } finally {
+    //         setUploading(false);
+    //     }
+    // };
     async function GetCategoryFeature() {
 
         try {
@@ -96,32 +121,78 @@ export default function Page() {
         }
     }
 
-    const CreateProduct = async () => {
+    // const CreateProduct = async () => {
+    //     const token = Cookies.get("token");
+    //     if (!token) {
+    //         router.push("/login")
+    //         return;
+    //     }
+    //     try {
+    //         const response = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/recommend`,{
+    //             method: "POST",
+    //             headers: {
+    //                 "Content-Type": "application/json",
+    //                 Authorization: `Bearer ${token}`,
+    //             },
+    //             body: JSON.stringify({
+    //                 productName: productName,
+    //                 subCategoryId: selectedSubCategory?.subCategoryId,
+    //                 price: price,
+    //                 mainImage: urlImage,
+    //                 description: description,
+    //                 extraImage: "https://i01.appmifile.com/v1/MI_18455B3E4DA706226CF7535A58E875F0267/pms_1645585904.11171995.png",
+    //                 specifications: spec,
+    //             })
+    //         })
+    //         if (response.ok) {
+    //             const data = await response.json();
+    //             console.log("Product",data);
+    //         }
+    //     } catch (error) {
+    //         console.log(error)
+    //     }
+    //
+    // }
+
+    const CreateProduct2 = async () => {
         const token = Cookies.get("token");
         if (!token) {
             router.push("/login")
             return;
         }
+        const product = {
+            productName: productName,
+            subCategoryId: selectedSubCategory?.subCategoryId,
+            price: price,
+            description: description,
+            specifications: spec,
+            inventory: inventory,
+        }
+
+        console.log(JSON.stringify(product))
+        const formData = new FormData();
+        formData.append("product", JSON.stringify(product));
+        if (file) {
+            console.log("file ",file);
+            formData.append("mainImage", file);
+        }
+        extraImages.forEach((img) => {
+            formData.append("extraImages", img);
+        });
+
         try {
-            const response = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/recommend`,{
+            const response = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/product/add2`,{
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify({
-                    productName: productName,
-                    subCategoryId: selectedSubCategory?.subCategoryId,
-                    price: price,
-                    mainImage: urlImage,
-                    description: description,
-                    extraImage: "https://i01.appmifile.com/v1/MI_18455B3E4DA706226CF7535A58E875F0267/pms_1645585904.11171995.png",
-                    specifications: spec,
-                })
+                body: formData,
             })
             if (response.ok) {
                 const data = await response.json();
                 console.log("Product",data);
+                alert("Tạo sản phẩm thành công")
+                router.push("/seller/product-management")
             }
         } catch (error) {
             console.log(error)
@@ -141,9 +212,23 @@ export default function Page() {
             <div className={"col-span-1 border-r border-gray-200 flex flex-col"}>
                 {/*HINH ANH*/}
                 <div className={"w-full flex items-center justify-center font-sf"}>
-                    <div className={"w-[120px] h-[120px] bg-gray-200 mr-[15px] relative flex items-center justify-center"}>
+                    <div onClick={()=> fileInputRef.current?.click()} className={"w-[120px] h-[120px] bg-gray-200 mr-[15px] relative flex items-center justify-center"}>
                         {previewUrl ? (
-                            <Image src={previewUrl} fill={true} alt="Preview" />
+                            <div className={"h-full w-full relative group"}>
+                                <Image src={previewUrl} fill={true} alt="Preview"/>
+                                <button
+                                    type="button"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setFile(null);
+                                        setPreviewUrl(null);
+                                    }}
+                                    className="absolute top-1 right-1 bg-black bg-opacity-70 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                                    title="Xóa ảnh"
+                                >
+                                    ×
+                                </button>
+                            </div>
                         ) : <TbPlus className={"text-gray-500 text-[40px]"}/>}
 
                     </div>
@@ -155,16 +240,13 @@ export default function Page() {
                             accept="image/*"
                             className="hidden"
                         />
-                        {/*<button onClick={() => fileInputRef.current?.click()} className={"px-[15px] py-[5px] bg-blue-500 text-gray-50 text-[15px] hover:shadow-md mt-[5px] rounded-full"}>*/}
-                        {/*    <p>Chọn Ảnh</p>*/}
-                        {/*</button>*/}
                         {/*<button onClick={handleUpload}*/}
                         {/*        disabled={uploading}*/}
                         {/*        className={"px-[15px] py-[5px] bg-blue-500 text-gray-50 text-[15px] hover:shadow-md mt-[5px] rounded-full"}>*/}
                         {/*    <p>{uploading ? 'Đang tải ...' : 'Tải lên'}</p>*/}
                         {/*</button>*/}
-                        {/*/!*<p className={"text-gray-600 text-[14px] mt-[10px]"}>Dung lượng tối đa 5 MB</p>*!/*/}
-                        {/*/!*<p className={"text-gray-600 text-[14px]"}>Định Dạng: .JPEG, .PNG</p>*!/*/}
+                        {/*<p className={"text-gray-600 text-[14px] mt-[10px]"}>Dung lượng tối đa 5 MB</p>*/}
+                        {/*<p className={"text-gray-600 text-[14px]"}>Định Dạng: .JPEG, .PNG</p>*/}
                         {/*<p className={"text-gray-600 text-[14px]"}>Tỉ lệ hình ảnh: 1x1</p>*/}
                     </div>
                 </div>
@@ -199,7 +281,6 @@ export default function Page() {
                                 <p className={"text-[15px]"}>{selectedSubCategory?.subCategoryName}</p>
                                 <button onClick={()=>setOpenCategory(!openCategory)} className={"flex justify-center items-center h-[30px] aspect-square rounded-[5px] bg-gray-200"}>
                                     {!openCategory? <HiChevronDown/> : <HiChevronUp/>}
-
                                 </button>
                             </div>
 
@@ -254,9 +335,37 @@ export default function Page() {
                             <p className={"text-[15px] ml-[10px] text-gray-600"}>Sản phẩm</p>
                         </div>
                         <div className={"h-[60px] mt-[20px] flex items-center"}>
-                            <div className={"h-[60px] w-[60px] border text-gray-500 text-[30px] flex justify-center items-center"}>
-                                <TbPlus/>
+                            <div className="flex gap-4 flex-wrap">
+                                {previewUrls.map((url, index) => (
+                                    <div key={index} className="w-[60px] h-[60px] bg-gray-200 relative group">
+                                        <Image src={url} alt={`extra-${index}`} fill={true} />
+                                        <button
+                                            type="button"
+                                            onClick={() => removeExtraImage(index)}
+                                            className="absolute top-1 right-1 bg-black bg-opacity-70 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                                            title="Xóa ảnh"
+                                        >
+                                            ×
+                                        </button>
+                                    </div>
+                                ))}
+                                {/* Nút thêm ảnh */}
+                                <div
+                                    onClick={() => extraFileInputRef.current?.click()}
+                                    className="w-[60px] h-[60px] bg-gray-100 flex items-center justify-center cursor-pointer"
+                                >
+                                    <TbPlus className="text-[40px] text-gray-500" />
+                                </div>
                             </div>
+
+                            <input
+                                type="file"
+                                ref={extraFileInputRef}
+                                multiple
+                                accept="image/*"
+                                className="hidden"
+                                onChange={handleExtraImagesChange}
+                            />
                         </div>
                         <textarea
 
@@ -264,7 +373,7 @@ export default function Page() {
                             onChange={(e) => setDescription(e.target.value)}
                             className={"h-[120px] w-full border border-gray-200 focus:outline-none rounded-[8px] text-[15px] mt-[20px] px-[10px] py-[10px]"}
                         />
-                        <button onClick={()=> CreateProduct()} className={"w-[140px] h-[40px] rounded-full bg-blue-500 flex justify-center items-center text-white mt-[20px]"} >Tạo Sản Phẩm</button>
+                        <button onClick={()=> CreateProduct2()} className={"w-[140px] h-[40px] rounded-full bg-blue-500 flex justify-center items-center text-white mt-[20px]"} >Tạo Sản Phẩm</button>
 
 
 

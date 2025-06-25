@@ -1,10 +1,10 @@
 'use client'
-import { FaCircleUser, FaCircleChevronLeft, FaGoogle, FaFacebook } from "react-icons/fa6";
+import { FaCircleUser, FaCircleChevronLeft } from "react-icons/fa6";
 
 import {useEffect, useState} from "react";
 import {useRouter} from "next/navigation";
-import Breadcrumb from "@/app/components/breadcrumb";
-import Cookies from "js-cookie";
+// import Breadcrumb from "@/app/components/breadcrumb";
+// import Cookies from "js-cookie";
 import {TbChevronDown} from "react-icons/tb";
 import {IAddress, IDistrict, IProvince, IWard} from "@/app/types/address";
 export default function RegisterPage() {
@@ -25,10 +25,10 @@ export default function RegisterPage() {
     const [openProvince, setOpenProvince] = useState<boolean>(false);
     const [address, setAddress] = useState<IAddress>();
     const [activeTab, setActiveTab] = useState(0)
-    const breadcrumbs = [
-        { name: "Register", href: "/register" },
-
-    ];
+    // const breadcrumbs = [
+    //     { name: "Register", href: "/register" },
+    //
+    // ];
 
     const GetProvinces = async () => {
         try {
@@ -271,7 +271,6 @@ export default function RegisterPage() {
                             className={`flex mt-[10px] items-center font-sf w-full focus:outline-none h-[45px] border-stone-200 bg-stone-200 border rounded-full px-[15px] placeholder-stone-500`}
                         />
                     </div>
-
                     <div className={`w-[400px] h-[45px]  mt-[30px] grid grid-cols-10 gap-[10px] rounded-[4px]`}>
                         <div onClick={()=> setOpenInfo(false)} className={`col-span-4 flex rounded-full bg-stone-800 justify-center items-center  hover:bg-stone-700 transition-all duration-200`}>
                             <FaCircleChevronLeft className={`text-stone-50 text-[18px] mr-[10px]`} />

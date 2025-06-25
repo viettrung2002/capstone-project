@@ -1,5 +1,7 @@
 ﻿using CoreBuyNow.Models.DTOs;
 using CoreBuyNow.Models.Entities;
+using CoreBuyNow.Repositories.Interfaces;
+using CoreBuyNow.Services;
 using CoreBuyNow.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +10,7 @@ namespace CoreBuyNow.Controllers;
 
 [ApiController]
 [Route("/api/account")]
-public class AccountController(IAccountService accountService) : ControllerBase
+public class AccountController(IAccountService accountService, EmailService emailService, IAccountRepository accountRepository) : ControllerBase
 {
     [HttpPost("register/shop")]
     public async Task<ActionResult> CreateAccountAsync([FromBody] AccountRegisterDto<ShopDto> info)
@@ -130,6 +132,40 @@ public class AccountController(IAccountService accountService) : ControllerBase
         {
             Console.WriteLine(e);
             throw;
+        }
+    }
+    
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword(string email)
+    {
+        try
+        {
+            await emailService.SendResetPasswordEmailAsync(email);
+            return Ok(new
+            {
+                message = "Reset password email sent"
+            });
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+    
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword(ForgotPasswordDto forgotPasswordDto)
+    {
+        try
+        {
+            await accountRepository.ResetPassword(forgotPasswordDto.Password, forgotPasswordDto.Token);
+            return Ok(new
+            {
+                message = "Password has been reset"
+            });
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
         }
     }
 }

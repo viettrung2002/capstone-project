@@ -148,7 +148,7 @@ public class VoucherRepository ( IScheduler scheduler ,AppDbContext dbContext, I
             
     }
 
-    public async Task<PageResponseDto<VoucherDto>> GetAllVoucher(Role role, int pageIndex = 1, int pageSize = 10)
+    public async Task<PageResponseDto<VoucherDto>> GetAllVoucher(Role role, int pageIndex = 1, int pageSize = 1000)
     {
         return new PageResponseDto<VoucherDto>(
             pageIndex,
@@ -157,7 +157,7 @@ public class VoucherRepository ( IScheduler scheduler ,AppDbContext dbContext, I
             await dbContext.Vouchers
                 .Include(v => v.Admin)
                 .Include(v => v.Shop)
-                .Where(v=>v.EndTime >= DateTime.Now && v.StartTime<=DateTime.Now && v.Role == role)
+                .Where(v=>v.EndTime >= DateTime.Now && v.StartTime<=DateTime.Now && v.Role == role && v.Active == true)
                 .OrderByDescending(b => b.Value)
                 .Skip((pageIndex - 1) * pageSize)
                 .Take(pageSize)
@@ -191,6 +191,7 @@ public class VoucherRepository ( IScheduler scheduler ,AppDbContext dbContext, I
             await dbContext.Vouchers
                 .Include(v => v.Admin)
                 .Include(v => v.Shop)
+                .Where(v=>v.Active == true)
                 // .Where(v=>v.EndTime >= DateTime.Now && v.StatTime<=DateTime.Now)
                 .OrderByDescending(b => b.Value)
                 .Skip((pageIndex - 1) * pageSize)
@@ -232,20 +233,22 @@ public class VoucherRepository ( IScheduler scheduler ,AppDbContext dbContext, I
     {
         var voucher = await dbContext.Vouchers.FindAsync(voucherId);
         if (voucher == null) throw new Exception("Voucher not found");
-        dbContext.Vouchers.Remove(voucher);
+        voucher.Active = false;
+        dbContext.Vouchers.Update(voucher);
         await dbContext.SaveChangesAsync();
     }
     
     public async Task<List<Voucher>> GetVoucherAdmin()
     {
         return await dbContext.Vouchers
+            .Where(v=>v.Active == true)
             .ToListAsync();
     }
     
     public async Task<List<Voucher>> GetVoucherShop(Guid shopId)
     {
         return await dbContext.Vouchers
-            .Where(v => v.ShopId == shopId)
+            .Where(v => v.ShopId == shopId && v.Active == true)
             .ToListAsync();
     }
 
@@ -253,7 +256,7 @@ public class VoucherRepository ( IScheduler scheduler ,AppDbContext dbContext, I
     {
         return await dbContext.VoucherWallets
             .Include(v=>v.Voucher)
-            .Where(v=>v.CustomerId == customerId && (v.Voucher.AdminId != Guid.Empty && v.Voucher.AdminId != null) && v.Quantity>0)
+            .Where(v=>v.CustomerId == customerId && (v.Voucher.AdminId != Guid.Empty && v.Voucher.AdminId != null) && v.Quantity>0 && v.Voucher.Active == true)
             .ToListAsync();
     }
 
@@ -279,10 +282,9 @@ public class VoucherRepository ( IScheduler scheduler ,AppDbContext dbContext, I
     {
         return await dbContext.VoucherWallets
             .Include(v=>v.Voucher)
-            .Where(v=>v.CustomerId == customerId && v.Voucher.ShopId == shopId )
+            .Where(v=>v.CustomerId == customerId && v.Voucher.ShopId == shopId && v.Quantity > 0 && v.Voucher.Active == true)
             .ToListAsync();
     }
-    
     
     public async Task IssueVoucher(Guid voucherId)
     {
@@ -319,7 +321,6 @@ public class IssueVoucherJob : IJob
         _scopeFactory = scopeFactory;
         _logger = logger;
     }
-
     public async Task Execute(IJobExecutionContext context)
     {
         _logger.LogDebug("Attempting to execute IssueVoucherJob for trigger {triggerKey}", context.Trigger.Key);

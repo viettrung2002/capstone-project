@@ -5,18 +5,20 @@ import Cookies from "js-cookie";
 import {useEffect, useRef, useState} from "react";
 import {ICustomer} from "@/app/types/account";
 import {useRouter} from "next/navigation";
+import ConfirmDialog from "@/app/components/confirm";
+import AlertMessage from "@/app/components/alert";
 export default function ProfilePage() {
 
     const [customer, setCustomer] = useState<ICustomer>();
     const router = useRouter();
     const [reload, setReload] = useState<boolean>(false);
-    const [userName, setUerName] = useState("ngviettrung2002");
     const [file, setFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [uploading, setUploading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-
+    const [openNotificationConfirm, setOpenNotificationConfirm] = useState(false);
+    const [openNotification,  setOpenNotification] = useState(false);
     useEffect(() => {
         const token = Cookies.get("token");
         if (!token) {
@@ -43,7 +45,7 @@ export default function ProfilePage() {
         GetCustomer();
 
 
-    }, [reload]);
+    }, [reload, router]);
     const updateCustomer = async () => {
         const token = Cookies.get("token");
         if (!token) {
@@ -62,7 +64,10 @@ export default function ProfilePage() {
             if (response.ok){
                 const data = await response.json();
                 setReload(!reload)
-                alert("Cập nhật thành công")
+                setOpenNotification(true);
+                setTimeout(() => {
+                    setOpenNotification(false);
+                }, 3000);
                 console.log(data);
             }
         } catch (error) {
@@ -94,7 +99,6 @@ export default function ProfilePage() {
                 body: formData,
                 // Không cần headers: Content-Type sẽ tự động là 'multipart/form-data'
             });
-
             if (!response.ok) throw new Error('Upload failed');
             const data = await response.json();
             console.log("URL",data);
@@ -112,6 +116,14 @@ export default function ProfilePage() {
     };
     return (
         <div className={` col-span-4 border border-stone-200 bg-white px-[20px] pb-[20px] relative rounded-[25px]`}>
+
+            {
+                openNotificationConfirm && <ConfirmDialog message={"Xác nhận cập nhật thông tin cá nhân"} onConfirm={()=> {
+                    setOpenNotificationConfirm(false);
+                    updateCustomer()
+                }} onCancel={()=> setOpenNotificationConfirm(false)}/>
+            }
+            {openNotification && <AlertMessage message={"Cập nhật thông tin thành công!"} onClose={()=> setOpenNotification(false)}/>}
             <div className={"w-full"}>
                 <div className={"h-[84px] border-b border-stone-200 flex justify-center flex-col"}>
                     <p className={"font-sf text-stone-800 text-[20px] font-[700] uppercase"}>Hồ sơ của tôi</p>
@@ -206,7 +218,7 @@ export default function ProfilePage() {
                         {/*        address: e.target.value,*/}
                         {/*    }))} type={"text"} value={customer ? customer.address : ""} className={"w-full h-full border border-stone-200 font-sf rounded-full text-stone-800 focus:outline-none px-[20px]"}/>*/}
                         {/*</div>*/}
-                        <button onClick={()=> updateCustomer()} className={"px-[25px] py-[8px] bg-amber-600 mt-[20px] hover:bg-stone-700 rounded-full"}>
+                        <button onClick={()=> setOpenNotificationConfirm(true)} className={"px-[25px] py-[8px] bg-amber-600 mt-[20px] hover:bg-stone-700 rounded-full"}>
                             <p className={"font-sf text-stone-50 text-[15px]"}>Lưu</p>
                         </button>
 

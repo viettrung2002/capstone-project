@@ -4,7 +4,6 @@ import {Quicksand, Fredoka, Poppins} from "next/font/google";
 import localFont from "next/font/local";
 import Navbar from "@/app/components/navbar";
 import Footer from "@/app/components/footer";
-import {cookies} from "next/headers";
 import Compare from "@/app/components/compare";
 const sfProRounded = localFont({
     src: [
@@ -58,9 +57,12 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body  className={`${sfProRounded.variable} ${quicksand.variable} ${fre.variable} ${sfCompactRounded.variable} ${pop.variable} flex items-center flex-col`} >
+      <body  className={`${sfProRounded.variable} ${quicksand.variable} ${fre.variable} ${sfCompactRounded.variable} ${pop.variable} items-center flex flex-col min-h-screen`} >
       <Navbar/>
+      <main className="flex-grow flex w-full">
         {children}
+      </main>
+    
       <Compare/>
       <Footer/>
       </body>

@@ -1,4 +1,7 @@
 import {SubCategory} from "@/app/types/ subCategory";
+import {IProductInStatistic} from "@/app/types/product";
+import {IAddressResponse} from "@/app/types/address";
+import {IAccount} from "@/app/types/account";
 
 export interface IShop {
     shopId: string;
@@ -36,4 +39,21 @@ export interface IShopInAdminPage {
     billCount: number;
     productCount: number;
     status: string;
+}
+
+export interface IShopStatisticData {
+    revenue: number;
+    sold: number;
+    completionRate: number;
+    products: IProductInStatistic[];
+}
+export interface IShopInfo {
+    shopId?: string;
+    shopName?: string;
+    addressId?: string;
+    address?: IAddressResponse;
+    email?: string;
+    avatar?: string;
+    accountId?: string;
+    account?: IAccount;
 }

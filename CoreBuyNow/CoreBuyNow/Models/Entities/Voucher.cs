@@ -28,6 +28,8 @@ public class Voucher
     public Role Role { get; set; }
     public bool IsIssued { get; set; }
     public int PerUserQuantity { get; set; }
+
+    public bool Active { get; set; } = true;
 }
 
 public enum Role

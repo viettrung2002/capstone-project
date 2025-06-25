@@ -3,6 +3,7 @@ import {useEffect, useState} from "react";
 import Cookies from "js-cookie";
 import {useRouter} from "next/navigation";
 import {ICustomer} from "@/app/types/account";
+import AlertMessage from "@/app/components/alert";
 export default function PasswordPage() {
     const [oldPassword, setOldPassword] = useState("");
     const [password, setPassword] = useState("");
@@ -10,6 +11,8 @@ export default function PasswordPage() {
     const [reload, setReload] = useState(false);
     const router = useRouter();
     const [customer, setCustomer] = useState<ICustomer>();
+    const [openNotification, setOpenNotification] = useState(false)
+    const [notifContent, setNotifContent] = useState("")
     useEffect(() => {
         const token = Cookies.get("token");
         if (!token) {
@@ -36,7 +39,7 @@ export default function PasswordPage() {
         GetCustomer();
 
 
-    }, [reload]);
+    }, [reload, router]);
 
         const ChangePassword = async (oldPass: string, newPass: string, accountId: string) => {
             const token = Cookies.get("token");
@@ -58,15 +61,32 @@ export default function PasswordPage() {
                     setPassword("")
                     setConfirmPassword("")
                     setOldPassword("")
-                    alert("Đổi mật khẩu thành công")
+                    setNotifContent("Đổi mật khẩu thành công!")
+                    setOpenNotification(true)
+                    setTimeout(()=> {
+                        setOpenNotification(false)
+                    },3000)
                     console.log(data);
+                } else {
+                    setNotifContent("Mật khẩu cũ của bạn không chính xác!")
+                    setOpenNotification(true)
+                    setTimeout(()=> {
+                        setOpenNotification(false)
+                    },3000)
                 }
             } catch (error) {
+                setNotifContent("Mật khẩu cũ của bạn không chính xác!")
+                    setOpenNotification(true)
+                    setTimeout(()=> {
+                        setOpenNotification(false)
+                    },3000)
                 console.log(error);
             }
         }
         return (
         <div className={` col-span-4 border border-stone-200 bg-white px-[20px] pb-[20px] rounded-[25px]`}>
+            {openNotification &&
+            <AlertMessage message={notifContent} onClose={()=> setOpenNotification(false)}/>}
             <div className={"w-full"}>
                 <div className={"h-[84px] border-b border-stone-200 flex justify-center flex-col"}>
                     <p className={"font-sf text-stone-800 text-[20px] uppercase font-[600]"}>Đổi Mật Khẩu</p>

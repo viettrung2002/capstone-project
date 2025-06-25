@@ -5,37 +5,39 @@ import {useEffect, useState} from "react";
 import {useRouter} from "next/navigation";
 import {IVoucher} from "@/app/types/voucher";
 import * as React from "react";
+import {formatDate} from "@/app/utils/format";
 export default function VoucherExpiredPage() {
     const router = useRouter();
 
     const [vouchers, setVouchers] = useState<IVoucher[]>([]);
-    const GetVoucher = async () => {
-        const token = Cookies.get("token");
-        if (!token) {
-            router.push("/login");
-            return;
-        }
-        try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/voucher/admin/all`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`
-                }
-            });
-            if (response.ok){
-                const data = await response.json();
-                console.log(data);
-                setVouchers(data.data);
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    }
+
 
     useEffect(() => {
+        const GetVoucher = async () => {
+            const token = Cookies.get("token");
+            if (!token) {
+                router.push("/login");
+                return;
+            }
+            try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/voucher/admin/all`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                if (response.ok){
+                    const data = await response.json();
+                    console.log(data);
+                    setVouchers(data.data);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
         GetVoucher();
-    },[])
+    },[router])
     return (
         <div className={"w-full h-full mt-[20px] grid grid-cols-3 gap-[20px]"}>
             {vouchers.map((voucher: IVoucher) => (
@@ -55,7 +57,7 @@ export default function VoucherExpiredPage() {
                                 <p className={"text-[15px] ml-[5px] text-stone-900 font-[600]"}>50000</p>
                             </div>
 
-                            <p className={"text-[13px] text-stone-700"}>Kết thúc: 20/9/2025</p>
+                            <p className={"text-[13px] text-stone-700"}>Kết thúc: {formatDate(voucher.endTime)}</p>
                         </div>
                     </div> : null
             ))}

@@ -20,17 +20,36 @@ public class ShopRepository (AppDbContext dbContext) : IShopRepository
         dbContext.Shops.Add(shop);
         await dbContext.SaveChangesAsync();
     }
+
+    public async Task<Shop> GetShop(Guid shopId)
+    {
+        var shop = await dbContext.Shops
+            .Include(s=>s.Account)
+            .Include(s=>s.Address)
+            .ThenInclude(a=>a.Province)
+            .Include(s=>s.Address)
+            .ThenInclude(a=>a.District)
+            .Include(s=>s.Address)
+            .ThenInclude(a=>a.Ward)
+            .FirstOrDefaultAsync(s=>s.ShopId==shopId);
+            
+        if (shop == null) throw new Exception("Shop not found!");
+        return shop;
+    }
+
     public async Task UpdateShop(Shop shop, Guid id)
     {
         var existingShop = await dbContext.Shops.FindAsync(id);
         if (existingShop == null) throw new AggregateException("Enter your shop id!");
         existingShop.ShopName = shop.ShopName;  
-        existingShop.Address = shop.Address;
+        existingShop.AddressId = shop.AddressId;
         existingShop.ProductCount = shop.ProductCount;
+        existingShop.Email = shop.Email;
+        existingShop.Avatar = shop.Avatar;
         dbContext.Shops.Update(existingShop);
         await dbContext.SaveChangesAsync();
     }
-
+    
     public async Task DeleteShop(Guid id)
     {
         var existingShop = await dbContext.Shops.FindAsync(id);
@@ -59,7 +78,7 @@ public class ShopRepository (AppDbContext dbContext) : IShopRepository
                 ShopId = s.ShopId,
                 ShopName = s.ShopName,
                 Avatar = s.Avatar,
-                Address = s.Address,
+                AddressId = s.AddressId,
                 ProductCount = s.ProductCount,
                 CreatedDate = s.CreatedDate,
                 IsOfficial = s.IsOfficial,
@@ -100,7 +119,6 @@ public class ShopRepository (AppDbContext dbContext) : IShopRepository
                                 .SumAsync();
         return doanhThu;
     }
-
     public async Task<int> SoLuongDaBan(Guid shopId, DateTime? startDate, DateTime? endDate)
     {
         var query = dbContext.Bills.AsQueryable();
@@ -132,25 +150,41 @@ public class ShopRepository (AppDbContext dbContext) : IShopRepository
         return (double)soLuongDaHoanThanh/(soLuongDaHoanThanh+soLuongDaHuy);
 
     }
-
-    public async Task<List<Product>> TopSanPham(Guid shopId, bool sort)
+    public async Task<List<ProductInStatisticResponseDto>> TopSanPham(Guid shopId, bool sort, DateTime? startDate, DateTime? endDate )
     {
-        if (sort)
+        var query = dbContext.Bills.Where(b=>b.ShopId == shopId && b.OrderStatus == OrderStatus.Completed);
+        if (startDate.HasValue && endDate.HasValue) 
+            query = query.Where(b => b.CreateDate >= startDate && b.CreateDate <= endDate);
+        var billItems = await query.SelectMany(b => b.Items).Include(i=>i.Product).ToListAsync();
+        if (!sort)
+            return billItems
+                .GroupBy(item => item.ProductId)
+                .Select(g => new ProductInStatisticResponseDto
+                {
+                    ProductId = g.Key,
+                    ProductName = g.Select(i=>i.Product.ProductName).FirstOrDefault(),
+                    Sold = g.Sum(s => s.Quantity),
+                    Price = g.Select(i=>i.Product.Price).FirstOrDefault(),
+                    Image = g.Select(i=>i.Image).FirstOrDefault(),
+                })
+                .OrderBy(x => x.Sold)
+                .ToList();
         {
-            return await dbContext.Products
-                .Where(p => p.ShopId == shopId)
-                .OrderByDescending(p=>p.Sold)
-                .Take(5)
-                .ToListAsync();
+            var result = billItems
+                .GroupBy(item => item.ProductId)
+                .Select(g => new ProductInStatisticResponseDto
+                {
+                    ProductId = g.Key,
+                    ProductName = dbContext.Products.Where(p=>p.ProductId == g.Key).Select(p=>p.ProductName).FirstOrDefault(),
+                    Sold = g.Sum(s => s.Quantity),
+                    Price = dbContext.Products.Where(p => p.ProductId == g.Key).Select(p=>p.Price).FirstOrDefault(),
+                    Image = g.Select(i=>i.Image).FirstOrDefault(),
+                })
+                .OrderByDescending(x => x.Sold) 
+                .ToList();
+            return result;
         }
-        return await dbContext.Products
-            .Where(p => p.ShopId == shopId)
-            .OrderBy(p=>p.Sold)
-            .Take(5)
-            .ToListAsync();
-        
     }
-
     // public async Task<List<SubCategory>> GetSubCategoryInShop(Guid shopId)
     // {
     //     throw new NotImplementedException();

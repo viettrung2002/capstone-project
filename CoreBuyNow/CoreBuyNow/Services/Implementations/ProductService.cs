@@ -17,6 +17,11 @@ public class ProductService(IProductRepository productRepository) : IProductServ
         await productRepository.AddProduct(product);
     }
 
+    public async Task AddProduct(Product product, IFormFile mainImage, List<IFormFile> extraImages)
+    {
+        await productRepository.AddProduct2(product, mainImage, extraImages);
+    }
+
     public async Task DeleteProduct(Guid productId)
     {
         await productRepository.DeleteProduct(productId);

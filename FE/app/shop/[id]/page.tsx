@@ -1,7 +1,7 @@
 'use client'
 import {useParams} from "next/navigation";
 import {useEffect, useState} from "react";
-import Breadcrumb from "@/app/components/breadcrumb";
+
 import {HiChevronDown, HiStar} from "react-icons/hi2";
 import { ProductInShop} from "@/app/components/product";
 import { PiListBulletsBold } from "react-icons/pi";
@@ -15,23 +15,23 @@ import Image from "next/image";
 
 export default function Shop() {
     const {id}  = useParams()
-    const breadcrumbs = [
-        {name: "Shop", href: "/categories" },
-        {name: "2", href: "/categories" },
-    ]
+    // const breadcrumbs = [
+    //     {name: "Shop", href: "/categories" },
+    //     {name: "2", href: "/categories" },
+    // ]
     const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
     const [timeoutId, setTimeoutId] = useState<ReturnType<typeof setTimeout> | null>(null);
     const [openCateMore, setOpenCateMore] = useState<boolean>(false)
     const [catActive, setCateActive] = useState<string>("")
     const [selectedFilter, setSelectedFilter] = useState<string>("popular")
-    const [categories, setCategories] = useState<SubCategory[]>([])
+    const categories : SubCategory[] = []
     const [shop, setShop] = useState<IShopInShop>()
 
-    const [pageIndex, setPageIndex] = useState<number>(0);
+    const pageIndex = 0
     const pageSize = 16;
     const [sortBy, setSortBy] = useState("")
-    const [searchQuery, setSearchQuery] = useState("");
+    const searchQuery = ""
     const [subCategoryId, setSubCategoryId] = useState("00000000-0000-0000-0000-000000000000");
     const [products, setProducts] = useState<IProduct[]>([]);
     useEffect(() => {
@@ -47,7 +47,7 @@ export default function Shop() {
             }
         }
         getCategories();
-    },[])
+    },[id])
     useEffect(() => {
         console.log(id)
         async function GetProduct() {
@@ -85,7 +85,7 @@ export default function Shop() {
             }
         }
         GetProduct();
-    }, [pageIndex, pageSize, sortBy, searchQuery, subCategoryId]);
+    }, [pageIndex, pageSize, sortBy, searchQuery, subCategoryId, id, router]);
     return (
         <div className="w-full flex  flex-col items-center pt-[20px]">
             {/*<div className={`2xl:w-[1300px] xl:w-full h-[40px] mt-[10px]  items-center flex mb-[20px]`}>*/}

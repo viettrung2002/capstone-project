@@ -10,32 +10,33 @@ export default function NotificationPage () {
     const token = Cookies.get("token");
     const router = useRouter();
     const [reload, setReload] = useState(false);
-    const GetNotifications = async () => {
 
-        try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/notification`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`
-                }
-            });
-            if (response.ok){
-                const data = await response.json();
-                console.log("NOTIFICATION: ",data.data);
-                setNotifications(data.data);
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    }
     useEffect(() => {
         if (token == null) {
             router.push("/login");
             return;
         }
+        const GetNotifications = async () => {
+
+            try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/notification`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                if (response.ok){
+                    const data = await response.json();
+                    console.log("NOTIFICATION: ",data.data);
+                    setNotifications(data.data);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
         GetNotifications();
-    }, [reload]);
+    }, [reload,  router, token]);
     const ReadNotification = async (notification: INotification) => {
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/notification/read?notificationId=${notification.notificationId}`, {

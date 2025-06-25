@@ -1,36 +1,32 @@
 'use client'
-import { HiOutlineBars3, HiArrowLeft, HiArrowRight} from "react-icons/hi2";
-import { FaFacebookF, FaInstagram } from "react-icons/fa6";
+import {  HiArrowLeft, HiArrowRight} from "react-icons/hi2";
+
 import FeatureCategories from "@/app/components/feature_category";
-import Product from "@/app/components/product";
+
 import {ProductSale} from "@/app/components/product";
-import {useState, useEffect, useRef} from "react";
+import {useState, useEffect} from "react";
 import Image from "next/image";
 import {useRouter} from "next/navigation";
 import {IProduct} from "@/app/types/product";
 import {ICategory} from "@/app/types/ subCategory";
 import Cookies from "js-cookie";
-type Slide = {
-    id: number;
-    text: string;
-    bgURL: string;
-};
-
-
-type OfficialShop = {
-    id: number;
-    name: string;
-    image: string;
-}
+// type Slide = {
+//     id: number;
+//     text: string;
+//     bgURL: string;
+// };
+//
+//
+// type OfficialShop = {
+//     id: number;
+//     name: string;
+//     image: string;
+// }
 
 export default function Home() {
-    const [isOpen, setIsOpen] = useState(false);
-    const [timeoutId, setTimeoutId] = useState<ReturnType<typeof setTimeout> | null>(null);
-    const [currentIndex, setCurrentIndex] = useState(0);
     const [transformSale, setTransformSale] = useState(0);
-    const [transformOfficialShop, setTransformOfficialShop] = useState(0);
     const [timeLeft, setTimeLeft] = useState(3600);
-    const [trendingProducts, setTrendingProducts] = useState<IProduct[]>([]);
+    // const [trendingProducts, setTrendingProducts] = useState<IProduct[]>([]);
     const [flashSaleProducts, setFlashSaleProducts] = useState<IProduct[]>([]);
     const [category, setCategory] = useState<ICategory[]>([]);
     const router = useRouter();
@@ -62,7 +58,7 @@ export default function Home() {
                 })
                 const data = await response.json();
                 console.log(data.data);
-                setTrendingProducts(data.data.items);
+                // setTrendingProducts(data.data.items);
 
             } catch (error) {
                 console.log(error)
@@ -113,29 +109,24 @@ export default function Home() {
         }
         GetCategoryFeature();
 
-    }, []);
-    const slides: Slide[] = [
-        { id: 1, text: 'Slide 1', bgURL: '/banner/slider-bg1.jpg' },
-        { id: 2, text: 'Slide 2', bgURL: '/banner/slider-bg2.jpg' }
-    ];
-    const officialShops: OfficialShop[] = [
-        { id: 1, name: "Apple", image: `/logo/apple.png` },
-        { id: 2, name: "Samsung", image: `/logo/samsung.jpg` },
-        { id: 3, name: "Sony", image: `/logo/sony.png` },
-        { id: 4, name: "Lg", image: `/logo/lg.png` },
-        { id: 5, name: "Microsoft", image: `/logo/ms.png` },
-        { id: 6, name: "Dell", image: `/logo/dell.png` },
-        { id: 7, name: "Hp", image: `/logo/hp.png` },
-        { id: 8, name: "Lenovo", image: `/logo/lenovo.png` },
-        { id: 9, name: "Asus", image: `/logo/asus.png` },
-        { id: 10, name: "Acer", image: `/logo/acer.png` },
-    ];
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setCurrentIndex((prevIndex) => (prevIndex + 1) % slides.length);
-        }, 3000);
-        return () => clearInterval(interval);
-    }, []);
+    }, [id, router, role, token]);
+    // const slides: Slide[] = [
+    //     { id: 1, text: 'Slide 1', bgURL: '/banner/slider-bg1.jpg' },
+    //     { id: 2, text: 'Slide 2', bgURL: '/banner/slider-bg2.jpg' }
+    // ];
+    // const officialShops: OfficialShop[] = [
+    //     { id: 1, name: "Apple", image: `/logo/apple.png` },
+    //     { id: 2, name: "Samsung", image: `/logo/samsung.jpg` },
+    //     { id: 3, name: "Sony", image: `/logo/sony.png` },
+    //     { id: 4, name: "Lg", image: `/logo/lg.png` },
+    //     { id: 5, name: "Microsoft", image: `/logo/ms.png` },
+    //     { id: 6, name: "Dell", image: `/logo/dell.png` },
+    //     { id: 7, name: "Hp", image: `/logo/hp.png` },
+    //     { id: 8, name: "Lenovo", image: `/logo/lenovo.png` },
+    //     { id: 9, name: "Asus", image: `/logo/asus.png` },
+    //     { id: 10, name: "Acer", image: `/logo/acer.png` },
+    // ];
+
 
     useEffect(() => {
         window.addEventListener("userLoggedIn", ()=> setOpenNotification(true));
@@ -161,8 +152,7 @@ export default function Home() {
     };
 
     return (
-        <div className="Home bg-white flex flex-col items-center z-10 relative ">
-
+        <div className="Home bg-white w-screen flex flex-col items-center z-10 relative ">
             {
                 openNotification && (
                     <div className={"absolute top-0 w-[200px] h-[50px] border border-amber-600"}>
@@ -273,26 +263,25 @@ export default function Home() {
                 {/*Flash Sale*/}
                 {/*Trending*/}
 
-                <div className={"w-full bg-white flex items-center justify-center"}>
-                    <div className="2xl:w-[1300px] xl:w-[1000px] h-screen flex items-center  mt-[30px] flex-col pt-[30px] ">
-                        <div className="w-full flex items-center justify-center">
-                            <div className={`w-full flex flex-col justify-center items-center`}>
-                                <p className={`font-sf font-[800] text-[35px] text-neutral-800`}>SẢN PHẨM ĐƯỢC YÊU THÍCH</p>
-                                <p className={"font-sf font-[500] text-[14px] text-neutral-600 w-[600px] text-center"}>Khám phá những sản phẩm công nghệ được yêu thích nhất hiện nay, với doanh số ấn tượng và đánh giá cao từ người dùng.</p>
-                                <div className={`border-b  border-blue-400 w-[70px] mt-[15px] mb-[15px]`}></div>
-                                {/*<p className={`text-center font-sf font-[400] text-neutral-500 mt-[20px]`}>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form.</p>*/}
-                            </div>
+                {/*<div className={"w-full bg-white flex items-center justify-center"}>*/}
+                {/*    <div className="2xl:w-[1300px] xl:w-[1000px] h-screen flex items-center  mt-[30px] flex-col pt-[30px] ">*/}
+                {/*        <div className="w-full flex items-center justify-center">*/}
+                {/*            <div className={`w-full flex flex-col justify-center items-center`}>*/}
+                {/*                <p className={`font-sf font-[800] text-[35px] text-neutral-800`}>SẢN PHẨM ĐƯỢC YÊU THÍCH</p>*/}
+                {/*                <p className={"font-sf font-[500] text-[14px] text-neutral-600 w-[600px] text-center"}>Khám phá những sản phẩm công nghệ được yêu thích nhất hiện nay, với doanh số ấn tượng và đánh giá cao từ người dùng.</p>*/}
+                {/*                <div className={`border-b  border-blue-400 w-[70px] mt-[15px] mb-[15px]`}></div>*/}
+                {/*                /!*<p className={`text-center font-sf font-[400] text-neutral-500 mt-[20px]`}>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form.</p>*!/*/}
+                {/*            </div>*/}
 
-                        </div>
-                        <div className={`grid gap-[20px] grid-cols-5 w-full mt-[10px]`}>
-                            {trendingProducts.map((product) => (
-                                <Product product={product} key={product.productId} />
-                            ))}
+                {/*        </div>*/}
+                {/*        <div className={`grid gap-[20px] grid-cols-5 w-full mt-[10px]`}>*/}
+                {/*            {trendingProducts.map((product) => (*/}
+                {/*                <Product product={product} key={product.productId} />*/}
+                {/*            ))}*/}
 
-                        </div>
-                    </div>
-                </div>
-
+                {/*        </div>*/}
+                {/*    </div>*/}
+                {/*</div>*/}
 
                 {/*Trending*/}
 
@@ -342,46 +331,46 @@ export default function Home() {
                 {/*</div>*/}
 
                 {/*Mall*/}
-                <div className="2xl:w-[1300px] xl:w-[1280px]  flex items-center justify-center mt-[50px]">
-                    <div className={`w-[600px] flex flex-col items-center`}>
-                        <p className={`font-sf font-[500] text-[30px] text-cl-text`}>Shop chính hãng</p>
-                        <div className={`border-b border-[2px] border-blue-600 w-[50px] mt-[4px]`}></div>
-                        {/*<p className={`text-center font-sf font-[400] text-neutral-500 mt-[20px]`}>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form.</p>*/}
-                    </div>
-                </div>
-                <div className={` 2xl:w-[1300px] xl:w-[1280px] mt-[30px] relative `}>
-                    <div className={`flex h-full w-full justify-center items-center  relative`}>
-                        <button onClick={()=> {
-                            if (transformOfficialShop >= 1)
-                                setTransformOfficialShop(transformOfficialShop - 1)
-                        }} className={`absolute left-0 w-[40px] h-[40px] rounded-full bg-white shadow-[0px_3px_7px_rgba(0,0,0,0.2)] flex items-center justify-center hover:bg-blue-500 hover:text-neutral-50 transition-all duration-200 z-20`}>
-                            <HiArrowLeft className={`text-[20px]`} />
-                        </button>
-                        <button onClick={()=> {
-                            if (transformOfficialShop >= 0)
-                                setTransformOfficialShop(transformOfficialShop + 1)
-                        }} className={`absolute right-0 w-[40px] h-[40px] rounded-full bg-white shadow-[0px_3px_7px_rgba(0,0,0,0.2)] flex items-center justify-center hover:bg-blue-500 hover:text-neutral-50 transition-all duration-200 z-20`}>
-                            <HiArrowRight className={`text-[20px]`} />
-                        </button>
-                        <div className={` w-[calc(100%-100px)] h-[180px] flex relative overflow-hidden`}>
-                            <div
-                                className={`w-full p-[5px] flex items-center transition-transform  `}
-                                style={{ transform: `translateX(-${transformOfficialShop * 50}%)` }}>
+                {/*<div className="2xl:w-[1300px] xl:w-[1280px]  flex items-center justify-center mt-[50px]">*/}
+                {/*    <div className={`w-[600px] flex flex-col items-center`}>*/}
+                {/*        <p className={`font-sf font-[500] text-[30px] text-cl-text`}>Shop chính hãng</p>*/}
+                {/*        <div className={`border-b border-[2px] border-blue-600 w-[50px] mt-[4px]`}></div>*/}
+                {/*        /!*<p className={`text-center font-sf font-[400] text-neutral-500 mt-[20px]`}>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form.</p>*!/*/}
+                {/*    </div>*/}
+                {/*</div>*/}
+                {/*<div className={` 2xl:w-[1300px] xl:w-[1280px] mt-[30px] relative `}>*/}
+                {/*    <div className={`flex h-full w-full justify-center items-center  relative`}>*/}
+                {/*        <button onClick={()=> {*/}
+                {/*            if (transformOfficialShop >= 1)*/}
+                {/*                setTransformOfficialShop(transformOfficialShop - 1)*/}
+                {/*        }} className={`absolute left-0 w-[40px] h-[40px] rounded-full bg-white shadow-[0px_3px_7px_rgba(0,0,0,0.2)] flex items-center justify-center hover:bg-blue-500 hover:text-neutral-50 transition-all duration-200 z-20`}>*/}
+                {/*            <HiArrowLeft className={`text-[20px]`} />*/}
+                {/*        </button>*/}
+                {/*        <button onClick={()=> {*/}
+                {/*            if (transformOfficialShop >= 0)*/}
+                {/*                setTransformOfficialShop(transformOfficialShop + 1)*/}
+                {/*        }} className={`absolute right-0 w-[40px] h-[40px] rounded-full bg-white shadow-[0px_3px_7px_rgba(0,0,0,0.2)] flex items-center justify-center hover:bg-blue-500 hover:text-neutral-50 transition-all duration-200 z-20`}>*/}
+                {/*            <HiArrowRight className={`text-[20px]`} />*/}
+                {/*        </button>*/}
+                {/*        <div className={` w-[calc(100%-100px)] h-[180px] flex relative overflow-hidden`}>*/}
+                {/*            <div*/}
+                {/*                className={`w-full p-[5px] flex items-center transition-transform  `}*/}
+                {/*                style={{ transform: `translateX(-${transformOfficialShop * 50}%)` }}>*/}
 
-                                {officialShops.map((shop) => (
-                                    <button key ={shop.id} className={`w-[calc((100%-50px)/6)] mr-[10px] h-[100px]  pt-[10px] pb-[10px] pl-[30px] pr-[30px] box-border shadow flex justify-center items-center flex-shrink-0`}>
-                                        <div className={`w-full h-full flex justify-center items-center relative`}>
-                                            <Image src={shop.image} alt={"image"} layout="fill" objectFit="contain" />
-                                        </div>
+                {/*                {officialShops.map((shop) => (*/}
+                {/*                    <button key ={shop.id} className={`w-[calc((100%-50px)/6)] mr-[10px] h-[100px]  pt-[10px] pb-[10px] pl-[30px] pr-[30px] box-border shadow flex justify-center items-center flex-shrink-0`}>*/}
+                {/*                        <div className={`w-full h-full flex justify-center items-center relative`}>*/}
+                {/*                            <Image src={shop.image} alt={"image"} layout="fill" objectFit="contain" />*/}
+                {/*                        </div>*/}
 
 
-                                    </button>
-                                ))}
+                {/*                    </button>*/}
+                {/*                ))}*/}
 
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {/*            </div>*/}
+                {/*        </div>*/}
+                {/*    </div>*/}
+                {/*</div>*/}
 
             </div>
 

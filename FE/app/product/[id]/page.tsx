@@ -1,49 +1,34 @@
 'use client'
 import {useParams, useRouter} from "next/navigation";
-import {useEffect, useState} from "react";
-import Breadcrumb from "@/app/components/breadcrumb";
+import {useEffect, useState, useRef} from "react";
+
 import Image from "next/image";
-import {HiOutlineStar, HiTag, HiStar, HiReceiptPercent, HiChevronUp, HiChevronDown, HiMiniArrowPath, HiMiniArrowLongRight} from "react-icons/hi2";
+import {HiOutlineStar, HiTag, HiStar, HiReceiptPercent, HiMiniArrowPath } from "react-icons/hi2";
 // import { randomInt } from "crypto";
-import {ProductR} from "@/app/components/product";
-import {IProductData, IProductInCompare} from "@/app/types/product";
+import {IProductData} from "@/app/types/product";
 import Cookies from "js-cookie";
-import {IComment, ICommentReq} from "@/app/types/comment";
-import {TbArrowDown, TbChevronDown, TbMinus, TbPlus, TbStar, TbStarFilled} from "react-icons/tb";
-import type {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
+import {IComment} from "@/app/types/comment";
+import { TbChevronDown, TbMinus, TbPlus} from "react-icons/tb";
+
 import {IVoucher} from "@/app/types/voucher";
 import * as React from "react";
-type Product = {
-    id: number;
-    category: string;
-    name: string;
-    image: string;
-    star: number;
-    price: number;
-    discount: number;
-};
+
+import VndText from "@/app/components/vnd-text";
+
 export default function ProductInfo () {
     const {id}  = useParams()
     const router = useRouter()
     const [quantity, setQuantity] = useState(0)
-    const [chooseColor , setChooseColor] = useState("")
+    const [mainImageUrl, setMainImageUrl] = useState<string>("")
     const [product, setProduct] = useState<IProductData | null>(null)
-    const [rating, setRating] = useState<Record<number, number> | null>(null)
     const [tab, setTab] = useState("spec")
     const [comment, setComment] = useState<IComment[]>([])
     const [openFilterComment, setOpenFilterComment] = useState<boolean>(false)
     const [star, setStar] = useState(0)
-    const [showPostComment, setShowPostComment] = useState<boolean>(false)
-    const [reload, setReload] = useState<boolean>(false)
-    const [recomendProducts, setRecomendProducts] = useState<IProductData[]>([])
     const [showNotification, setShowNotification] = useState<boolean>(false)
     const [showOutOfInventory, setShowOutOfInventory] = useState<boolean>(false)
     const [shopVouchers, setShopVouchers] = useState<IVoucher[]>([])
-    const [newComment, setNewComment] = useState<ICommentReq>({
-        content: "",
-        rating: 5,
-        productId: id ? id.toString() : ""
-    })
+
     const token = Cookies.get("token");
 
     async function GetShopVouchers( shopId: string) {
@@ -131,45 +116,9 @@ export default function ProductInfo () {
         }
         GetProductById();
 
-        async function GetRating () {
-            try {
-                const response = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/comment/star/${id}`, {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                    }
-                })
-                const data = await response.json();
-                console.log(data);
-                setRating(data.data);
 
-            } catch (error) {
-                console.log(error)
-            }
-        }
-        GetRating ();
 
-        async function GetRecommendedProduct () {
-            try {
-                const response = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/recommend`, {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`
-                    }
-                })
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log(data);
-                    setRecomendProducts(data.data);
-                }
-
-            } catch (error) {
-                console.error(error)
-            }
-        }
-        GetRecommendedProduct()
-    }, [reload]);
+    }, [id, router, token]);
 
     useEffect(() => {
         async function GetComments () {
@@ -189,51 +138,22 @@ export default function ProductInfo () {
             }
         }
         GetComments ();
-    }, [star, reload]);
+    }, [star, id]);
 
-    const breadcrumbs = [
-        {name: "Category", href: "/categories" },
-        {name: "2", href: "/categories" },
-    ]
-    const image = [
-        "/a.png",
-        "/b.png",
-        "/c.png",
-        "/d.png",
-        "/e.png",
-
-    ]
+    // const breadcrumbs = [
+    //     {name: "Category", href: "/categories" },
+    //     {name: "2", href: "/categories" },
+    // ]
+    // const image = [
+    //     "/a.png",
+    //     "/b.png",
+    //     "/c.png",
+    //     "/d.png",
+    //     "/e.png",
     //
-    async function CreateComment () {
-        if (!token) {
-            router.push("/login");
-            return
-        }
-        try {
-            const response = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/comment/create`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify(newComment),
-            })
+    // ]
+    //
 
-            if (response.ok) {
-                const data = await response.json();
-                console.log("comment",data);
-                setShowPostComment(false)
-                setReload(!reload);
-
-            }
-
-        } catch (error) {
-            console.log(error);
-        }
-    }
-    useEffect(() => {
-        console.log(chooseColor)
-    }, [chooseColor]);
 
     function AddToCompare(product: IProductData) {
         console.log("add to Compare", product);
@@ -256,7 +176,34 @@ export default function ProductInfo () {
         window.dispatchEvent(new Event("localStorageChanged"));
         console.log(localStorage.length);
     }
+    const containerRef = useRef<HTMLDivElement>(null);
+    const isDragging = useRef(false);
+    const startY = useRef(0);
+    const scrollTop = useRef(0);
 
+    const handleMouseDown = (e: React.MouseEvent) => {
+        isDragging.current = true;
+        startY.current = e.clientY;
+        scrollTop.current = containerRef.current?.scrollTop || 0;
+        // Ngăn chọn văn bản
+        document.body.style.userSelect = "none";
+    };
+
+    const handleMouseMove = (e: React.MouseEvent) => {
+        if (!isDragging.current || !containerRef.current) return;
+        const dy = e.clientY - startY.current;
+        containerRef.current.scrollTop = scrollTop.current - dy;
+    };
+
+    const handleMouseUp = () => {
+        isDragging.current = false;
+        document.body.style.userSelect = ""; // khôi phục lại chọn văn bản
+    };
+
+    useEffect(() => {
+        document.addEventListener("mouseup", handleMouseUp);
+        return () => document.removeEventListener("mouseup", handleMouseUp);
+    }, []);
     return (
         <div className="w-full flex bg-white flex-col items-center pt-[20px]">
             {/*<div className={`w-[1300px] h-[40px] mt-[10px]  items-center flex mb-[20px]`}>*/}
@@ -279,24 +226,59 @@ export default function ProductInfo () {
             }
 
             <div className={`w-[1300px] h-[490px] flex gap-[40px] mb-[30px]  `}>
+                {/*<ConfirmDialog message={"Xác Nhận Tạo bill"} onConfirm={()=>{}} onCancel={()=>{}}/>*/}
+                {/*<AlertMessage message={"hehehe"} onClose={()=> {}}/>*/}
                 <div className="w-[660px] h-full  bg-white flex gap-[20px]">
-                    <div className={"grid w-[170px] gap-[15px] col-span-1  "}>
-                        {image.slice(0,3).map((image, index) => (
-                        <div key={index} className={"relative col-span-1  w-[150px] flex items-center justify-center rounded-[25px] overflow-hidden"}>
-                            <div className={"h-full w-full relative bg-stone-200"}>
-                                <Image src={`/products/samsung-${index+1}.jpg`} alt={"image"}  fill={true} />
-                            </div>
+                    <div
+                        ref={containerRef}
+                        onMouseDown={handleMouseDown}
+                        onMouseMove={handleMouseMove}
+                        className={`w-[170px] col-span-1 ${
+                            product?.extraImages &&  product.extraImages.length > 3 ? "max-h-[520px]" : ""
+                        } overflow-hidden relative cursor-grab active:cursor-grabbing`}
+                        style={{
+                            scrollbarWidth: "none", // Firefox
+                            msOverflowStyle: "none", // IE 10+
+                        }}
+                    >
+                        <div
+                            className="grid gap-[15px]"
+                            style={{
+                                overflowY: "scroll",
+                                maxHeight: product?.extraImages && product.extraImages.length > 3 ? "520px" : "auto",
+                            }}
+                        >
+                            {product?.extraImages.map((image, index) => (
+                                <div
+                                    key={index}
+                                    className="w-[150px] h-[150px] rounded-[25px] overflow-hidden bg-stone-200 relative mx-auto"
+                                    onClick={()=> setMainImageUrl(image.imageUrl)}
+                                >
+                                    <Image
+                                        src={image.imageUrl}
+                                        alt={`image-${index}`}
+                                        fill
+                                        className="object-cover"
+                                    />
+                                </div>
+                            ))}
                         </div>
-                        ))}
+
+                        {/* Ẩn scrollbar - cả Chrome và Firefox */}
+                        <style jsx>{`
+                            div::-webkit-scrollbar {
+                              display: none;
+                            }
+                          `}</style>
                     </div>
                     <div className="flex items-center w-[550px] h-full rounded-[25px] overflow-hidden ">
                         <div className={"w-full h-full relative overflow-hidden bg-stone-200"}>
-                            <Image src={product?.mainImage ? product.mainImage : "/products/product-1.jpg"} alt={"image"} width={1000} height={1000} className={"w-full h-full object-cover"} />
+                            <Image src={mainImageUrl != "" ? mainImageUrl : product?.mainImage ? product.mainImage : "/products/product-1.png"} alt={"image"} width={1000} height={1000} className={"w-full h-full object-cover"} />
                         </div>
                     </div>
                 </div>
                 <div className=" flex-1 flex-col justify-center h-full  ">
-                    <div className={" w-full h-[50px] "}>
+                    <div className={" w-full  "}>
                         <p className={"font-sf text-stone-800 text-[40px] font-[900] uppercase"}>{product?.productName}</p>
                     </div>
                     <div className={"w-full flex items-center mt-[5px] h-[30px] "}>
@@ -304,7 +286,7 @@ export default function ProductInfo () {
                         <p className={"font-sf text-[15px] text-stone-600 ml-[5px]"}>{product?.categoryName}</p>
                     </div>
                     <div className={"h-[25px] w-full flex mt-[5px] "}>
-                        <div className={"h-[25px] flex items-center pr-[10px]  "}>
+                        <div className={"h-[25px] flex items-center pr-[10px]"}>
                             {product &&
                                 <div className={"flex text-yellow-500 items-center justify-center mr-[5px] text-[16px] "}>
                                     {Array.from({length: Math.round(product.rating)}, (_, index) => (
@@ -333,8 +315,15 @@ export default function ProductInfo () {
                     </div>
 
                     <div className={" w-full flex items-center mt-[5px] h-[40px] "}>
-                        <p className={"text-[14px] self-start mt-[4px] mr-[2px] text-amber-600 font-sf underline"}>đ</p>
-                        <p className={"font-sf font-[700] text-amber-600 text-[24px]"}>{product?.price != undefined ? product?.price - product?.price * product?.discount/100 : null}</p>
+
+                        {product?.price != undefined ?
+                            <VndText
+                                amount={product?.price - product?.price * product?.discount/100}
+                                classNameCurrency={"font-[400] text-[20px] text-amber-600 font-sf"}
+                                classNameNumber={"font-[600] text-[25px] text-amber-600 font-sf"}
+                            />
+                            : null
+                        }
                         {product?.discount ? product?.discount > 0 ? (
                             <div className={"relative flex items-center ml-[3px] mr-[5px]"}>
                                 <HiReceiptPercent className={"text-blue-500 mr-[10px] text-[13px]"} />
@@ -482,13 +471,11 @@ export default function ProductInfo () {
                             <p className="font-sf font-[700] text-[24px] text-stone-800 uppercase absolute top-[-18px] bg-white px-[15px]">Voucher của shop</p>
                             <div className={"w-full grid grid-cols-1"}>
                                 {
-
                                     shopVouchers.map((shopVoucher, index) => {
                                         const now = new Date();
-                                        const startTime = new Date(shopVoucher.startTime);
                                         const endTime = new Date(shopVoucher.endTime);
                                         const endTimeFormatted = `${endTime.getHours().toString().padStart(2, "0")}:${endTime.getMinutes().toString().padStart(2, "0")} ${endTime.getDate()}/${endTime.getMonth() + 1}/${endTime.getFullYear()}`;
-                                        if (startTime < now && endTime > now) return (
+                                        if (endTime > now) return (
                                             <div key={index} className={"col-span-1 rounded-[20px] bg-amber-50 border border-amber-200 h-[100px] overflow-hidden flex justify-between relative"}>
 
                                                 <div className={"flex flex-col justify-center ml-[20px]"}>
@@ -636,64 +623,19 @@ export default function ProductInfo () {
                     
                     
                 </div>
-                <div className=" w-[1300px] max-h-fit pt-[25px] pb-[30px] flex flex-col justify-center items-center mt-[20px]">
-                    <p className="font-sf font-[900] text-[30px] mb-[10px] text-stone-800 uppercase">Có thể bạn cũng thích</p>
-                    <div className={"border-b border-amber-500 w-[150px] mb-[40px]"}></div>
-                    <div className="w-full grid grid-cols-5 gap-[20px]">
-                        {recomendProducts.slice(0,5).map((product, index) => (
-                            <ProductR product={product} key={index}/>
-                        ))}
-                    </div>
+                {/*<div className=" w-[1300px] max-h-fit pt-[25px] pb-[30px] flex flex-col justify-center items-center mt-[20px]">*/}
+                {/*    <p className="font-sf font-[900] text-[30px] mb-[10px] text-stone-800 uppercase">Có thể bạn cũng thích</p>*/}
+                {/*    <div className={"border-b border-amber-500 w-[150px] mb-[40px]"}></div>*/}
+                {/*    <div className="w-full grid grid-cols-5 gap-[20px]">*/}
+                {/*        {recomendProducts.slice(0,5).map((product, index) => (*/}
+                {/*            <ProductR product={product} key={index}/>*/}
+                {/*        ))}*/}
+                {/*    </div>*/}
 
-                </div>
+                {/*</div>*/}
 
             </div>
-            {
-                showPostComment ?
-                    <div className={`w-full h-screen top-0 fixed  bg-stone-500/20 z-20  flex justify-center items-center font-sf`}>
 
-                        <div className={" w-[500px] bg-white rounded-[25px] shadow pb-[20px]"}>
-                            <div className={"w-full h-[50px] justify-center items-center flex border-b border-stone-200"}>
-                                <p className={"uppercase text-[22px] text-stone-800 font-[700]"}>đánh giá</p>
-                            </div>
-
-                            <div className={"h-[40px] w-full px-[20px] flex items-center  mt-[10px] text-[22px] text-yellow-500"}>
-                                {newComment.rating >= 1 ? <TbStarFilled onClick={()=> setNewComment((prev) => ({...prev!, rating: 1}))}/> : <TbStar/> }
-                                {newComment.rating >= 2 ? <TbStarFilled onClick={()=> setNewComment((prev) => ({...prev!, rating: 2}))}/> : <TbStar onClick={()=> setNewComment((prev) => ({...prev!, rating: 2}))}/> }
-                                {newComment.rating >= 3 ? <TbStarFilled onClick={()=> setNewComment((prev) => ({...prev!, rating: 3}))}/> : <TbStar onClick={()=> setNewComment((prev) => ({...prev!, rating: 3}))}/> }
-                                {newComment.rating >= 4 ? <TbStarFilled onClick={()=> setNewComment((prev) => ({...prev!, rating: 4}))}/> : <TbStar onClick={()=> setNewComment((prev) => ({...prev!, rating: 4}))}/> }
-                                {newComment.rating >= 5 ? <TbStarFilled onClick={()=> setNewComment((prev) => ({...prev!, rating: 5}))}/> : <TbStar onClick={()=> setNewComment((prev) => ({...prev!, rating: 5}))}/> }
-                            </div>
-
-                            <div className={"w-full px-[20px] relative mt-[15px]"}>
-                                <p className={"font-[600] ml-[20px] text-stone-700 absolute top-[-12px] px-[6px] bg-white"}>Nội Dung</p>
-                                <textarea
-                                    value={newComment.content}
-                                    onChange={(e) =>
-                                        setNewComment((prev) => ({...prev!, content: e.target.value}))
-                                    }
-                                    className={"w-full h-[200px] border border-stone-200 rounded-[20px] p-[15px] focus:outline-none"}
-                                />
-                            </div>
-
-                            <div className={"h-10 w-full flex justify-end px-[20px] mt-[10px]"}>
-                                <div className={"h-full flex justify-center items-center font-sf px-[20px] rounded-full bg-stone-200 text-[15px] font-[500] text-stone-800"}
-                                    onClick={()=> {
-                                        setShowPostComment(false);
-                                        setNewComment((prev) => ({...prev!, content: "", rating: 5}))
-                                    }}>
-                                    <p className={"select-none"}>Trở Lại</p>
-                                </div>
-                                <div onClick={()=>CreateComment()} className={"h-full flex justify-center items-center font-sf px-[20px] rounded-full bg-stone-800 text-[15px] font-[500] text-white ml-[10px]"}>
-                                    <p>Gửi</p>
-                                </div>
-                            </div>
-
-                        </div>
-                        <button onClick={()=> setShowPostComment(false)}>X</button>
-                    </div>
-                    : null
-            }
 
         </div>
     )

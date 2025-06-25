@@ -19,6 +19,9 @@ public class Account
     public Shop? Shop { get; set; }   
     [JsonIgnore]
     public Customer? Customer { get; set; }
+    public DateTime CreatedDate { get; set; } = DateTime.Now;
+    public Guid ResetPasswordToken { get; set; }
+    public DateTime ResetPasswordTokenExpiration { get; set; }
 }
 
 public enum AccountRole

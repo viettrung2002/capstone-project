@@ -1,10 +1,10 @@
 'use client'
 import Image from "next/image";
-import {useState} from "react";
+
 import {ICategory} from "@/app/types/ subCategory";
 import {useRouter} from "next/navigation";
 export default function FeatureCategories({category}:{category: ICategory}) {
-    const [seeAll, setSeeAll] = useState<boolean>(false);
+
     const router = useRouter();
     return (
         <div onClick={()=> router.push(`categories/${category.categoryId}`)} className={`group relative flex flex-col col-span-1  items-center 2xl:pb-[10px] xl:pb-[25px] justify-between bg-stone-200 rounded-[22px]  select-none `}>

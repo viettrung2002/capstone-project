@@ -6,6 +6,7 @@ namespace CoreBuyNow.Repositories.Interfaces;
 public interface IProductRepository 
 {
     Task AddProduct(Product product);
+    Task AddProduct2(Product product, IFormFile mainImage, List<IFormFile> extraImages);
     Task AddProductAndVector(Product product);
     Task<List<ProductAttribute>> GetSubCategoryAttributes(Guid subCategoryId);
     Task UpdateProduct(Product product, Guid productId);

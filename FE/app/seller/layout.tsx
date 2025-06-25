@@ -8,13 +8,12 @@ import {useRouter} from "next/navigation";
 
 export default function SellerLayout ({children}: {children: React.ReactNode} ) {
     const [activeTab, setActiveTab] = useState(0);
-    const [openOderManagement , setOpenOderManagement] = useState(true);
-    const [openProductManagement , setOpenProductManagement] = useState(true);
+    const openProductManagement = true
     const router = useRouter();
     return (
-        <div className="w-full bg-gray-200 flex justify-center items-center flex-col pb-[20px]">
+        <div className="w-full flex-1 bg-gray-200 flex justify-center items-center flex-col pb-[20px]">
 
-            <div className={`w-[1300px] grid grid-cols-5 gap-[20px] mt-[20px]`}>
+            <div className={`w-[1300px] grid grid-cols-5 h-full gap-[20px] mt-[20px]`}>
                 <div className={"col-span-1"}>
 
                     <div className={"flex h-[30px] pl-[15px] items-center mt-[20px]"}>
@@ -23,7 +22,7 @@ export default function SellerLayout ({children}: {children: React.ReactNode} ) 
                         </div>
                         <p onClick={()=> {
                             setActiveTab(8);
-                            router.push("/seller/statistics");
+                            router.push("/seller/profile");
                         }} className={`flex font-[600] font-sf text-[15px]  ${activeTab == 8 ? "text-blue-500" : "text-gray-800"}`}>Tài Khoản Của Tôi</p>
                     </div>
                     <div className={"flex h-[30px] pl-[15px] items-center mt-[20px]"}>
@@ -112,7 +111,7 @@ export default function SellerLayout ({children}: {children: React.ReactNode} ) 
                         </div>
                         <p onClick={()=> {
                             setActiveTab(7);
-                            router.push("/seller/statistics");
+                            router.push("/seller/wallet");
                         }} className={`flex font-[600] font-sf text-[15px]  ${activeTab == 7 ? "text-blue-500" : "text-gray-800"}`}>Ví BuyNow</p>
                     </div>
                 </div>

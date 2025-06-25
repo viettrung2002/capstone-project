@@ -1,5 +1,5 @@
 'use client'
-import Breadcrumb from "@/app/components/breadcrumb";
+// import Breadcrumb from "@/app/components/breadcrumb";
 import {useEffect, useState} from "react";
 import {
     HiOutlineMagnifyingGlass,
@@ -13,20 +13,14 @@ import {
     HiChevronLeft,
     HiChevronRight, HiMiniEllipsisHorizontal,
 } from "react-icons/hi2";
-import { BiFilterAlt } from "react-icons/bi";
-import Image from "next/image";
 import {ProductInCategory} from "@/app/components/product";
-import Cookies from "js-cookie";
 import {IProduct} from "@/app/types/product";
 import {SubCategory} from "@/app/types/ subCategory";
 import {useParams} from "next/navigation";
-import {useRouter} from "next/navigation";
-import {IShop} from "@/app/types/shop";
+// import {useRouter} from "next/navigation";
+// import {IShop} from "@/app/types/shop";
 import {TbChevronLeft, TbChevronRight, TbMinus} from "react-icons/tb";
-type SubCategoriesProps = {
-    id: number;
-    name: string;
-};
+
 type Location = {
     id: number;
     name: string;
@@ -35,18 +29,13 @@ type Brand = {
     id: number;
     name: string;
 }
-type Official_Store  = {
-    id: number;
-    name: string;
-    avatar: string;
-}
 
 export default function Categories() {
     const {id} = useParams();
-    const router = useRouter();
-    const breadcrumbs = [
-        {name: "Category", href: "/categories" },
-    ]
+    // const router = useRouter();
+    // const breadcrumbs = [
+    //     {name: "Category", href: "/categories" },
+    // ]
     const [products, setProducts] = useState<(IProduct[])>([]);
     const [subCategories, setSubCategories] = useState<(SubCategory[])>([]);
     const [pageIndex, setPageIndex] = useState<number>(0);
@@ -60,22 +49,21 @@ export default function Categories() {
     const [minPrice, setMinPrice] = useState<number | string>("");
     const [maxPrice, setMaxPrice] = useState<number | string>("");
     const [isMall, setIsMall] = useState(false)
-    const [officialShop, setOfficialShop] = useState<IShop[]>([]);
+    // const [officialShop, setOfficialShop] = useState<IShop[]>([]);
     useEffect(() => {
-        console.log(id)
         async function GetProduct() {
-            const token = Cookies.get("token");
-            console.log("Token:", token);
-            if (!token) {
-                router.push("/login");
-                return;
-            }
+            // const token = Cookies.get("token");
+            // console.log("Token:", token);
+            // if (!token) {
+            //     router.push("/login");
+            //     return;
+            // }
             try {
                 const response = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/product/search`,{
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`
+                        // Authorization: `Bearer ${token}`
                     },
                     body: JSON.stringify({
                         index: pageIndex,
@@ -99,7 +87,7 @@ export default function Categories() {
             }
         }
         GetProduct();
-    }, [pageIndex, pageSize, sortBy, searchQuery, subCategoryId,minPrice, maxPrice,rate,isMall]);
+    }, [pageIndex, pageSize, sortBy, searchQuery, subCategoryId,minPrice, maxPrice,rate,isMall, id]);
     useEffect(() => {
         async function GetCategory() {
             try {
@@ -119,24 +107,24 @@ export default function Categories() {
         }
         GetCategory();
 
-        async function GetOfficialShop() {
-            try {
-                const res = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/shop`, {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                    }
-                });
-                const data = await res.json();
-                console.log("Shop",data);
-                setOfficialShop(data.data);
-
-            } catch (err) {
-                console.log(err)
-            }
-        }
-        GetOfficialShop()
-    }, []);
+        // async function GetOfficialShop() {
+        //     try {
+        //         const res = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/shop`, {
+        //             method: "GET",
+        //             headers: {
+        //                 "Content-Type": "application/json",
+        //             }
+        //         });
+        //         const data = await res.json();
+        //         console.log("Shop",data);
+        //         setOfficialShop(data.data);
+        //
+        //     } catch (err) {
+        //         console.log(err)
+        //     }
+        // }
+        // GetOfficialShop()
+    }, [id]);
     const locations : Location[] = [
         { id: 1, name: "Hà Nội" },
         { id: 2, name: "Hồ Chí Minh" },
@@ -208,7 +196,6 @@ export default function Categories() {
     const [timeoutId, setTimeoutId] = useState<ReturnType<typeof setTimeout> | null>(null);
 
     const [locationFilter, setLocationFilter] = useState<number[]>([]);
-    const [brandFilter, setBrandFilter] = useState<number[]>([]);
     const [showfullLocattion, setShowfullLocattion] = useState<number>(9);
     const [showFullBrand, setShowFullBrand] = useState(9);
 
@@ -216,7 +203,7 @@ export default function Categories() {
         console.log(locationFilter);
     }, [locationFilter]);
     return (
-        <div className={`flex items-center justify-center flex-col bg-white z-10 pt-[20px]`}>
+        <div className={`flex w-full items-center justify-center flex-col bg-white z-10 pt-[20px]`}>
 
             {/*<div className={`w-[1300px] h-[40px] mt-[10px] px-[10px] items-center flex `}>*/}
             {/*    <div className="flex items-center w-[250px] h-full  ">*/}
@@ -228,7 +215,6 @@ export default function Categories() {
             {/*    Banner*/}
             {/*</div>*/}
             {/*Banner*/}
-
             {/*Product*/}
             <div className="flex gap-[20px] w-[1300px] ">
                 <div className={`w-[calc(23%-15px)] flex flex-col`}>
@@ -462,7 +448,7 @@ export default function Categories() {
                                 <button className={"h-full w-[40px] rounded-full bg-white flex justify-center items-center mr-[7px]"}>
                                     <TbChevronLeft/>
                                 </button>
-                                <p className={"font-sf"}>1/2</p>
+                                <p className={"font-sf"}>1/{Math.ceil(productCount / 16)}</p>
                                 <button className={"h-full w-[40px] rounded-full bg-white flex justify-center items-center ml-[7px]"}>
                                     <TbChevronRight/>
                                 </button>
@@ -482,7 +468,7 @@ export default function Categories() {
                             Array.from({length: Math.ceil(productCount/pageSize)},(_,i) => i ).map((page) =>
                                 <div key={page}>
                                     <button onClick={()=> setPageIndex(page)} className={"flex w-[35px] h-[35px] border ml-[3px] mr-[3px] border-stone-300 rounded-full justify-center items-center text-stone-800 "}>
-                                        <p className={"font-sf"}>{page}</p>
+                                        <p className={"font-sf"}>{page+1}</p>
                                     </button>
                                 </div>) :
                         <div className={"flex"}>
@@ -490,7 +476,7 @@ export default function Categories() {
                             Array.from({length: 5},(_,i) => i + 1).map((page) =>
                                 <div key={page}>
                                     <button className={"flex w-[35px] h-[35px] border ml-[3px] mr-[3px] border-stone-300 rounded-full justify-center items-center text-stone-800 "}>
-                                        <p className={"font-sf"}>{page}</p>
+                                        <p className={"font-sf"}>{page+1}</p>
                                     </button>
                                 </div>)
                         }
@@ -651,23 +637,23 @@ export default function Categories() {
 
 
                         {/*----------Thương hiệu------------*/}
-                        <h1 className={` font-sf font-[500] text-[17px]  mt-[20px]`}>Thương hiệu</h1>
-                        <div className={`grid grid-cols-3 gap-[15px] mt-[10px]`}>
-                            {brands.slice(0,showFullBrand).map((brand) => (
-                                <div className={"flex col-span-1 h-[25px] items-center text-stone-800 text-[15px] font-sf"} key={brand.id}>
-                                    <div className={`w-[15px] h-[15px] border border-stone-300 rounded-[4px] bg-stone-100 flex justify-center items-center `}>
-                                        <input type={'checkbox'} value={brand.id}
-                                               onChange={(e) => {
-                                                   setBrandFilter((prev)=>
-                                                       prev.includes(Number(e.target.value)) ? prev.filter((num)=> num != Number(e.target.value)) : [...prev, Number(e.target.value) ]
-                                                   );
-                                               }}
-                                               className={"w-[9px] h-[9px] accent-stone-500 appearance-none  rounded-[2px] checked:bg-stone-500  peer-checked:block text-stone-50 "}/>
-                                    </div>
-                                    <p className={"ml-[7px]"}>{brand.name}</p>
-                                </div>
-                            ))}
-                        </div>
+                        {/*<h1 className={` font-sf font-[500] text-[17px]  mt-[20px]`}>Thương hiệu</h1>*/}
+                        {/*<div className={`grid grid-cols-3 gap-[15px] mt-[10px]`}>*/}
+                        {/*    {brands.slice(0,showFullBrand).map((brand) => (*/}
+                        {/*        <div className={"flex col-span-1 h-[25px] items-center text-stone-800 text-[15px] font-sf"} key={brand.id}>*/}
+                        {/*            <div className={`w-[15px] h-[15px] border border-stone-300 rounded-[4px] bg-stone-100 flex justify-center items-center `}>*/}
+                        {/*                <input type={'checkbox'} value={brand.id}*/}
+                        {/*                       onChange={(e) => {*/}
+                        {/*                           setBrandFilter((prev)=>*/}
+                        {/*                               prev.includes(Number(e.target.value)) ? prev.filter((num)=> num != Number(e.target.value)) : [...prev, Number(e.target.value) ]*/}
+                        {/*                           );*/}
+                        {/*                       }}*/}
+                        {/*                       className={"w-[9px] h-[9px] accent-stone-500 appearance-none  rounded-[2px] checked:bg-stone-500  peer-checked:block text-stone-50 "}/>*/}
+                        {/*            </div>*/}
+                        {/*            <p className={"ml-[7px]"}>{brand.name}</p>*/}
+                        {/*        </div>*/}
+                        {/*    ))}*/}
+                        {/*</div>*/}
                         {showFullBrand == 9 ?
                             (
                                 <button onClick={()=> setShowFullBrand(brands.length)} className={"text-stone-50 mb-[20px] font-sf font-[300] flex justify-center items-center border w-[110px] py-[2px] rounded-full border-stone-300 bg-stone-500 px-[10px]  mt-[10px] hover:bg-stone-700 "}>

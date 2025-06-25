@@ -12,29 +12,7 @@ export default function ShopManagementPage() {
     const [openLock, setOpenLock] = useState<boolean>(false);
     const [reload, setReload] = useState<boolean>(false);
     const [shopId, setShopId] = useState<string>("");
-    const GetShops = async () => {
-        const token = Cookies.get("token");
-        if (!token) {
-            router.push("/login");
-            return;
-        }
-        try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/shops`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`
-                }
-            });
-            if (response.ok){
-                const data = await response.json();
-                console.log(data);
-                setShops(data.data);
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    }
+
 
     const ActivateShop = async (shopId: string) => {
         const token = Cookies.get("token");
@@ -83,8 +61,31 @@ export default function ShopManagementPage() {
         }
     }
     useEffect(() => {
+        const GetShops = async () => {
+            const token = Cookies.get("token");
+            if (!token) {
+                router.push("/login");
+                return;
+            }
+            try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/shops`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                if (response.ok){
+                    const data = await response.json();
+                    console.log(data);
+                    setShops(data.data);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
         GetShops();
-    },[reload])
+    },[reload, router])
     return(
         <div className={"w-full h-full px-[20px] py-[20px]"}>
             {openUnlock && (

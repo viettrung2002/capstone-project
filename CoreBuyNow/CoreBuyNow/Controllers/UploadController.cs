@@ -19,7 +19,6 @@ public class UploadController (IConfiguration configuration, ILogger<UploadContr
             File = new FileDescription(image.FileName, image.OpenReadStream()),
             PublicId = $"uploads/{Guid.NewGuid()}"
         };
-    
         var uploadResult = await cloudinary.UploadAsync(uploadParams);
         return Ok(new { imageUrl = uploadResult.SecureUrl.ToString() });
     }

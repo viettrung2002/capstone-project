@@ -1,5 +1,5 @@
 'use client'
-import Breadcrumb from "@/app/components/breadcrumb";
+// import Breadcrumb from "@/app/components/breadcrumb";
 import Image from "next/image";
 import {HiMiniMinus, HiMiniPlus, HiOutlineTrash} from "react-icons/hi2";
 import {useEffect, useState, useRef} from "react";
@@ -7,14 +7,16 @@ import Cookies from "js-cookie";
 import {useRouter} from "next/navigation";
 import {IProductInCart} from "@/app/types/product";
 import {IShop} from "@/app/types/shop";
+import VndText from "@/app/components/vnd-text";
+import * as React from "react";
 
 
 export  default function Cart() {
     const router = useRouter();
-    const breadcrumbs = [
-        {name: "Shop", href: "/categories" },
-        {name: "2", href: "/categories" },
-    ]
+    // const breadcrumbs = [
+    //     {name: "Shop", href: "/categories" },
+    //     {name: "2", href: "/categories" },
+    // ]
     const [products, setProducts] = useState<IProductInCart[]>([])
     const [shop, setShop] = useState<IShop[]>([])
     const [reload, setReload] = useState<boolean>(false)
@@ -130,7 +132,7 @@ export  default function Cart() {
             }
         }
         GetCart();
-    }, [reload]);
+    }, [reload, router, shop]);
     async function RemoveItem (itemId: string) {
         const token = Cookies.get("token");
         if (!token) {
@@ -183,11 +185,11 @@ export  default function Cart() {
         }
     }
 
-    function checkActivate () {
-        return Object.values(localActiveItem).includes(false);
-    }
+    // function checkActivate () {
+    //     return Object.values(localActiveItem).includes(false);
+    // }
     return (
-        <div className={"w-full flex justify-center flex-col items-center bg-white pt-[20px] pb-[20px]"}>
+        <div className={"w-full flex  flex-col items-center bg-white pt-[20px] pb-[20px]"}>
             {/*<div className={`2xl:w-[1300px] xl:w-full h-[40px] mt-[10px]  items-center flex mb-[20px]`}>*/}
             {/*    <div className="flex items-center w-[250px] h-full  ">*/}
             {/*        <Breadcrumb breadcrumbs={breadcrumbs} />*/}
@@ -265,7 +267,12 @@ export  default function Cart() {
                                                     <p className={"font-sf text-stone-700 font-[500] text-[15px]"}>{product.productName}</p>
                                                 </div>
                                                 <div className={"col-span-5 flex items-center justify-center"}>
-                                                    <p className={"font-sf text-stone-600 text-[15px]"}>{product.price}</p>
+                                                    <VndText
+                                                        amount={product.price}
+                                                        classNameCurrency={"font-[400] text-[14px] font-sf text-stone-600" }
+                                                        classNameNumber={"font-sf text-stone-600 text-[15px]"}
+                                                    />
+
                                                 </div>
                                                 <div className={"col-span-3 flex items-center justify-center"}>
                                                     <div className={"w-[110px] h-[35px] bg-stone-200 rounded-full px-[10px] overflow-hidden flex"}>
@@ -317,7 +324,12 @@ export  default function Cart() {
 
                                                 </div>
                                                 <div className={"col-span-5  flex items-center justify-center"}>
-                                                    <p className={"font-sf text-stone-600 text-[15px]"}>{product.price*product.quantity}</p>
+                                                    <VndText
+                                                        amount={product.price * product.quantity}
+                                                        classNameCurrency={"font-[400] text-[14px] font-sf text-stone-600" }
+                                                        classNameNumber={"font-sf text-stone-600 text-[15px]"}
+                                                    />
+
                                                 </div>
                                                 <div className={"col-span-3  flex items-center justify-center"}>
                                                     <button onClick={()=> RemoveItem(product.itemId)} className={"flex justify-center items-center w-[35px] h-[35px] rounded-full bg-stone-800 text-stone-50 text-[16px] hover:bg-stone-700"}>
@@ -340,16 +352,28 @@ export  default function Cart() {
                     <div className={"border-b border-stone-200 w-full mt-[10px]"}></div>
                     <div className={"flex justify-between items-center mt-[20px] w-full"}>
                         <p className={"font-sf text-stone-600 font-400 text-[16px]"}>Tổng cộng (10 sản phẩm)</p>
-                        <p className={"font-sf text-amber-600 font-400 text-[17px]"}>{total}</p>
+                        <VndText
+                            amount={total}
+                            classNameCurrency={"font-[400] text-[15px] font-sf text-amber-600" }
+                            classNameNumber={"font-sf  text-[17px] text-amber-600"}
+                        />
                     </div>
                     <div className={"flex justify-between items-center mt-[10px] w-full"}>
                         <p className={"font-sf text-stone-600 font-400 text-[16px]"}>Giảm giá sản phẩm</p>
-                        <p className={"font-sf text-amber-600 font-400 text-[17px]"}>0</p>
+                        <VndText
+                            amount={0}
+                            classNameCurrency={"font-[400] text-[15px] font-sf text-amber-600" }
+                            classNameNumber={"font-sf  text-[17px] text-amber-600"}
+                        />
                     </div>
                     <div className={"border-b border-stone-200 w-full mt-[10px]"}></div>
                     <div className={"flex justify-between items-center mt-[10px] w-full"}>
                         <p className={"font-sf text-stone-800 font-[600] text-[16px] uppercase"}>Tổng số tiền</p>
-                        <p className={"font-sf text-amber-600 font-[500] text-[18px]"}>{total}</p>
+                        <VndText
+                            amount={total}
+                            classNameCurrency={"font-[400] text-[15px] font-sf text-amber-600" }
+                            classNameNumber={"font-sf  text-[17px] text-amber-600"}
+                        />
                     </div>
                     <div className={"border-b border-stone-200 w-full mt-[10px] mb-[20px]"}></div>
 

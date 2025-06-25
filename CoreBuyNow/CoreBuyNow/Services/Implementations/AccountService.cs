@@ -5,7 +5,7 @@ using CoreBuyNow.Services.Interfaces;
 
 namespace CoreBuyNow.Services.Implementations;
 
-public class AccountService (IAccountRepository accountRepository, ICustomerRepository customerRepository, IShopRepository shopRepository, ILogger<AccountService> logger) : IAccountService
+public class AccountService (IAccountRepository accountRepository, ICustomerRepository customerRepository, IShopRepository shopRepository, ILogger<AccountService> logger, IAddressRepository addressRepository) : IAccountService
 {
     public async Task AddAccount<T>(AccountRegisterDto<T> accountRegisterDto)
     {
@@ -17,35 +17,64 @@ public class AccountService (IAccountRepository accountRepository, ICustomerRepo
         };
         await accountRepository.AddAccount(account);
         logger.LogInformation("AccountId_: {accountId}", account.AccountId);
-        if (account.Role == AccountRole.Shop && accountRegisterDto.Info is ShopDto shopInfo)
+        switch (account.Role)
         {
-            var shop = new Shop
+            case AccountRole.Shop when accountRegisterDto.Info is ShopDto shopInfo:
             {
-                ShopId = Guid.NewGuid(),
-                ShopName = shopInfo.ShopName,
-                Address = shopInfo.Address,
-                ProductCount = shopInfo.ProductCount,
-                CreatedDate = DateTime.Now,
-                IsOfficial = shopInfo.IsOfficial,
-                AccountId = account.AccountId,
-            };
-            await shopRepository.CreateShop(shop);
-        }
+                logger.LogInformation("da vao day");
+                var newId = Guid.NewGuid();
+                if (shopInfo.Address != null)
+                {
+                    var address = new Address
+                    {
+                        AddressId = Guid.NewGuid(),
+                        UserId = newId,
+                        ProvinceId = shopInfo.Address.ProvinceId,
+                        Name = "shop",
+                        PhoneNumber = "0",
+                        DistrictId = shopInfo.Address.DistrictId,
+                        WardId = shopInfo.Address.WardId,
+                        StreetAddress = "s"
+                    };
+                    await addressRepository.AddAddressShop(address);
+                    var shop = new Shop
+                    {
+                        ShopId = newId,
+                        ShopName = shopInfo.ShopName,
+                        AddressId = address.AddressId,
+                        ProductCount = shopInfo.ProductCount,
+                        CreatedDate = DateTime.Now,
+                        IsOfficial = shopInfo.IsOfficial,
+                        AccountId = account.AccountId,
+                    };
+                    await shopRepository.CreateShop(shop);
+                    
+                    
+                }
 
-        if (account.Role == AccountRole.Customer && accountRegisterDto.Info is CustomerDto customerInfo)
-        {
-            logger.LogInformation("AccountId: {accountId}", account.AccountId);
-            var customer = new Customer
+                
+                break;
+            }
+            case AccountRole.Customer when accountRegisterDto.Info is CustomerDto customerInfo:
             {
-                CustomerId = Guid.NewGuid(),
-                CustomerName = customerInfo.CustomerName,
-                Address = customerInfo.Address,
-                PhoneNumber = customerInfo.PhoneNumber,
-                Gender = customerInfo.Gender,
-                BirthDay = customerInfo.BirthDay,
-                AccountId = account.AccountId,
-            };
-            await customerRepository.CreateCustomer(customer);
+                logger.LogInformation("AccountId: {accountId}", account.AccountId);
+                var customer = new Customer
+                {
+                    CustomerId = Guid.NewGuid(),
+                    CustomerName = customerInfo.CustomerName,
+                    Address = customerInfo.Address,
+                    PhoneNumber = customerInfo.PhoneNumber,
+                    Gender = customerInfo.Gender,
+                    BirthDay = customerInfo.BirthDay,
+                    AccountId = account.AccountId,
+                };
+                await customerRepository.CreateCustomer(customer);
+                break;
+            }
+            case AccountRole.Admin:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
     }
     public async Task<Account?> GetAccountByIdAsync(Guid id)

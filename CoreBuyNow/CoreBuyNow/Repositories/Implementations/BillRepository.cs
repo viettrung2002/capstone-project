@@ -229,7 +229,7 @@ public class BillRepository (AppDbContext dbContext, ILogger<BillRepository> log
                 if (shopWallet == null) throw new Exception ("Not found shop wallet");
                 if (bill.VoucherId != Guid.Empty)
                 {
-                    var value = dbContext.Vouchers.Where(v=>v.VoucherId == bill.VoucherId).Select(v=>v.Value);
+                    var value = dbContext.Vouchers.Where(v=>v.VoucherId == bill.VoucherId).Select(v=>v.Value).FirstOrDefault();
                     shopWallet.Balance += (Convert.ToDecimal(value) + bill.TotalPrice);
                     var dTransaction = new Transaction
                     {
@@ -298,6 +298,7 @@ public class BillRepository (AppDbContext dbContext, ILogger<BillRepository> log
                 Description = "Hoan Tien Don Hang " + bill.BillId,
                 CreateDate = DateTime.Now,
             };
+            dbContext.Transactions.Add(dTransaction);
         }
         await dbContext.SaveChangesAsync();
     }

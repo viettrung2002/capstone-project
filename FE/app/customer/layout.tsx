@@ -14,11 +14,10 @@ import {useRouter} from "next/navigation";
 import {ICustomer} from "@/app/types/account";
 import React from "react";
 import Image from "next/image";
-import {images} from "next/dist/build/webpack/config/blocks/images";
 export default function CustomerLayout({children}: {children: React.ReactNode}) {
     const router = useRouter();
     const [customer, setCustomer] = useState<ICustomer>();
-    const [isOpenAccountInfo, setIsOpenAccountInfo] = useState(true);
+    const isOpenAccountInfo = true;
     const [activeTab, setActiveTab] = useState(0);
 
     useEffect(() => {
@@ -46,16 +45,13 @@ export default function CustomerLayout({children}: {children: React.ReactNode}) 
         }
         GetCustomer();
 
-    }, []);
+    }, [router]);
 
-    function formatVND(amount: number): string {
-        return amount.toLocaleString('vi-VN') ;
-    }
     useEffect(() => {
         console.log(customer);
     }, [customer]);
     return(
-        <div className={`w-full flex items-center justify-center bg-white pb-[20px]`}>
+        <div className={`w-full flex justify-center bg-white pb-[20px]`}>
             <div className={`w-[1300px] grid grid-cols-5 gap-[20px] mt-[20px] `}>
                 <div className={`col-span-1 max-h-fit rounded-[25px] border border-stone-200`}>
                     <div className={"h-[85px] flex p-[15px] border-b border-stone-200"}>

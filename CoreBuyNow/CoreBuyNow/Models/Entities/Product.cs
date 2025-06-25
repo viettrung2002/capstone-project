@@ -33,7 +33,7 @@ public class Product
     public int Sold { get; set; }
     [Required]
     public DateTime CreatedDate { get; set; }
-    public int Rating { get; set; }
+    public double Rating { get; set; }
     [Range(0, 100, ErrorMessage = "Price must be between 0 and 100.")]
     public int Discount { get; set; } = 0;
     [Column(TypeName = "json")] 
@@ -42,4 +42,5 @@ public class Product
     
     [Column(TypeName = "json")]
     public double[] Vector { get; set; } = [];
+    public bool Active { get; set; } = true;
 }

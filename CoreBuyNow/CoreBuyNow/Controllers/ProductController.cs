@@ -1,4 +1,5 @@
-﻿using CoreBuyNow.Models.DTOs;
+﻿using System.Text.Json;
+using CoreBuyNow.Models.DTOs;
 using CoreBuyNow.Models.Entities;
 using CoreBuyNow.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -26,6 +27,48 @@ public class ProductController (IProductService productService, ILogger<ProductC
         {
             product.ShopId = id;
             await productService.AddProduct(product);
+            return Ok(new
+            {
+                message = "Product created successfully"
+            });
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+    
+    [HttpPost("add2")]
+    [Authorize(Roles = "Shop")]
+    public async Task<IActionResult> AddProduct2(
+        [FromForm] string product,
+        [FromForm] IFormFile mainImage,
+        [FromForm] List<IFormFile> extraImages)
+    {
+        logger.LogInformation("Product da duoc nhan thanh json {obj}", product);
+        Product? productObj;
+        try
+        {
+            productObj = JsonSerializer.Deserialize<Product>(product, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+            
+            logger.LogInformation("Product da duoc chuyen thanh json {obj}", productObj.ToString());
+        }
+        catch (Exception ex)
+        {
+            return BadRequest($"Không thể parse object product: {ex.Message}");
+        }
+        
+        if (productObj == null) return BadRequest("Product object rỗng");
+        productObj.MainImage = "";
+        var id = User.FindFirst("id")?.Value;
+        if (id == null) return Unauthorized();
+        try
+        {
+            productObj.ShopId = Guid.Parse(id);
+            await productService.AddProduct(productObj, mainImage, extraImages);
             return Ok(new
             {
                 message = "Product created successfully"

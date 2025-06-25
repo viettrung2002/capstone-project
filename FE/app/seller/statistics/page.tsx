@@ -1,8 +1,8 @@
 'use client'
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import Cookies from "js-cookie";
 import {useRouter} from "next/navigation";
-import {IProductData} from "@/app/types/product";
+
 import {Bar} from "react-chartjs-2"
 import {
     Chart as ChartJS,
@@ -15,24 +15,29 @@ import {
 } from "chart.js";
 import {TbChevronRight} from "react-icons/tb";
 import Image from "next/image";
+import {IShopStatisticData} from "@/app/types/shop";
+import AlertMessage from "@/app/components/alert";
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 export default function Page(){
     const token = Cookies.get("token");
     const router = useRouter();
-    const [revenue, setRevenue] = useState<number>(0);
-    const [sold, setSold] = useState(0);
-    const [mostProduct, setMostProduct] = useState<IProductData[]>([]);
-    const [complete, setComplete] = useState(0);
-    const [dataChart, setDataChart] = useState<Record<string, number>>()
+
     const [labels, setLabels] = useState<string[]>([]);
     const [values, setValues] = useState<number[]>([]);
-    const GetData = async () => {
+    const [startDate, setStartDate] = useState("")
+    const [endDate, setEndDate] = useState("")
+    const inputStartDateRef = useRef<HTMLInputElement>(null);
+    const inputEndDateRef = useRef<HTMLInputElement>(null);
+    const [stattisticData, setStatisticData] = useState<IShopStatisticData>();
+    const [openNotification, setOpenNotification] = useState<boolean>(false);
+
+    const GetStatisticDataByDate = async () => {
         if(!token){
             router.push("/login");
             return;
         }
         try {
-            const response = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/shop/doanh-thu`, {
+            const response = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/shop/statistic?startDate=${startDate}&endDate=${endDate}`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -41,53 +46,68 @@ export default function Page(){
             })
             if (response.ok) {
                 const data = await response.json();
-                setRevenue(data.data);
-            }
-            const response1 = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/shop/sold`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                }
-            })
-            const data1 = await response1.json();
-            setSold(data1.data);
+                setStatisticData(data.data);
 
-            const response2 = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/shop/complete`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                }
-            })
-                const data2 = await response2.json();
-                console.log("data complete",data2.data);
-                setComplete(Number((data2.data * 100).toFixed(2)));
-            const response3 = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/shop/most-product?sort=true`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                }
-            })
-            const data3 = await response3.json();
-            console.log(data3);
-            setMostProduct(data3.data);
+            }
+
         } catch (error) {
             console.log(error);
         }
     }
 
-     async function getLast10Months() {
-        const result = [];
-        const now = new Date();
 
-        for (let i = 0; i < 10; i++) {
-            const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-            const startDate = new Date(date.getFullYear(), date.getMonth(), 1);
-            const endDate = new Date(date.getFullYear(), date.getMonth() + 1, 0); // last day of month
+    useEffect(() => {
+        async function getLast10Months() {
+            const result = [];
+            const now = new Date();
+
+            for (let i = 0; i < 10; i++) {
+                const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const startDate = new Date(date.getFullYear(), date.getMonth(), 1);
+                const endDate = new Date(date.getFullYear(), date.getMonth() + 1, 0); // last day of month
+                try {
+                    const response = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/shop/doanh-thu?startDate=${startDate.toDateString()}&endDate=${endDate.toDateString()}`, {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${token}`,
+                        }
+                    })
+                    if (response.ok) {
+                        const data = await response.json();
+                        console.log(`DOANH THU ${startDate.toDateString()} den ${endDate.toDateString()}`,data);
+                        result.push({
+                            startDate: startDate.toISOString().split('T')[0],
+                            endDate: endDate.toISOString().split('T')[0],
+                            value: data.data,
+                        });
+                    }
+                } catch (err) {
+                    console.log(err);
+                }
+
+            }
+
+            const _labels : string[] = []
+            const _values : number[] = []
+            result.slice().reverse().forEach((item) => {
+                const date = new Date(item.startDate);
+                const label = `${date.getMonth() + 1}/${date.getFullYear()}`;
+                _labels.push(label);
+                _values.push(item.value);
+            });
+            setLabels(_labels);
+            setValues(_values);
+            console.log("RES",result);
+            return result;
+        }
+        const GetStatisticData = async () => {
+            if(!token){
+                router.push("/login");
+                return;
+            }
             try {
-                const response = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/shop/doanh-thu?startDate=${startDate.toDateString()}&endDate=${endDate.toDateString()}`, {
+                const response = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/shop/statistic`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -96,43 +116,21 @@ export default function Page(){
                 })
                 if (response.ok) {
                     const data = await response.json();
-                    console.log(`DOANH THU ${startDate.toDateString()} den ${endDate.toDateString()}`,data);
-                    result.push({
-                        startDate: startDate.toISOString().split('T')[0],
-                        endDate: endDate.toISOString().split('T')[0],
-                        value: data.data,
-                    });
+                    setStatisticData(data.data)
                 }
-            } catch (err) {
-                console.log(err);
+
+            } catch (error) {
+                console.log(error);
             }
-
         }
-         const transformed = result.reduce((acc, item) => {
-             const date = new Date(item.startDate);
-             const key = `${date.getMonth() + 1}/${date.getFullYear()}`; // ví dụ: "6/2025"
-             acc[key] = item.value;
-             return acc;
-         }, {} as Record<string, number>);
-         const _labels : string[] = []
-         const _values : number[] = []
-         result.slice().reverse().forEach((item) => {
-             const date = new Date(item.startDate);
-             const label = `${date.getMonth() + 1}/${date.getFullYear()}`;
-             _labels.push(label);
-             _values.push(item.value);
-         });
-         setDataChart(transformed);
-         setLabels(_labels);
-         setValues(_values);
-         console.log("RES",result);
-         return result;
-    }
-    useEffect(() => {
-        GetData();
+        GetStatisticData();
         getLast10Months();
-    }, []);
+    }, [router, token]);
 
+
+    useEffect(() => {
+        console.log(startDate)
+    }, [startDate]);
     const data = {
         labels,
         datasets: [
@@ -191,16 +189,49 @@ export default function Page(){
         },
     };
     return(
-
         <div>
+            {openNotification && (
+                <AlertMessage message="Vui lòng chọn thời gian!" onClose={()=> setOpenNotification(false)}/>
+            )}
             <div className={"h-[30px] w-full flex mb-[10px] items-center"}>
-                <button className={"w-[160px] h-full flex justify-center items-center bg-white shadow mr-[10px] rounded-[4px] text-[14px] font-sf"}>
-                    <p>Ngày Bắt Đầu</p>
-                </button>
+                <div className={"h-full relative"}>
+                    <input
+                        type={"date"}
+                        ref={inputStartDateRef}
+                        onChange={(e)=> setStartDate(e.target.value)}
+                        className={"opacity-0 absolute pointer-events-none h-full"}
+                        max={new Date().toISOString().split("T")[0]}
+                    />
+                    <button onClick={()=> inputStartDateRef.current?.showPicker()} className={"w-[160px] h-full  flex justify-center items-center bg-white shadow mr-[10px] rounded-[4px] text-[14px] font-sf"}>
+                        <p>{startDate ? startDate : "Ngày Bắt Đầu"}</p>
+                    </button>
+                </div>
                 <TbChevronRight/>
-                <button className={"w-[160px] h-full flex justify-center items-center bg-white shadow ml-[10px] rounded-[4px] text-[14px] font-sf"}>
-                    <p>Ngày Kết Thúc</p>
+                <div className={"h-full relative ml-[10px]"}>
+                    <input
+                        type={"date"}
+                        ref={inputEndDateRef}
+                        onChange={(e)=> setEndDate(e.target.value)}
+                        className={"opacity-0 absolute pointer-events-none h-full"}
+                        min={startDate}
+                        max={new Date().toISOString().split("T")[0]}
+                    />
+                    <button onClick={()=> {
+                        if (startDate != "")
+                            inputEndDateRef.current?.showPicker()
+                        else alert("Vui lòng chọn ngày bắt đầu trước")
+                    }} className={"w-[160px] h-full  flex justify-center items-center bg-white shadow mr-[10px] rounded-[4px] text-[14px] font-sf"}>
+                        <p>{endDate ? endDate : "Ngày Kết Thúc"}</p>
+                    </button>
+                </div>
+                <button onClick={()=>{
+                    if (new Date(startDate) < new Date(endDate)) {
+                        GetStatisticDataByDate()
+                    } else setOpenNotification(true)
+                }} className={"px-[20px] h-full ml-[5px] rounded-sm shadow flex justify-center items-center text-white bg-blue-500 text-[15px] font-sf"}>
+                    <p>Lọc</p>
                 </button>
+
             </div>
             <div className={"w-full  grid grid-cols-3 gap-[20px] font-sf"}>
 
@@ -209,17 +240,17 @@ export default function Page(){
                     <div className={"w-full grid grid-cols-3 gap-x-[20px]"}>
                         <div className={"col-span-1 bg-white rounded-[4px] shadow-md flex flex-col p-[10px]"}>
                             <p className={"text-stone-600 text-[14px] mb-[5px]"}>TỔNG DOANH THU</p>
-                            <p className={"text-stone-800 text-[24px] font-[700]"}>{revenue}</p>
+                            <p className={"text-stone-800 text-[24px] font-[700]"}>{stattisticData?.revenue}</p>
                             <p className={"text-stone-600 text-[12px] mt-[5px]"}>từ trước tới hiện tại</p>
                         </div>
                         <div className={"col-span-1 bg-white rounded-[4px] shadow-md flex flex-col p-[10px]"}>
                             <p className={"text-stone-600 text-[14px] mb-[5px]"}>ĐÃ BÁN</p>
-                            <p className={"text-stone-800 text-[24px] font-[700]"}>{sold}</p>
+                            <p className={"text-stone-800 text-[24px] font-[700]"}>{stattisticData?.sold}</p>
                             <p className={"text-stone-600 text-[12px] mt-[5px]"}>từ trước tới hiện tại</p>
                         </div>
                         <div className={"col-span-1 bg-white rounded-[4px] shadow-md flex flex-col p-[10px]"}>
                             <p className={"text-stone-600 text-[14px] mb-[5px]"}>HOÀN THÀNH</p>
-                            <p className={"text-stone-800 text-[24px] font-[700]"}>{complete}%</p>
+                            <p className={"text-stone-800 text-[24px] font-[700]"}>{stattisticData?.completionRate && (stattisticData?.completionRate*100).toFixed(2)}%</p>
                             <p className={"text-stone-600 text-[12px] mt-[5px]"}>số đơn hàng</p>
                         </div>
                     </div>
@@ -235,12 +266,12 @@ export default function Page(){
                     <div className={"w-full bg-white rounded-[4px] shadow-md flex flex-col p-[10px]"}>
                         <p className={"font-[600] text-[15px] text-center"}>Sản Phẩm Bán Chạy</p>
                         <div className={"border-b border-stone-300 mt-[5px]"}></div>
-                        {mostProduct.map((product, index) => (
+                        {stattisticData?.products.map((product, index) => (
                             <div key={product.productId} className={"w-full flex items-center h-[60px] mt-[8px] mb-[8px]"}>
                                 <p className={"font-[600] w-[10px]  text-[15px] text-stone-600 mr-[10px] "}>{index+1}</p>
                                 <div className={"h-[60px] aspect-square bg-stone-200 p-[5px]"}>
                                     <div className={"w-full h-full relative"}>
-                                        <Image src={product.mainImage} alt={"i"} fill={true}/>
+                                        <Image src={product.image} alt={"i"} fill={true}/>
 
                                     </div>
                                 </div>

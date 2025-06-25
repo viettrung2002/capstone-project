@@ -2,7 +2,7 @@
 import {useState, useEffect} from "react";
 import {IProductData} from "@/app/types/product";
 import Image from "next/image";
-import {TbAB2, TbRefresh, TbTrash, TbX} from "react-icons/tb";
+import { TbRefresh, TbTrash, TbX} from "react-icons/tb";
 import {useRouter} from "next/navigation";
 
 export default function Compare() {
@@ -37,8 +37,7 @@ export default function Compare() {
         return () => {
             window.removeEventListener("localStorageChanged", checkLocalStorage);
         };
-
-    }, [products.length]);
+    }, []);
     return (
         <div className={`${hasItems ? "visible" :"hidden"} h-[50px] w-[300px] bg-neutral-300/60 z-30 fixed bottom-0 flex items-center rounded-full px-[8px] justify-between`}>
             <button onClick={()=> setHasItems(false)} className={"h-[35px] flex w-[35px] justify-center items-center font-sf text-white bg-stone-800 hover:bg-stone-600 rounded-full text-[20px]"}>
@@ -68,7 +67,11 @@ export default function Compare() {
             </div>
 
             <button onClick={()=> {
-                if (products.length == 2 ) router.push("/compare")
+
+                if (products.length == 2 ) {
+                    if (products[0].subCategoryId == products[1].subCategoryId)
+                        router.push("/compare"); else alert("Danh mục không giống nhau")
+                }
             }} className={"h-[35px] w-[35px] flex justify-center items-center font-sf text-white bg-amber-600 hover:bg-amber-500 rounded-full"}>
 
                 <TbRefresh className={"text-[20px]"}/>

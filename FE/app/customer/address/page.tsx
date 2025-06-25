@@ -4,6 +4,7 @@ import {useEffect, useState} from "react";
 import {IAddress, IAddressResponse, IDistrict, IProvince, IWard} from "@/app/types/address";
 import Cookies from "js-cookie";
 import {useRouter} from "next/navigation";
+import AlertMessage from "@/app/components/alert";
 export default function AddressPage( ) {
 
     const [openAddAddress, setOpenAddAddress] = useState<boolean>(false);
@@ -19,26 +20,13 @@ export default function AddressPage( ) {
     const [addresses, setAddresses] = useState<IAddressResponse[]>([]);
     const [reload, setReload] = useState<boolean>(true);
     const router = useRouter();
+    const [openNotification, setOpenNotification] = useState<boolean>(false);
+    const [notifContent, setNotifContent] = useState("");
     useEffect(() => {
         console.log(address);
 
     }, [address]);
-    const GetProvinces = async () => {
-        try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/address/provinces`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
-            if (response.ok){
-                const data = await response.json();
-                setProvinces(data.data);
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    }
+
 
     const GetDistricts = async (id: string) => {
         try {
@@ -88,36 +76,19 @@ export default function AddressPage( ) {
                 body: JSON.stringify(address),
             });
             if (response.ok){
-                const data = await response.json();
-                alert(data.message);
+                setOpenAddAddress(false)
+                setReload(!reload);
+                setNotifContent("Địa chỉ của bạn đã được thêm!");
+                setOpenNotification(true);
+                setTimeout(() => {
+                    setOpenNotification(false);
+                }, 3000);
             }
         } catch (error) {
             console.log(error);
         }
     }
-    const GetAddreses = async () => {
-        const token = Cookies.get("token");
-        if (!token) {
-            router.push("/login");
-            return;
-        }
-        try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/address/user`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                }
-            });
-            if (response.ok){
-                const data = await response.json();
-                setAddresses(data.data);
-                console.log("ADDRESS: " ,data.data);
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    }
+
 
     const SetDefault = async (id: string) => {
         const token = Cookies.get("token");
@@ -135,7 +106,12 @@ export default function AddressPage( ) {
             });
             if (response.ok){
                 const data = await response.json();
-                alert("Cập nhật địa chỉ mặc định thành công");
+                setNotifContent("Cập nhật địa chỉ mặc định thành công!")
+                setOpenNotification(true)
+                setTimeout(() => {
+                    setOpenNotification(false);
+                }, 3000);
+
                 setReload(!reload);
                 console.log(data);
             }
@@ -144,14 +120,55 @@ export default function AddressPage( ) {
         }
     }
     useEffect(() => {
+        const GetAddreses = async () => {
+            const token = Cookies.get("token");
+            if (!token) {
+                router.push("/login");
+                return;
+            }
+            try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/address/user`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    }
+                });
+                if (response.ok){
+                    const data = await response.json();
+                    setAddresses(data.data);
+                    console.log("ADDRESS: " ,data.data);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
         GetAddreses()
 
-    }, [reload]);
+    }, [reload, router]);
     useEffect(() => {
+        const GetProvinces = async () => {
+            try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/address/provinces`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                });
+                if (response.ok){
+                    const data = await response.json();
+                    setProvinces(data.data);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
         GetProvinces();
     }, []);
     return (
-        <div className={ `w-full h-full border rounded-[25px] px-[20px] font-sf`}>
+        <div className={ `w-full h-full border rounded-[25px] px-[20px] pb-[20px] font-sf`}>
+            {openNotification &&  <AlertMessage message={notifContent} onClose={()=>setOpenNotification(false)} />}
+
             <div className={"w-full"}>
                 <div className={"h-[84px] border-b border-stone-200 flex justify-between items-center"}>
                     <div>

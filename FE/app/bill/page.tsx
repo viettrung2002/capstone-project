@@ -2,18 +2,22 @@
 import {useEffect, useState, useRef} from "react";
 import Cookies from "js-cookie";
 import {useRouter} from "next/navigation";
-import {HiMiniXMark } from "react-icons/hi2"
-import {ICustomer} from "@/app/types/account";
+
 import {IProductInCart, IProductInBill} from "@/app/types/product";
 import { IShopInBill} from "@/app/types/shop";
 import Image from "next/image";
 import {IVoucher, IVoucherW} from "@/app/types/voucher";
 import {Payload} from "@/app/types/payload";
 import {TbCheck, TbMapPin, TbTicket, TbX} from "react-icons/tb";
-import {IAddress, IAddressResponse} from "@/app/types/address";
+import { IAddressResponse} from "@/app/types/address";
+import ConfirmDialog from "@/app/components/confirm";
+import AlertMessage from "@/app/components/alert";
+import VndText from "@/app/components/vnd-text";
+import * as React from "react";
+import {formatDate} from "@/app/utils/format";
 export default function Bill() {
     const router = useRouter();
-    const [customer, setCustomer] = useState<ICustomer>()
+
     const [product, setProduct] = useState<IProductInCart[]>([])
     const [shop, setShop] = useState<IShopInBill[]>([])
     const [adminVoucher, setAdminVoucher] = useState<IVoucherW[]>([])
@@ -22,10 +26,7 @@ export default function Bill() {
     const [showVoucher, setShowVoucher] = useState<boolean>(false)
     const [showShopVoucher, setShowShopVoucher] = useState<boolean>(false)
     const [voucher, setVoucher] = useState<IVoucher>()
-    const [shippingFee, setShippingFee] = useState<number>(0)
-    const [shippingVoucher, setShippingVoucher] = useState<IVoucher>()
     const [selectedShopVoucher, setSelectedShopVoucher] = useState<IVoucher[]>([])
-    const [openNotification, setOpenNotification] = useState<boolean>(false)
     const [paymentMethod, setPaymentMethod] = useState(0)
     const [shopVoucher, setShopVoucher] = useState<IVoucher>()
     const [billComplete, setBillComplete] = useState<boolean>(false)
@@ -33,10 +34,13 @@ export default function Bill() {
     const [otp, setOtp] = useState<string[]>(["", "", "", "","",""]);
     const [addresses, setAddresses] = useState<IAddressResponse[]>([]);
     const [selectedAddress, setSelectedAddress] = useState<IAddressResponse>();
+    const [addressToSelect, setAddressToSelect] = useState<IAddressResponse>();
     const [openAddress, setOpenAddress] = useState<boolean>(false)
     // 👇 Dùng đúng kiểu Ref cho TypeScript
     const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
-
+    const [notifContent, setNotifContent] = useState("")
+    const [openNotificataion, setOpenNotification] =  useState<boolean>(false)
+    const [openNotifConfirm, setOpenNotifConfirm] = useState<boolean>(false)
     const handleChange = (index: number, value: string) => {
         if (!/^\d?$/.test(value)) return; // chỉ cho nhập số
 
@@ -114,14 +118,14 @@ export default function Bill() {
                 })
                 const data = await response.json();
                 console.log(data.data);
-                setCustomer(data.data);
+
             } catch (error) {
                 console.log(error)
             }
         }
         GetProduct();
 
-    }, []);
+    }, [router]);
     const fetchVoucherData = async () => {
         try {
             const token = Cookies.get("token");
@@ -199,15 +203,11 @@ export default function Bill() {
             if (voucher) {
                 payload.voucherId = voucher.voucherId;
             }
-            if (shippingVoucher) {
-                payload.shippingVoucherId = shippingVoucher.voucherId;
-            }
             const shopVoucher = selectedShopVoucher.find(s=>s.shopId == item.shopId)
 
             if (selectedShopVoucher && shopVoucher!=null) {
                 payload.shopVoucherId = shopVoucher.voucherId ;
             }
-
             try {
                 const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bill`,{
                     method: "POST",
@@ -222,17 +222,23 @@ export default function Bill() {
                 const data = await response.json();
 
                 if (response.ok) {
-
                     console.log("CREATE BILL",data);
                     setBillComplete(true)
                 } else {
-                    if (data.error == "Insufficient inventory") setShowInsufficientInventory(true)
+                    console.log(data.error)
+                    if (data.error == "Insufficient inventory") Notification("Không đủ số lượng tồn kho");
                 }
-
             } catch (error) {
                 console.log(error)
             }
         }
+    }
+    const Notification = (content: string) => {
+        setNotifContent(content);
+        setOpenNotification(true);
+        setTimeout(() => {
+            setOpenNotification(false);
+        }, 3000);
     }
     const createBillPayWithWallet =  async () => {
         const token = Cookies.get("token");
@@ -266,9 +272,7 @@ export default function Bill() {
                 if (voucher) {
                     payload.voucherId = voucher.voucherId;
                 }
-                if (shippingVoucher) {
-                    payload.shippingVoucherId = shippingVoucher.voucherId;
-                }
+
                 const shopVoucher = selectedShopVoucher.find(s=>s.shopId == item.shopId)
 
                 if (selectedShopVoucher && shopVoucher!=null) {
@@ -294,7 +298,9 @@ export default function Bill() {
                         console.log("CREATE BILL",data);
                         setBillComplete(true)
                     } else {
-                        if (data.error == "Insufficient inventory") setShowInsufficientInventory(true)
+                        if (data.error == "Insufficient inventory") Notification("Không đủ số lượng tồn kho!")
+                        if (data.error == "Insufficient balance to pay") Notification("Số dư trong ví không đủ để thanh toán!")
+                        if (data.error == "Otp doesn't match") Notification("Mã OTP không chính xác!")
                     }
 
                 } catch (error) {
@@ -305,39 +311,41 @@ export default function Bill() {
 
     }
 
-    const GetAddresses = async () => {
-        const token = Cookies.get("token");
-        if (!token) {
-            router.push("/login");
-            return;
-        }
-        try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/address/user`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                }
-            });
-            if (response.ok){
-                const data = await response.json();
-                console.log(data.data);
-                setAddresses(data.data);
-                data.data.forEach((item : IAddressResponse) => {
-                    if (item.isDefault) {
-                        setSelectedAddress(item);
-                    }
-                })
-                setOpenAddress(true)
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    }
+
 
     useEffect(() => {
+        const GetAddresses = async () => {
+            const token = Cookies.get("token");
+            if (!token) {
+                router.push("/login");
+                return;
+            }
+            try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/address/user`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    }
+                });
+                if (response.ok){
+                    const data = await response.json();
+                    console.log(data.data);
+                    setAddresses(data.data);
+                    data.data.forEach((item : IAddressResponse) => {
+                        if (item.isDefault) {
+                            setSelectedAddress(item);
+                            setAddressToSelect(item);
+                        }
+                    })
+                    // setOpenAddress(true)
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
         GetAddresses();
-    }, []);
+    }, [router]);
     if (billComplete)
         return (
             <div className={"flex justify-center items-center flex-col w-full h-screen pb-[80px]"}>
@@ -359,8 +367,24 @@ export default function Bill() {
     else
         return (
 
-            <div className="w-full flex flex-col justify-center items-center bg-white relative pb-[20px] font-sf">
+            <div className="w-full flex flex-col items-center bg-white relative pb-[20px] font-sf">
 
+                {openNotifConfirm &&
+                    <ConfirmDialog
+                        message={"Xác nhận tạo đơn hàng?"}
+                        onConfirm={()=> {
+                            if (paymentMethod == 0) {
+                                setOpenNotifConfirm(false)
+                                createBill()
+                            } else {
+                                setOpenNotifConfirm(false)
+                                createBillPayWithWallet()
+                            }
+                        }}
+                        onCancel={()=> setOpenNotifConfirm(false)}/>
+                }
+
+                {openNotificataion && <AlertMessage message={notifContent} onClose={()=>setOpenNotification(false)}/>}
                 <div className={`${openAddress ? "visible" : "hidden"} fixed w-screen h-screen top-0 left-0 bg-black/20 z-50 flex justify-center items-center `}>
                     <div className={" w-[500px] bg-white rounded-[25px] pb-[10px]"}>
                         <div className={"h-[40px] border-b flex justify-center items-center"}>
@@ -371,8 +395,8 @@ export default function Bill() {
                             {
                                 addresses.map((address) => {
                                     return (
-                                        <div key={address.addressId} className={`${selectedAddress == address && "border border-amber-600 "}  w-full rounded-[20px] bg-stone-50  flex justify-between items-center px-[20px] py-[10px] mt-[20px]`}>
-                                            <div onClick={()=> address?.addressId && setSelectedAddress(address) } className={"flex-1 flex flex-col"}>
+                                        <div key={address.addressId} className={`${ addressToSelect == address && "border border-amber-600 "}  w-full rounded-[20px] bg-stone-50  flex justify-between items-center px-[20px] py-[10px] mt-[20px]`}>
+                                            <div onClick={()=> address?.addressId && setAddressToSelect(address)} className={"flex-1 flex flex-col"}>
                                                 <div className={"flex items-center "}>
                                                     <p className={"pr-[10px] border-r  flex justify-center items-center text-[16px] font-[500]"}>{address.name}</p>
                                                     <p className={"pl-[10px] flex justify-center items-center text-[15px] mt-[1px] text-stone-700"}>{address.phoneNumber}</p>
@@ -400,7 +424,10 @@ export default function Bill() {
                             <button onClick={()=>setOpenAddress(false)} className={"h-full px-[20px] flex items-center justify-center bg-stone-200 text-[15px] rounded-full"}>
                                 Trở Lại
                             </button>
-                            <button className={"h-full px-[20px] flex items-center justify-center bg-amber-600 text-white text-[15px] ml-[10px] rounded-full"}>
+                            <button onClick={()=> {
+                                setOpenAddress(false)
+                                setSelectedAddress(addressToSelect)
+                            }} className={"h-full px-[20px] flex items-center justify-center bg-amber-600 text-white text-[15px] ml-[10px] rounded-full"}>
                                 Xác Nhận
                             </button>
                         </div>
@@ -471,8 +498,12 @@ export default function Bill() {
                                                             </div>
                                                             <p className={"font-sf text-stone-600 text-[15px]"}>{product.productName}</p>
                                                         </div>
-                                                        <div className={"col-span-5 flex items-center justify-center"}>
-                                                            <p className={"font-sf text-stone-600 text-[15px]"}>{product.price}</p>
+                                                        <div className={"col-span-5 flex items-center justify-center text-stone-600"}>
+                                                            <VndText
+                                                                amount={product.price}
+                                                                classNameCurrency={"font-[400] text-[14px] font-sf " }
+                                                                classNameNumber={"font-sf text-[15px] "}
+                                                            />
                                                         </div>
                                                         <div className={"col-span-2 flex items-center justify-center"}>
                                                             <div className={"w-[110px] h-[30px] font-sf justify-center items-center text-stone-600 flex"}>
@@ -480,8 +511,12 @@ export default function Bill() {
                                                             </div>
 
                                                         </div>
-                                                        <div className={"col-span-4  flex items-center justify-center pl-[calc(30%)]"}>
-                                                            <p className={"font-sf text-stone-600 text-[15px]"}>{product.price*product.quantity}</p>
+                                                        <div className={"col-span-4  flex items-center justify-center pl-[calc(30%)] text-stone-600"}>
+                                                            <VndText
+                                                                amount={product.price*product.quantity}
+                                                                classNameCurrency={"font-[400] text-[14px] font-sf " }
+                                                                classNameNumber={"font-sf  text-[15px] "}
+                                                            />
                                                         </div>
 
                                                     </div>
@@ -512,7 +547,11 @@ export default function Bill() {
                                                     </div>
                                                     <div className={"flex items-end justify-end mt-[10px]"}>
                                                         <p className={"font-sf text-[16px] text-stone-800 mb-[2px] mr-[5px]"}>Tổng số tiền:</p>
-                                                        <p className={"font-sf text-[20px] text-amber-600 font-[600]"}>{shop.totalPrice}</p>
+                                                        <VndText
+                                                            amount={shop.totalPrice}
+                                                            classNameCurrency={"font-[400] text-[17px] font-sf text-amber-600" }
+                                                            classNameNumber={"font-sf font-[600]  text-[19px] text-amber-600"}
+                                                        />
                                                     </div>
                                                 </div>
                                             </div>
@@ -569,19 +608,38 @@ export default function Bill() {
                             <div className={"flex flex-col w-full justify-end items-end"}>
                                 <div className={"w-full h-[30px] justify-between flex items-center"}>
                                     <p className={"text-stone-600 text-[15px] font-sf"}>Tổng tiền hàng</p>
-                                    <p className={"text-stone-700 text-[16px] font-sf"}>{shop.reduce((sum,s) => sum + s.totalPrice, 0)}</p>
+                                    <VndText
+                                        amount={shop.reduce((sum,s) => sum + s.totalPrice, 0)}
+                                        classNameCurrency={"font-[400] text-[15px] font-sf " }
+                                        classNameNumber={"font-sf  text-[16px] "}
+                                    />
+                                    {/*<p className={"text-stone-700 text-[16px] font-sf"}>{shop.reduce((sum,s) => sum + s.totalPrice, 0)}</p>*/}
                                 </div>
                                 <div className={"w-full h-[30px] justify-between flex items-center"}>
                                     <p className={"text-stone-600 text-[15px] font-sf"}>Tổng tiền phí vận chuyển</p>
-                                    <p className={"text-stone-700 text-[16px] font-sf"}>{shippingFee}</p>
+                                    <VndText
+                                        amount={0}
+                                        classNameCurrency={"font-[400] text-[15px] font-sf " }
+                                        classNameNumber={"font-sf  text-[16px] "}
+                                    />
                                 </div>
                                 <div className={"w-full h-[30px] justify-between flex items-center"}>
                                     <p className={"text-stone-600 text-[15px] font-sf"}>Tổng cộng voucher giảm giá</p>
-                                    <p className={"text-stone-700 text-[16px] font-sf"}>{(voucher ? voucher.value * shop.length : 0) + (selectedShopVoucher ? selectedShopVoucher.reduce((sum,s)=> sum + s.value, 0): 0) + (shippingVoucher ? shippingVoucher.value * shop.length : 0) }</p>
+                                    <VndText
+                                        amount={(voucher ? voucher.value * shop.length : 0) + (selectedShopVoucher ? selectedShopVoucher.reduce((sum,s)=> sum + s.value, 0): 0)}
+                                        classNameCurrency={"font-[400] text-[15px] font-sf " }
+                                        classNameNumber={"font-sf  text-[16px] "}
+                                    />
+                                    {/*<p className={"text-stone-700 text-[16px] font-sf"}>{(voucher ? voucher.value * shop.length : 0) + (selectedShopVoucher ? selectedShopVoucher.reduce((sum,s)=> sum + s.value, 0): 0) + (shippingVoucher ? shippingVoucher.value * shop.length : 0) }</p>*/}
                                 </div>
                                 <div className={"w-full h-[30px] justify-between flex items-center"}>
                                     <p className={"text-stone-800 text-[15px] font-sf font-[500] uppercase"}>Tổng thanh toán</p>
-                                    <p className={"text-amber-600 font-[600] text-[20px] font-sf"}>{(shop.reduce((sum,s) => sum + s.totalPrice, 0)) - shippingFee - ((voucher ? voucher.value * shop.length : 0) + (selectedShopVoucher ? selectedShopVoucher.reduce((sum,s)=> sum + s.value, 0): 0) + (shippingVoucher ? shippingVoucher.value * shop.length : 0))}</p>
+                                    <VndText
+                                        amount={(shop.reduce((sum,s) => sum + s.totalPrice, 0)) - ((voucher ? voucher.value * shop.length : 0) + (selectedShopVoucher ? selectedShopVoucher.reduce((sum,s)=> sum + s.value, 0): 0) )}
+                                        classNameCurrency={"font-[400] text-[17px] font-sf text-amber-600" }
+                                        classNameNumber={"font-sf font-[600]  text-[19px] text-amber-600"}
+                                    />
+                                    {/*<p className={"text-amber-600 font-[600] text-[20px] font-sf"}>{(shop.reduce((sum,s) => sum + s.totalPrice, 0)) - shippingFee - ((voucher ? voucher.value * shop.length : 0) + (selectedShopVoucher ? selectedShopVoucher.reduce((sum,s)=> sum + s.value, 0): 0) + (shippingVoucher ? shippingVoucher.value * shop.length : 0))}</p>*/}
                                 </div>
                             </div>
 
@@ -618,7 +676,7 @@ export default function Bill() {
                             )}
 
                             <button onClick={()=> {
-                                if (paymentMethod == 0)  createBill(); else createBillPayWithWallet()
+                                setOpenNotifConfirm(true)
                             }} className={"w-full h-[40px] bg-stone-800 text-white hover:bg-stone-700 rounded-full"}>
                                 <p className={" text-[18px] font-sf"}>ĐẶT HÀNG</p>
                             </button>
@@ -630,7 +688,7 @@ export default function Bill() {
                 <div className={`${showShopVoucher ? `visible bg-black/20` : `hidden`} top-0 flex justify-center items-center fixed w-screen h-screen z-50  flex-col `}>
                     <div className={"w-[500px] rounded-[25px] bg-white "}>
                         <div className={"border-b border-stone-200 p-[20px] py-[15px] relative flex items-center justify-center"}>
-                            <h1 className={"font-sf text-[20px] text-stone-800 uppercase font-[700]"}> BuyNow Voucher</h1>
+                            <h1 className={"font-sf text-[20px] text-stone-800 uppercase font-[700]"}> Shop Voucher</h1>
                             <button className={"absolute right-[20px] text-[20px] "} onClick={()=> {
                                 setShowShopVoucher(!showVoucher);
                                 setShopVoucher(undefined);
@@ -650,30 +708,39 @@ export default function Bill() {
                         </div>
                         <div className={"overflow-y-auto h-[475px] pr-[15px] pl-[25px] pt-[5px]"}>
 
-                            {shopVouchers.map((v) => (
-                                <div key={v.voucherWalletId} className={"h-[100px] mb-[20px] flex"}>
-                                    <div className={"h-full aspect-square bg-stone-300 rounded-l-[20px] flex items-center justify-center"}>
+                            {shopVouchers.map((v) => {
+                                const now = new Date();
+                                const endTime = new Date(v.voucher.endTime);
+                                if (endTime > now) return(
+                                <div key={v.voucherWalletId} className={"h-[100px] mb-[20px] flex relative"}>
+                                    <div className={"h-full aspect-square bg-stone-300 rounded-l-[20px] flex items-center justify-center "}>
                                         <p className={"font-fre ml-[5px] text-text font-[800] text-amber-600 text-[17px]"}>BuyNow</p>
+                                    </div>
+                                    <div className={"absolute right-[8px] top-[5px] w-[20px] h-[20px] flex justify-center items-center bg-amber-600 rounded-full text-[13px] text-white"}>
+                                        x{v.quantity}
                                     </div>
                                     <div className={"flex-1 border-y border-r border-stone-200 flex justify-between px-[20px] rounded-r-[20px]  items-center"}>
                                         <div>
                                             <p className={"font-sf text-stone-800 text-[16px]"}>{v.voucher.voucherName}</p>
                                             <div className={"flex items-baseline h-[20px]"}>
-                                                <p className={"font-sf text-stone-600 text-[14px]"}>Giảm giá</p>
-                                                <p className={"font-sf tebg-amber-600 text-[16px] ml-[5px]"}>{v.voucher.value}</p>
+                                                <p className={"font-sf text-stone-600 text-[14px] mr-[5px]"}>Giảm giá</p>
+                                                <VndText
+                                                    amount={v.voucher.value}
+                                                    classNameCurrency={"font-[400] text-[15px] font-sf text-amber-600" }
+                                                    classNameNumber={"font-sf  text-[16px] text-amber-600 "}
+                                                />
                                             </div>
                                             <div className={"flex items-baseline"}>
-                                                <p className={"font-sf text-stone-600 text-[14px]"}>Đơn tối thiểu</p>
-                                                <p className={"font-sf text-stone-800 text-[14px] ml-[5px]"}> {v.voucher.minPrice}</p>
+                                                <p className={"font-sf text-stone-600 text-[14px]  mr-[5px]"}>Đơn tối thiểu</p>
+                                                <VndText
+                                                    amount={v.voucher.minPrice}
+                                                    classNameCurrency={"font-[400] text-[13px] font-sf " }
+                                                    classNameNumber={"font-sf  text-[14px] "}
+                                                />
+
                                             </div>
 
-                                            <p className={"font-sf text-stone-600 text-[13px]"}>HSD: {new Date(v.voucher.endTime).toLocaleString("vi-VN", {
-                                                hour: "2-digit",
-                                                minute: "2-digit",
-                                                day: "2-digit",
-                                                month: "2-digit",
-                                                year: "numeric",
-                                            })}</p>
+                                            <p className={"font-sf text-stone-600 text-[13px]"}>HSD: {formatDate(v.voucher.endTime)}</p>
                                         </div>
                                         <button onClick={()=> {
                                             if (v.quantity >= 1) {
@@ -689,7 +756,10 @@ export default function Bill() {
                                         </button>
                                     </div>
                                 </div>
-                            ))}
+
+                            )
+                            })
+                            }
                             {/*Voucher*/}
 
                         </div>
@@ -713,7 +783,7 @@ export default function Bill() {
 
                 </div>
                 <div className={`${showVoucher ? `visible bg-black/20` : `hidden`} top-0 flex justify-center items-center fixed w-screen h-screen z-50  flex-col `}>
-                    <div className={"w-[500px]  border border-stone-200 bg-white"}>
+                    <div className={"w-[500px]  border border-stone-200 bg-white rounded-[25px] overflow-hidden"}>
                         <div className={"border-b border-stone-200 p-[20px] py-[15px] relative flex items-center justify-center"}>
                             <h1 className={"font-sf text-[20px] text-stone-800"}>Chọn BuyNow Voucher</h1>
                             <button className={"absolute right-[20px]"} onClick={()=> {
@@ -735,30 +805,40 @@ export default function Bill() {
                         </div>
                         <div className={"overflow-y-auto h-[475px] pr-[15px] pl-[25px] pt-[5px]"}>
 
-                            {adminVoucher.map((v) => (
-                                <div key={v.voucherWalletId} className={"h-[100px] mb-[20px] flex"}>
-                                    <div className={"h-full aspect-square bg-blue-300"}>
+                            {adminVoucher.map((v) => {
+                                const now = new Date();
+                                const endTime = new Date(v.voucher.endTime);
+                                if (endTime > now)
+                                return(
 
+                                <div key={v.voucherWalletId} className={"h-[100px] mb-[20px] flex relative rounded-[20px] overflow-hidden"}>
+                                    <div className={"h-full aspect-square bg-stone-300 rounded-l-[20px] flex items-center justify-center"}>
+                                        <p className={"font-fre ml-[5px] text-text font-[800] text-amber-600 text-[17px]"}>BuyNow</p>
                                     </div>
-                                    <div className={"flex-1 border-y border-r border-stone-200 flex justify-between px-[20px]  items-center"}>
+                                    <div className={"absolute right-[8px] top-[5px] w-[20px] h-[20px] flex justify-center items-center bg-amber-600 rounded-full text-[13px] text-white"}>
+                                        x{v.quantity}
+                                    </div>
+                                    <div className={"flex-1 border-y border-r border-stone-200 flex justify-between px-[20px] rounded-r-[20px]  items-center"}>
                                         <div>
                                             <p className={"font-sf text-stone-800 text-[16px]"}>{v.voucher.voucherName}</p>
                                             <div className={"flex items-baseline h-[20px]"}>
-                                                <p className={"font-sf text-stone-600 text-[14px]"}>Giảm giá</p>
-                                                <p className={"font-sf tebg-amber-600 text-[16px] ml-[5px]"}>{v.voucher.value}</p>
+                                                <p className={"font-sf text-stone-600 text-[14px] mr-[5px]"}>Giảm giá</p>
+                                                <VndText
+                                                    amount={v.voucher.value}
+                                                    classNameCurrency={"font-[400] text-[15px] font-sf text-amber-600" }
+                                                    classNameNumber={"font-sf  text-[16px] text-amber-600 "}
+                                                />
                                             </div>
                                             <div className={"flex items-baseline"}>
-                                                <p className={"font-sf text-stone-600 text-[14px]"}>Đơn tối thiểu</p>
-                                                <p className={"font-sf text-stone-800 text-[14px] ml-[5px]"}> {v.voucher.minPrice}</p>
+                                                <p className={"font-sf text-stone-600 text-[14px]  mr-[5px]"}>Đơn tối thiểu</p>
+                                                <VndText
+                                                    amount={v.voucher.minPrice}
+                                                    classNameCurrency={"font-[400] text-[13px] font-sf " }
+                                                    classNameNumber={"font-sf  text-[14px] "}
+                                                />
                                             </div>
 
-                                            <p className={"font-sf text-stone-600 text-[13px]"}>HSD: {new Date(v.voucher.endTime).toLocaleString("vi-VN", {
-                                                hour: "2-digit",
-                                                minute: "2-digit",
-                                                day: "2-digit",
-                                                month: "2-digit",
-                                                year: "numeric",
-                                            })}</p>
+                                            <p className={"font-sf text-stone-600 text-[13px]"}>HSD: {formatDate(v.voucher.endTime)}</p>
                                         </div>
                                         <button onClick={()=> {
                                             if (v.quantity >= shop.length) {
@@ -774,7 +854,7 @@ export default function Bill() {
                                         </button>
                                     </div>
                                 </div>
-                            ))}
+                            )})}
                             {/*Voucher*/}
 
                         </div>
@@ -792,15 +872,15 @@ export default function Bill() {
                     </div>
 
                 </div>
-                <div className={`${openNotification? "block" : "hidden"} border-blue-200 border absolute top-[-50px] z-50`}>
-                    <div className={"flex items-center px-[20px] py-[15px] bg-blue-50"}>
-                        <p className={"font-sf text-blue-600 mr-[15px]"}>Số lượng voucher còn lại không đủ</p>
-                        <button onClick={()=>setOpenNotification(false)} className={""}>
-                            <HiMiniXMark className="text-[20px] text-blue-600" />
-                        </button>
-                    </div>
+                {/*<div className={`${openNotification? "block" : "hidden"} border-blue-200 border absolute top-[-50px] z-50`}>*/}
+                {/*    <div className={"flex items-center px-[20px] py-[15px] bg-blue-50"}>*/}
+                {/*        <p className={"font-sf text-blue-600 mr-[15px]"}>Số lượng voucher còn lại không đủ</p>*/}
+                {/*        <button onClick={()=>setOpenNotification(false)} className={""}>*/}
+                {/*            <HiMiniXMark className="text-[20px] text-blue-600" />*/}
+                {/*        </button>*/}
+                {/*    </div>*/}
 
-                </div>
+                {/*</div>*/}
             </div>
         )
 }

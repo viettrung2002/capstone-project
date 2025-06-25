@@ -5,7 +5,7 @@ namespace CoreBuyNow.Repositories.Interfaces;
 
 public interface IAdminRepository
 {
-    Task<AdminDto> GetInfomation();
+    Task<AdminDto> GetInfomation(DateTime? startDate, DateTime? endDate);
     Task<decimal> GetRevenueOverTime(DateTime startDate, DateTime endDate);
     
     Task<List<ShopInAdminResponse>> GetShops();

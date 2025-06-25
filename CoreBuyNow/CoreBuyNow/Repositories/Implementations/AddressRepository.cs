@@ -18,7 +18,13 @@ public class AddressRepository (AppDbContext dbContext, ILogger<AddressRepositor
         dbContext.Addresses.Add(address);
         await dbContext.SaveChangesAsync();
     }
-
+    public async Task AddAddressShop(Address address)
+    {
+        if (address.AddressId == Guid.Empty) address.AddressId = Guid.NewGuid();
+        
+        dbContext.Addresses.Add(address);
+        await dbContext.SaveChangesAsync();
+    }
     public Task SetDefaultAddressId(Guid addressId, Guid customerId)
     {
         var address = dbContext.Addresses.FirstOrDefault(a => a.AddressId == addressId);

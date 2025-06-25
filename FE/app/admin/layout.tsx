@@ -8,7 +8,7 @@ export default function AdminLayout({children} : {children: React.ReactNode}) {
     const pathname = usePathname();
     const router = useRouter();
     return (
-        <div className={"w-full bg-white flex justify-center items-center font-sf pb-[20px]"}>
+        <div className={"w-full bg-white flex justify-center  font-sf pb-[20px]"}>
             <div className={"w-[1300px] grid grid-cols-5 gap-[20px] mt-[20px]"}>
                 <div className={"col-span-1 rounded-[25px] border border-stone-200 px-[20px] py-[18px] max-h-fit font-[500]"}>
                     <div onClick={()=> router.push("/admin/overview")} className={`h-[30px] flex items-center ${pathname === "/admin/overview" &&  "text-amber-600"} `}>

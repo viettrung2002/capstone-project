@@ -5,6 +5,8 @@ import {useState, useEffect} from "react";
 import {IBillInfo, ItemInBill} from "@/app/types/bill";
 import {IVoucher} from "@/app/types/voucher";
 import Image from "next/image";
+import VndText from "@/app/components/vnd-text";
+import * as React from "react";
 
 export default function OrderDetailsPage() {
     const {id} = useParams();
@@ -12,34 +14,35 @@ export default function OrderDetailsPage() {
     const [voucher, setVoucher] = useState<IVoucher>()
     const [shopVoucher, setShopVoucher] = useState<IVoucher>()
     const [total, setTotal] = useState(0);
-    const GetBill = async () => {
 
-        try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bill/details/${id}`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                }
-            });
-            if (response.ok){
-                const data = await response.json();
-                console.log("BILL: ",data.data);
-                if (data.data.voucherId != "00000000-0000-0000-0000-000000000000") GetVoucher(data.data.voucherId);
-                if (data.data.shopVoucherId != "00000000-0000-0000-0000-000000000000") GetShopVoucher(data.data.shopVoucherId);
-                setBill(data.data);
-                const totalUnitPrice = data.data.items.reduce((sum: number, item: ItemInBill) => {
-                    const price = Number(item.unitPrice) || 0;
-                    return sum + price;
-                }, 0);
-                setTotal(totalUnitPrice);
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    }
     useEffect(() => {
+        const GetBill = async () => {
+
+            try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bill/details/${id}`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    }
+                });
+                if (response.ok){
+                    const data = await response.json();
+                    console.log("BILL: ",data.data);
+                    if (data.data.voucherId != "00000000-0000-0000-0000-000000000000") GetVoucher(data.data.voucherId);
+                    if (data.data.shopVoucherId != "00000000-0000-0000-0000-000000000000") GetShopVoucher(data.data.shopVoucherId);
+                    setBill(data.data);
+                    const totalUnitPrice = data.data.items.reduce((sum: number, item: ItemInBill) => {
+                        const price = Number(item.unitPrice) || 0;
+                        return sum + price;
+                    }, 0);
+                    setTotal(totalUnitPrice);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
         GetBill();
-    },[])
+    },[id])
     const GetVoucher = async (voucherId: string) => {
 
         try {
@@ -203,7 +206,12 @@ export default function OrderDetailsPage() {
                                 </div>
                                 <div className={"flex-1 px-[10px] flex flex-col justify-center"}>
                                     <p className={"text-[15px] text-stone-800"}>{item.productName}</p>
-                                    <p className={"text-[14px] text-stone-600"}>{item.unitPrice}</p>
+                                    <VndText
+                                        amount={item.unitPrice}
+                                        classNameCurrency={"font-[400] text-[14px] font-sf text-stone-600" }
+                                        classNameNumber={"font-sf text-[14px] text-stone-600"}
+                                    />
+                                    {/*<p className={"text-[14px] text-stone-600"}>{item.unitPrice}</p>*/}
                                     <p className={"text-[14px] text-stone-600"}>{item.quantity} sản phẩm</p>
                                 </div>
                             </div>
@@ -233,22 +241,50 @@ export default function OrderDetailsPage() {
                         </div>
                         <div className={"col-span-1 flex flex-col items-center justify-center"}>
                             <div className={"h-[40px] w-full flex items-center justify-end text-stone-600 text-[15px] border-b border-stone-100 px-[20px]"}>
-                                <p>{total}</p>
+                                <VndText
+                                    amount={total}
+                                    classNameCurrency={"font-[400] text-[14px] font-sf " }
+                                    classNameNumber={"font-sf  "}
+                                />
                             </div>
                             <div className={"h-[40px] w-full flex items-center justify-end text-stone-600 text-[15px] border-b border-stone-100 px-[20px]"}>
-                                <p>0</p>
+                                <VndText
+                                    amount={0}
+                                    classNameCurrency={"font-[400] text-[14px] font-sf " }
+                                    classNameNumber={"font-sf  "}
+                                />
                             </div>
                             <div className={"h-[40px] w-full flex items-center justify-end text-stone-600 text-[15px] border-b border-stone-100 px-[20px]"}>
-                                <p>-{voucher?.value}</p>
+                                <p>-</p>
+                                {
+                                    voucher?.value &&
+                                    <VndText
+                                        amount={voucher.value}
+                                        classNameCurrency={"font-[400] text-[14px] font-sf " }
+                                        classNameNumber={"font-sf  "}
+                                    />
+                                }
                             </div>
                             <div className={"h-[40px] w-full flex items-center justify-end text-stone-600 text-[15px] border-b border-stone-100 px-[20px]"}>
-                                <p>-{shopVoucher?.value}</p>
+                                <p>-</p>
+                                {
+                                    shopVoucher?.value &&
+                                    <VndText
+                                        amount={shopVoucher.value}
+                                        classNameCurrency={"font-[400] text-[14px] font-sf " }
+                                        classNameNumber={"font-sf  "}
+                                    />
+                                }
                             </div>
                             <div className={"h-[40px] w-full flex items-center justify-end  text-[19px] border-b border-stone-100 font-[600] px-[20px] text-amber-600"}>
-                                <p>{bill.totalPrice}</p>
+                                <VndText
+                                    amount={bill.totalPrice}
+                                    classNameCurrency={"font-[400] text-[17px] font-sf " }
+                                    classNameNumber={"font-sf  "}
+                                />
                             </div>
                             <div className={"h-[40px] w-full flex items-center justify-end text-stone-600 text-[15px] border-stone-100 px-[20px]"}>
-                                <p>Thanh Toán Khi Nhận Hàng</p>
+                                <p>{bill?.paymentType == "Wallet" ? "Thanh toán bằng ví" : "Thanh toán khi nhận hàng"}</p>
                             </div>
                         </div>
                     </div>

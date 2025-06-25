@@ -31,7 +31,6 @@ public class CommentRepository (AppDbContext dbContext) : ICommentRepository
         dbContext.Comments.Add(comment);
         await dbContext.SaveChangesAsync();
     }
-
     public async Task UpdateComment(Comment comment, Guid commentId)
     {
         var commentToUpdate = await dbContext.Comments.FindAsync(commentId);

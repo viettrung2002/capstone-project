@@ -4,19 +4,26 @@ import {IProductData} from "@/app/types/product";
 import Image from "next/image";
 import {HiStar , HiOutlineStar} from "react-icons/hi2";
 export default function ComparePage(){
-    const [products, setProducts] = useState<IProductData[]>([]);
+    const [products, setProducts] = useState<IProductData[] | null>(null);
     useEffect(()=> {
+        const loadedProducts: IProductData[] = [];
+
         for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
-            if (key != "productInBill" && key) {
+            if (key !== "productInBill" && key) {
                 const value = localStorage.getItem(key);
                 if (value) {
                     const product = JSON.parse(value) as IProductData;
-                    setProducts(prevState => [...prevState, product]);
+                    loadedProducts.push(product);
                 }
             }
         }
+
+        setProducts(loadedProducts);
     },[])
+    if (products === null) {
+        return <p>Loading...</p>
+    }
     return (
         <div className={"w-full flex flex-col items-center justify-center bg-white font-sf mt-[40px]"}>
             {products.length == 2 &&
@@ -32,15 +39,22 @@ export default function ComparePage(){
                                     <p>Đã Bán: {products[0].sold}</p>
                                 </div>
                                 <div className={"flex text-yellow-500 items-center justify-center mr-[5px] text-[18px] mt-[10px]"}>
-                                    {Array.from({length: Math.round(products[0].rating)}, (_, index) => (
-                                        <HiStar className={"mb-[1px] "} key={index} />
-                                    ))}
-                                    {(5-Math.round(products[0].rating)) >= 1  ?
-                                        (
-                                            Array.from({length: 5 - Math.round(products[0].rating)}, (_, index) => (
-                                                <HiOutlineStar key={index} />
-                                            ))
-                                        ) : null }
+                                    {(products[0].rating > 0) ?
+                                        <div className={"flex"}>
+                                            {Array.from({length: Math.round(products[0].rating)}, (_, index) => (
+                                                <HiStar className={"mb-[1px] "} key={index} />
+                                            ))}
+                                            {(5-Math.round(products[0].rating)) >= 1  ?
+                                                (
+                                                    Array.from({length: 5 - Math.round(products[0].rating)}, (_, index) => (
+                                                        <HiOutlineStar key={index} />
+                                                    ))
+                                                ) : null }
+                                        </div>
+                                        :
+                                        <div>
+                                            <p className={"text-stone-700 text-[15px]"}>Chưa có đánh giá</p>
+                                        </div> }
                                 </div>
 
                             </div>
@@ -56,22 +70,33 @@ export default function ComparePage(){
                             </div>
                             <div className={"flex-1 items-start h-full flex flex-col justify-center px-[20px]"}>
                                 <p className={"text-stone-800 font-[500] text-[18px]"}>{products[1].shopName}</p>
-                                <p className={"text-amber-600 font-[700] text-[22px] mt-[10px]"}>{products[0].price}</p>
+                                <p className={"text-amber-600 font-[700] text-[22px] mt-[10px]"}>{products[1].price}</p>
                                 <div className={"flex mt-[10px]"}>
-                                    <p className={"border-r border-gray-200 pr-[10px]"}>Đã Bán: {products[0].sold}</p>
+                                    <p className={"border-r border-gray-200 pr-[10px]"}>Đã Bán: {products[1].sold}</p>
                                     <p className={" mr-[10px] px-[10px]"}>{products[1].like} Lượt Thích</p>
                                 </div>
-                                <div className={"flex text-stone-500 items-center justify-center mr-[5px] text-[15px] mt-[10px]"}>
-                                    <p>Chưa có đánh giá</p>
-                                    {/*{Array.from({length: Math.round(products[1].rating)}, (_, index) => (*/}
-                                    {/*    <HiStar className={"mb-[1px] "} key={index} />*/}
-                                    {/*))}*/}
-                                    {/*{(5-Math.round(products[0].rating)) >= 1  ?*/}
-                                    {/*    (*/}
-                                    {/*        Array.from({length: 5 - Math.round(products[1].rating)}, (_, index) => (*/}
-                                    {/*            <HiOutlineStar key={index} />*/}
-                                    {/*        ))*/}
-                                    {/*    ) : null }*/}
+                                <div className={"flex text-yellow-500 items-center justify-center mr-[5px] text-[18px] mt-[10px]"}>
+                                    {
+                                        (products[1].rating > 0) ?
+                                            <div>
+                                                {Array.from({length: Math.round(products[1].rating)}, (_, index) => (
+                                                    <HiStar className={"mb-[1px] "} key={index} />
+                                                ))}
+                                                {(5-Math.round(products[0].rating)) >= 1  ?
+                                                    (
+                                                        Array.from({length: 5 - Math.round(products[1].rating)}, (_, index) => (
+                                                            <HiOutlineStar key={index} />
+                                                        ))
+                                                    ) : null }
+                                            </div>
+                                            :
+                                            <div>
+                                                <p className={"text-stone-700 text-[15px]"}>Chưa có đánh giá</p>
+                                            </div>
+
+                                    }
+
+
                                 </div>
                             </div>
                         </div>

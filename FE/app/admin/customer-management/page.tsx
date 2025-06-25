@@ -1,9 +1,8 @@
 'use client'
 import {useRouter} from "next/navigation";
 import {useEffect, useState} from "react";
-import {IShopInAdminPage} from "@/app/types/shop";
 import Cookies from "js-cookie";
-import {TbLock, TbLockOpen2, TbSearch} from "react-icons/tb";
+import {TbSearch} from "react-icons/tb";
 import {ICustomerInAdminPage} from "@/app/types/account";
 import {MdLockReset} from "react-icons/md";
 import Image from "next/image";
@@ -15,29 +14,7 @@ export default function CustomerManagementPage() {
     const [reload, setReload] = useState(false);
     const [openLock, setOpenLock] = useState<boolean>(false);
     const [id, setId] = useState<string>("");
-    const GetShops = async () => {
-        const token = Cookies.get("token");
-        if (!token) {
-            router.push("/login");
-            return;
-        }
-        try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/customers`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`
-                }
-            });
-            if (response.ok){
-                const data = await response.json();
-                console.log(data);
-                setCustomers(data.data);
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    }
+
 
     const ResetPassword = async (accountId : string) => {
         const token = Cookies.get("token");
@@ -64,8 +41,31 @@ export default function CustomerManagementPage() {
         }
     }
     useEffect(() => {
-        GetShops();
-    },[reload]);
+        const GetShops = async () => {
+            const token = Cookies.get("token");
+            if (!token) {
+                router.push("/login");
+                return;
+            }
+            try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/customers`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                if (response.ok){
+                    const data = await response.json();
+                    console.log(data);
+                    setCustomers(data.data);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        GetShops()
+    },[reload, router]);
     return(
         <div className={"w-full h-full px-[20px] py-[20px]"}>
             {openLock && (

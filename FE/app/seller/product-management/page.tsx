@@ -1,21 +1,21 @@
 'use client'
 import {useState, useEffect} from "react";
 import {SubCategory} from "@/app/types/ subCategory";
-import {HiChevronDown, HiChevronUp} from "react-icons/hi2";
+import {HiChevronDown} from "react-icons/hi2";
 import {HiOutlineSearch} from "react-icons/hi";
 import {ProductInSeller} from "@/app/components/product";
 import {useRouter} from "next/navigation";
 import Cookies from "js-cookie";
 import {IProduct, IProductData} from "@/app/types/product";
-import Image from "next/image";
+
 
 export default function Page() {
     const router = useRouter();
     const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
     const [subCategoryId, setSubCategoryId] = useState<string>("00000000-0000-0000-0000-000000000000");
     const [openCateMore, setOpenCateMore] = useState<boolean>(true);
-    const [pageIndex, setPageIndex] = useState(0);
-    const [pageSize, setPageSize] = useState(12);
+    const pageIndex = 0
+    const pageSize = 1000
     const [products, setProducts] = useState<IProduct[]>([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [reload, setReload] = useState<boolean>(true);
@@ -24,27 +24,7 @@ export default function Page() {
     const id = Cookies.get("id");
     const [activeTab, setActiveTab] = useState(0)
     const [product, setProduct] = useState<IProductData | null>(null)
-    const GetSubCategory  = async () => {
-        if (id == null) {
-            router.push("/login");
-            return;
-        }
-        try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/shop/subcategory/${id}`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                }
-            });
-            if (response.ok){
-                const data = await response.json();
-                console.log(data);
-                setSubCategories(data.data);
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    }
+
 
     useEffect(() => {
         console.log(id)
@@ -82,7 +62,7 @@ export default function Page() {
             }
         }
         GetProduct();
-    }, [pageIndex, pageSize, searchQuery, subCategoryId, reload]);
+    }, [pageIndex, pageSize, searchQuery, subCategoryId, reload, id, router, token]);
 
     async function GetProductById (id: string) {
 
@@ -106,8 +86,29 @@ export default function Page() {
             router.push("/login");
             return;
         }
+        const GetSubCategory  = async () => {
+            if (id == null) {
+                router.push("/login");
+                return;
+            }
+            try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/shop/subcategory/${id}`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    }
+                });
+                if (response.ok){
+                    const data = await response.json();
+                    console.log(data);
+                    setSubCategories(data.data);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
         GetSubCategory();
-    }, []);
+    }, [id, router, token]);
 
     const HandleClickEdit = (id: string) => {
         setOpenUpdateProduct(true);
@@ -137,7 +138,7 @@ export default function Page() {
         console.log(product)
     }, [product]);
     return (
-        <div>
+        <div className="h-full">
             <div className={" h-[45px] bg-white border-t border-x border-gray-100 grid grid-cols-5"}>
                 <div className={`${subCategoryId == "00000000-0000-0000-0000-000000000000" ? "border-b-[2px] border-blue-500 text-blue-500" : "border-b-[2px] border-gray-200 text-gray-800"} col-span-1 justify-center items-center flex`}>
                     <p onClick={()=> setSubCategoryId("00000000-0000-0000-0000-000000000000")} className={"font-sf text-gray-800 text-[15px]"}>Tất cả</p>

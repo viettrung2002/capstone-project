@@ -7,6 +7,7 @@ public interface IProductService
 {
     Task<List<ProductAttribute>> GetProductAttributeByIdAsync(Guid subCategoryId);
     Task AddProduct (Product product);
+    Task AddProduct (Product product, IFormFile mainImage, List<IFormFile> extraImages);
     Task DeleteProduct (Guid productId);
     Task<ProductInfoResponseDto> GetProductById (Guid productId);
     Task UpdateProduct (Product product, Guid productId);

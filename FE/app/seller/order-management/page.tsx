@@ -37,7 +37,7 @@ export default function Page() {
             }
         }
         GetBill();
-    },[updateBills])
+    },[updateBills, router])
 
     const UpdateBill = async (bill: Bill) => {
         try {
@@ -86,7 +86,7 @@ export default function Page() {
         }
     }
     return(
-        <div className={"w-full h-full  "}>
+        <div className={"w-full h-full "}>
             <div className={"w-full h-[45px] bg-white border-t border-x border-gray-100 grid grid-cols-6"}>
                 <div onClick={()=>setOrderStatus(0)} className={`${orderStatus == 0 ? "border-b-[2px] border-blue-500 text-blue-500" : "border-b-[2px] border-gray-200 text-gray-800"} col-span-1 flex items-center justify-center hover:text-blue-500`}>
                     <p className={` font-sf text-[16px] select-none`}>Tất cả</p>

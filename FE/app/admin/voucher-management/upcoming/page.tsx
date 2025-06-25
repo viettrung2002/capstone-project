@@ -6,6 +6,7 @@ import {useRouter} from "next/navigation";
 import Cookies from "js-cookie";
 import {TbEdit, TbTrash} from "react-icons/tb";
 import * as React from "react";
+import {formatDate} from "@/app/utils/format";
 
 export default function VoucherUpcomingPage() {
 
@@ -41,33 +42,34 @@ export default function VoucherUpcomingPage() {
             console.log(error)
         }
     }
-    const GetVoucher = async () => {
-        const token = Cookies.get("token");
-        if (!token) {
-            router.push("/login");
-            return;
-        }
-        try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/voucher/admin/all`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`
-                }
-            });
-            if (response.ok){
-                const data = await response.json();
-                console.log(data);
-                setVouchers(data.data);
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    }
+
 
     useEffect(() => {
+        const GetVoucher = async () => {
+            const token = Cookies.get("token");
+            if (!token) {
+                router.push("/login");
+                return;
+            }
+            try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/voucher/admin/all`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                if (response.ok){
+                    const data = await response.json();
+                    console.log(data);
+                    setVouchers(data.data);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
         GetVoucher();
-    },[])
+    },[router])
     return (
         <div className={"h-full w-full grid grid-cols-3 py-[20px] gap-[20px]"}>
             {vouchers.map((voucher: IVoucher) => (
@@ -87,7 +89,7 @@ export default function VoucherUpcomingPage() {
                                 <p className={"text-[15px] ml-[5px] text-stone-900 font-[600]"}>{voucher.minPrice}</p>
                             </div>
 
-                            <p className={"text-[13px] text-stone-700 mt-[5]"}>Kết thúc: 20/9/2025</p>
+                            <p className={"text-[13px] text-stone-700 mt-[5]"}>Kết thúc: {formatDate(voucher.endTime)}</p>
                             <div className={'flex '}>
                                 <button className={"h-[30px] w-[30px] rounded-full bg-stone-200 flex justify-center items-center"}>
                                     <TbEdit/>

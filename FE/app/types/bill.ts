@@ -35,5 +35,6 @@ export interface IBillInfo {
     shopVoucherId: string;
     voucherId: string;
     items: ItemInBill[];
+    paymentType: string;
 
 }

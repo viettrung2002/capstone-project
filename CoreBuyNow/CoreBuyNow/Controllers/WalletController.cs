@@ -5,9 +5,10 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CoreBuyNow.Controllers;
+
 [ApiController]
 [Route("/api/wallet")]
-public class WalletController (IWalletService walletService) : ControllerBase
+public class WalletController(IWalletService walletService) : ControllerBase
 {
     [HttpPut]
     [Authorize(Roles = "Customer, Shop")]
@@ -33,7 +34,7 @@ public class WalletController (IWalletService walletService) : ControllerBase
     public async Task<IActionResult> DeleteWallet()
     {
         try
-        {   
+        {
             var id = Guid.Parse(User.FindFirst("id")?.Value);
             await walletService.DeleteWallet(id);
             return Ok(new
@@ -46,7 +47,7 @@ public class WalletController (IWalletService walletService) : ControllerBase
             return BadRequest(e.Message);
         }
     }
-    
+
     [HttpGet]
     [Authorize(Roles = "Customer, Shop")]
     public async Task<IActionResult> GetWallet()
@@ -66,13 +67,14 @@ public class WalletController (IWalletService walletService) : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "Customer")]
-    public async Task<IActionResult> TransferMoney(decimal amount, string description, Guid recipientId)
+    [Authorize(Roles = "Customer, Shop")]
+    public async Task<IActionResult> TransferMoney(decimal amount, string description, string recipientId,[FromBody] string otp)
     {
         try
         {
-            var id = Guid.Parse(User.FindFirst("id")?.Value);
-            await walletService.TransferMoney(amount, description, id, recipientId);
+            var id = User.FindFirst("id")?.Value;
+            if (id == null) return Unauthorized();
+            await walletService.TransferMoney(amount, description, Guid.Parse(id), recipientId, otp);
             return Ok(new
             {
                 message = "Money transfered"
@@ -85,16 +87,17 @@ public class WalletController (IWalletService walletService) : ControllerBase
     }
 
     [HttpGet("transactions")]
-    [Authorize(Roles = "Customer")]
-    public async Task<IActionResult> GetTransactions()
+    [Authorize(Roles = "Customer, Shop")]
+    public async Task<IActionResult> GetTransactions(DateTime? startDate, DateTime? endDate)
     {
-        
+
         try
         {
-            var id = Guid.Parse(User.FindFirst("id")?.Value);
+            var id = User.FindFirst("id")?.Value;
+            if (id == null) return Unauthorized();
             return Ok(new
             {
-                data = await walletService.GetTransactions(id)
+                data = await walletService.GetTransactions(Guid.Parse(id), startDate, endDate)
             });
         }
         catch (Exception e)
@@ -122,6 +125,19 @@ public class WalletController (IWalletService walletService) : ControllerBase
         }
     }
 
-
-
+    [HttpGet("wallet-number")]
+    public async Task<IActionResult> GetWalletByWalletNumber(string walletNumber)
+    {
+        try
+        {
+            return Ok(new
+            {
+                data = await walletService.GetWalletByWalletNumber(walletNumber)
+            });
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
 }

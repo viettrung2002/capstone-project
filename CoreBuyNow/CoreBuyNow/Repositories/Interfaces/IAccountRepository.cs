@@ -13,4 +13,7 @@ public interface IAccountRepository
     AccountRole GetRole (string username);
     
     Task ChangePassword(string oldPassword, string newPassword, Guid accountId);
+    
+    Task SavePassWordToken(string email, Guid token);
+    Task ResetPassword(string password, Guid token);
 }

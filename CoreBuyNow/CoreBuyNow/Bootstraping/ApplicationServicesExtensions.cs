@@ -5,6 +5,7 @@ using CoreBuyNow.Models.Entities;
 using CoreBuyNow.Repositories;
 using CoreBuyNow.Repositories.Implementations;
 using CoreBuyNow.Repositories.Interfaces;
+using CoreBuyNow.Services;
 using CoreBuyNow.Services.Implementations;
 using CoreBuyNow.Services.Interfaces;
 
@@ -50,6 +51,10 @@ public static class ApplicationServicesExtensions
             var schedulerFactory = provider.GetRequiredService<ISchedulerFactory>();
             return schedulerFactory.GetScheduler().Result;
         });
+        
+        builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+        builder.Services.AddTransient<EmailService>();
+        
         builder.Services.AddQuartzHostedService(opt => opt.WaitForJobsToComplete = true);
         builder.Services.AddTransient<IssueVoucherJob>();
         builder.Services.AddScoped<IAccountRepository, AccountRepository>(); 
@@ -107,4 +112,12 @@ public static class ApplicationServicesExtensions
         return builder;
     }
     
+}
+public class EmailSettings
+{
+    public string SmtpServer { get; set; }
+    public int Port { get; set; }
+    public string SenderEmail { get; set; }
+    public string SenderName { get; set; }
+    public string AppPassword { get; set; }
 }

@@ -4,7 +4,7 @@ import {useEffect, useState} from "react";
 import { HiOutlineMagnifyingGlass} from "react-icons/hi2";
 import {useRouter , usePathname} from "next/navigation";
 
-import {TbBasketFilled, TbBellFilled, TbHomeFilled, TbShoppingCartFilled} from "react-icons/tb";
+import {TbBasketFilled, TbBellFilled, TbHomeFilled} from "react-icons/tb";
 import Cookies from "js-cookie";
 import {ICustomer} from "@/app/types/account";
 import {TbLogout, TbUser} from "react-icons/tb";
@@ -196,7 +196,7 @@ export default function Navbar() {
                                         <div className={"w-full h-[30px] font-sf text-[15px]  text-stone-600 flex items-center justify-start px-[20px] border-b "}>
                                             <p>Thông Báo Mới Nhận</p>
                                         </div>
-                                        {notifications.map((notification) => (
+                                        {notifications.slice(0,4).map((notification) => (
                                             <div onClick={()=> {
                                                 ReadNotification(notification);
                                                 router.push(`/customer/order/${notification.billId}`)

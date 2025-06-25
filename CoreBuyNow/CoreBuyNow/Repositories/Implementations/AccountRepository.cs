@@ -97,6 +97,7 @@ public class AccountRepository(AppDbContext dbContext, IConfiguration configurat
         await dbContext.SaveChangesAsync();
     }
 
+   
     private string GenerateJwtToken(string username, string role, Guid id)
     {
         var jwtSettings = configuration.GetSection("JwtSettings");
@@ -120,5 +121,38 @@ public class AccountRepository(AppDbContext dbContext, IConfiguration configurat
         );
 
         return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    public async Task SavePassWordToken(string email, Guid token)
+    {
+        
+        var customer = dbContext.Customers.FirstOrDefault(c => c.Email == email);
+        if (customer == null)
+        {
+            var shop = dbContext.Shops.FirstOrDefault(s => s.Email == email);
+            if (shop == null) throw new Exception("User not found!");
+
+            var account = dbContext.Accounts.FirstOrDefault(a => a.AccountId == shop.AccountId);
+            if (account == null) throw new Exception("Account not found!");
+            account.ResetPasswordToken = token;
+            account.ResetPasswordTokenExpiration = DateTime.UtcNow.AddMinutes(15);
+            
+        }
+        else
+        {
+            var account = dbContext.Accounts.FirstOrDefault(a => a.AccountId == customer.AccountId);
+            if (account == null) throw new Exception("Account not found!");
+            account.ResetPasswordToken = token;
+            account.ResetPasswordTokenExpiration = DateTime.UtcNow.AddMinutes(15);
+            
+        }
+        await dbContext.SaveChangesAsync();
+    }
+    public async Task ResetPassword(string password, Guid token)
+    {
+        var account = dbContext.Accounts.FirstOrDefault(a => a.ResetPasswordToken == token);
+        if (account == null) throw new Exception("Wrong token!");
+        account.PassWord = password;
+        await dbContext.SaveChangesAsync();
     }
 }

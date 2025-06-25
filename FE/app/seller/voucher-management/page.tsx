@@ -1,5 +1,5 @@
 'use client'
-import {useState, useEffect} from "react";
+import {useState, useEffect, useRef} from "react";
 import {useRouter} from "next/navigation";
 import Cookies from "js-cookie";
 import {IVoucher} from "@/app/types/voucher";
@@ -7,6 +7,7 @@ import {HiOutlineSearch} from "react-icons/hi";
 import * as React from "react"
 import {TbEdit, TbTrash} from "react-icons/tb";
 import Image from "next/image";
+import {formatDate} from "@/app/utils/format";
 
 
 export default function Page() {
@@ -14,40 +15,17 @@ export default function Page() {
     const [vouchers, setVouchers] = useState<IVoucher[]>([])
     const  [searchQuery, setSearchQuery] = useState("")
     const [activeTab, setActiveTab] = useState(0)
-    const [showDatePicker, setShowDatePicker] = useState<boolean>(false)
-    const [showEndDatePicker, setShowEndDatePicker] = useState<boolean>(false)
     const [voucherName, setVoucherName] = useState("")
-    const [startDate, setStartDate] = useState<Date>(new Date(0))
-    const [endDate, setEndDate] = useState<Date>(new Date(0))
+    const [startDate, setStartDate] = useState("")
+    const [endDate, setEndDate] = useState("")
     const [value, setValue] = useState(0)
     const [quantity, setQuantity] = useState(0)
     const [minPrice, setMinPrice] = useState<number>(0)
     const [perUserQuantity, setPerUserQuantity] = useState<number>(0)
-    const [openHour, setOpenHour] = useState<boolean>(false)
-    const [openMinute, setOpenMinute] = useState<boolean>(false)
     const [reload, setReload] = useState<boolean>(false)
-    const GetVouchers = async () => {
-        const token = Cookies.get("token");
-        console.log("Token:", token);
-        if (!token) {
-            router.push("/login");
-            return;
-        }
-        try {
-            const response = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/voucher/shop`,{
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`
-                },
-            })
-            const data = await response.json();
-            console.log(data.data);
-            setVouchers(data.data);
-        } catch (error) {
-            console.log(error)
-        }
-    }
+
+    const inputStartDateRef = useRef<HTMLInputElement>(null);
+    const inputEndDateRef = useRef<HTMLInputElement>(null);
 
     const CreateVouchers = async () => {
         const token = Cookies.get("token");
@@ -65,8 +43,8 @@ export default function Page() {
                 },
                 body: JSON.stringify({
                     voucherName: voucherName,
-                    startTime: startDate.toISOString(),
-                    endTime: endDate.toISOString(),
+                    startTime: startDate,
+                    endTime: endDate,
                     value: value,
                     quantity: quantity,
                     minPrice: minPrice,
@@ -116,12 +94,31 @@ export default function Page() {
         }
     }
     useEffect(() => {
+        const GetVouchers = async () => {
+            const token = Cookies.get("token");
+            console.log("Token:", token);
+            if (!token) {
+                router.push("/login");
+                return;
+            }
+            try {
+                const response = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/voucher/shop`,{
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`
+                    },
+                })
+                const data = await response.json();
+                console.log(data.data);
+                setVouchers(data.data);
+            } catch (error) {
+                console.log(error)
+            }
+        }
         GetVouchers();
-    }, [reload]);
+    }, [reload, router]);
 
-    useEffect(() => {
-        console.log(startDate.toISOString());
-    }, [startDate]);
     return (
         <div className={"w-full bg-gray-200 font-sf"}>
             <div className={"w-full h-[40px] bg-white mt-[10px] flex items-center px-[10px] rounded-[8px] shadow-md"}>
@@ -224,7 +221,7 @@ export default function Page() {
                                             <p className={"text-[15px] ml-[5px] text-gray-900 font-[600]"}>{voucher.minPrice}</p>
                                         </div>
 
-                                        <p className={"text-[13px] text-gray-700 mt-[5]"}>Kết thúc: 20/9/2025</p>
+                                        <p className={"text-[13px] text-gray-700 mt-[5]"}>Kết thúc: {formatDate(voucher.endTime)}</p>
                                         <div className={'flex '}>
                                             <button className={"h-[30px] w-[30px] rounded-full bg-gray-200 flex justify-center items-center"}>
                                                 <TbEdit/>
@@ -259,7 +256,7 @@ export default function Page() {
                                             <p className={"text-[15px] ml-[5px] text-gray-900 font-[600]"}>50000</p>
                                         </div>
 
-                                        <p className={"text-[13px] text-gray-700"}>Kết thúc: 20/9/2025</p>
+                                        <p className={"text-[13px] text-gray-700"}>Kết thúc: {formatDate(voucher.endTime)}</p>
                                     </div>
                                 </div> : null
                         ))}
@@ -338,126 +335,35 @@ export default function Page() {
                                 />
                             </div>
                             <div className={"h-[40px] flex items-center mt-[10px] relative "}>
-                                <button onClick={()=>setShowDatePicker(!showDatePicker)} className={"w-[180px] h-[40px] border rounded-sm bg-gray-200"}>
-                                    Chọn Ngày và Giờ
-                                </button>
-                                {showDatePicker && (
-                                    <div className={"absolute top-[45px] bg-gray-100 rounded-[20px] pb-[10px]"}>
-                                        {/*<Calendar*/}
-                                        {/*    mode="single"*/}
-                                        {/*    selected={startDate}*/}
-                                        {/*    onSelect={(date) => {*/}
-                                        {/*        if (date) setStartDate(date);*/}
-                                        {/*    }}*/}
-                                        {/*    initialFocus*/}
-                                        {/*/>*/}
-                                        <div className={"w-full h-[40px] mt-[10px] relative flex justify-between px-[10px] items-center"}>
-                                            <button onClick={()=>setOpenHour(!openHour)} className={"h-full w-[105px] flex items-center justify-center bg-gray-200 rounded-full"}>
-                                                {startDate.getHours() == 0 ? "00" : "Giờ"}
-                                            </button>
+                                <div className={"h-full relative"}>
+                                    <input
+                                        type={"datetime-local"}
+                                        ref={inputStartDateRef}
+                                        onChange={(e)=> setStartDate(e.target.value)}
+                                        className={"opacity-0 absolute pointer-events-none h-full"}
 
-                                            {openHour && (
-                                                <div className={"absolute w-[100px] h-[130px] left-[-1px] border border-gray-200 bottom-[-131px] bg-white overflow-y-auto z-10"}>
-                                                    {Array.from({ length: 24 }).map((_, index) => (
-                                                        <div key={index} onClick={()=> {
-                                                            if (startDate) {
-                                                                const updated = new Date(startDate);
-                                                                updated.setHours(index + 1);
-                                                                setStartDate(updated);
-                                                            }
-                                                        }} className=" px-[15px] py-[2px] bg-white border-gray-100 border-b font-sf text-[15px]">
-                                                            {index + 1}
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            )}
-                                            <p className={"text-[20px] mb-[2px]"}>:</p>
-                                            <button onClick={()=>setOpenMinute(!openMinute)} className={"h-full w-[105px] flex items-center justify-center relative bg-gray-200 rounded-full"}>
-                                                {startDate.getMinutes() == 0 ? "00" : "Phút"}
-                                            </button>
-
-                                            {openMinute && (
-                                                <div className={"absolute w-[100px] h-[130px] right-[-0px] border border-gray-200 bottom-[-131px] bg-white overflow-y-auto z-10"}>
-                                                    {Array.from({ length: 6 }).map((_, index) => (
-                                                        <div key={index} onClick={()=> {
-                                                            if (startDate) {
-                                                                const updated = new Date(startDate);
-                                                                updated.setMinutes(index * 10);
-                                                                setStartDate(updated);
-                                                            }
-                                                        }} className=" px-[15px] py-[2px] bg-white border-gray-100 border-b font-sf text-[15px]">
-                                                            {index == 0 ? "00" : index*10}
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            )}
-
-                                        </div>
-                                    </div>
-                                )}
-
+                                    />
+                                    <button onClick={()=> inputStartDateRef.current?.showPicker()} className={"w-[160px] h-full  flex justify-center items-center bg-stone-200 mr-[10px] rounded-full text-[15px] font-sf"}>
+                                        <p>{startDate ? formatDate(startDate, true) : "Ngày Bắt Đầu"}</p>
+                                    </button>
+                                </div>
 
                             </div>
                             <div className={"h-[40px] flex items-center mt-[10px] relative "}>
-                                <button onClick={()=>setShowEndDatePicker(!showEndDatePicker)} className={"w-[180px] h-[40px] border rounded-sm bg-gray-200"}>
-                                    Chọn Ngày và Giờ
+                                <input
+                                    type={"datetime-local"}
+                                    ref={inputEndDateRef}
+                                    onChange={(e)=> setEndDate(e.target.value)}
+                                    className={"opacity-0 absolute pointer-events-none h-full"}
+                                    min={startDate}
+                                />
+                                <button onClick={()=> {
+                                    if (startDate != "")
+                                        inputEndDateRef.current?.showPicker()
+                                    else alert("Vui lòng chọn ngày bắt đầu trước")
+                                }} className={"w-[160px] h-full  flex justify-center items-center bg-stone-200 mr-[10px] rounded-full text-[15px] font-sf"}>
+                                    <p>{endDate ? formatDate(endDate, true) : "Ngày Kết Thúc"}</p>
                                 </button>
-                                {showEndDatePicker && (
-                                    <div className={"absolute top-[45px] bg-gray-100 rounded-[20px] pb-[10px]"}>
-                                        {/*<Calendar*/}
-                                        {/*    mode="single"*/}
-                                        {/*    selected={endDate}*/}
-                                        {/*    onSelect={(date) => {*/}
-                                        {/*        if (date) setEndDate(date);*/}
-                                        {/*    }}*/}
-                                        {/*    initialFocus*/}
-                                        {/*/>*/}
-                                        <div className={"w-full h-[40px] mt-[10px] relative flex justify-between px-[10px] items-center"}>
-                                            <button onClick={()=>setOpenHour(!openHour)} className={"h-full w-[105px] flex items-center justify-center bg-gray-200 rounded-full"}>
-                                                {endDate.getHours() == 0 ? "00" : "Giờ"}
-                                            </button>
-
-                                            {openHour && (
-                                                <div className={"absolute w-[100px] h-[130px] left-[-1px] border border-gray-200 bottom-[-131px] bg-white overflow-y-auto z-10"}>
-                                                    {Array.from({ length: 24 }).map((_, index) => (
-                                                        <div key={index} onClick={()=> {
-                                                            if (startDate) {
-                                                                const updated = new Date(startDate);
-                                                                updated.setHours(index + 1);
-                                                                setEndDate(updated);
-                                                            }
-                                                        }} className=" px-[15px] py-[2px] bg-white border-gray-100 border-b font-sf text-[15px]">
-                                                            {index + 1}
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            )}
-                                            <p className={"text-[20px] mb-[2px]"}>:</p>
-                                            <button onClick={()=>setOpenMinute(!openMinute)} className={"h-full w-[105px] flex items-center justify-center relative bg-gray-200 rounded-full"}>
-                                                {endDate.getMinutes() == 0 ? "00" : "Phút"}
-                                            </button>
-
-                                            {openMinute && (
-                                                <div className={"absolute w-[100px] h-[130px] right-[-0px] border border-gray-200 bottom-[-131px] bg-white overflow-y-auto z-10"}>
-                                                    {Array.from({ length: 6 }).map((_, index) => (
-                                                        <div key={index} onClick={()=> {
-                                                            if (startDate) {
-                                                                const updated = new Date(startDate);
-                                                                updated.setMinutes(index * 10);
-                                                                setEndDate(updated);
-                                                            }
-                                                        }} className=" px-[15px] py-[2px] bg-white border-gray-100 border-b font-sf text-[15px]">
-                                                            {index == 0 ? "00" : index*10}
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            )}
-
-                                        </div>
-                                    </div>
-                                )}
-
-
                             </div>
 
                             <button

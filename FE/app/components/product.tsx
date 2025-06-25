@@ -1,14 +1,16 @@
 'use client'
-import {HiOutlineStar, HiStar, HiOutlineShoppingCart, HiReceiptPercent, HiMiniArrowPath} from "react-icons/hi2";
+import {HiOutlineStar, HiStar, HiOutlineShoppingCart} from "react-icons/hi2";
 import {} from "react-icons/tb"
 import {TbEdit, TbTrash} from "react-icons/tb";
-import {useState} from "react";
+
 import Image from "next/image";
 import {useRouter} from "next/navigation";
 import type {IProduct, IProductData} from "@/app/types/product";
 import Cookies from "js-cookie";
 import type {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
-import Nof from "@/app/components/nof"
+
+import VndText from "@/app/components/vnd-text";
+import * as React from "react";
 
 async function AddToCart( productId: string , router: AppRouterInstance) {
     const token = Cookies.get("token");
@@ -179,7 +181,6 @@ export function ProductSale({product}: {product: IProduct}) {
                     </div>
                 )}
             </div>
-
         </div>
     )
 }
@@ -235,15 +236,27 @@ export function ProductInCategory({product}: {product: IProduct}) {
 
                 {product.discount > 0 ? (
                     <div className={`flex items-center`}>
-                        <p className={`font-sf text-amber-600 text-[18px] font-[700] `}>{product.price - product.price * product.discount / 100}  </p>
+                        <VndText
+                            amount={product?.price - product?.price * product?.discount/100}
+                            classNameCurrency={"font-[400] text-[16px] text-amber-600 font-sf"}
+                            classNameNumber={"font-[600] text-[18px] text-amber-600 font-sf"}
+                        />
                         <div className={`relative ml-[10px]`}>
-                            <p className={`font-sf text-neutral-400 text-[13px] font-[400] ml-[0px]`}>{product.price}  </p>
+                            <VndText
+                                amount={product?.price}
+                                classNameCurrency={"font-[400] text-[12px] text-amber-600 font-sf"}
+                                classNameNumber={"font-[400] text-[14px] text-amber-600 font-sf"}
+                            />
                             <div className={`absolute w-full border-t border-neutral-400 top-1/2 `}></div>
                         </div>
                     </div>
                 ): (
                     <div className={`flex items-end`}>
-                        <p className={`font-sf text-amber-600 text-[18px] font-[700] `}>{product.price }  </p>
+                        <VndText
+                            amount={product?.price - product?.price * product?.discount/100}
+                            classNameCurrency={"font-[400] text-[16px] text-amber-600 font-sf"}
+                            classNameNumber={"font-[600] text-[18px] text-amber-600 font-sf"}
+                        />
                     </div>
                 )}
 
@@ -341,7 +354,11 @@ export function ProductInShop({product}: {product: IProduct}) {
                     </div>
                 ): (
                     <div className={`flex items-end`}>
-                        <p className={`font-sf text-amber-600 text-[16px] font-[700] `}>${product.price }  </p>
+                        <VndText
+                            amount={product?.price - product?.price * product?.discount/100}
+                            classNameCurrency={"font-[400] text-[16px] text-amber-600 font-sf"}
+                            classNameNumber={"font-[600] text-[18px] text-amber-600 font-sf"}
+                        />
                     </div>
                 )}
             </div>

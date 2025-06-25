@@ -10,13 +10,13 @@ public class AdminController (IAdminRepository adminRepository) : ControllerBase
 {
     [HttpGet]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> GetAdminInfo()
+    public async Task<IActionResult> GetAdminInfo(DateTime? startDate, DateTime? endDate)
     {
         try
         {
             return Ok(new
             {
-                data = await adminRepository.GetInfomation()
+                data = await adminRepository.GetInfomation(startDate, endDate)
             });
         }
         catch (Exception e)

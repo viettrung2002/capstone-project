@@ -8,7 +8,7 @@ export interface IComment {
         rating: number;
     }
 export interface ICommentReq {
-        productId: string;
+        productId?: string;
         content: string;
         rating: number;
 }

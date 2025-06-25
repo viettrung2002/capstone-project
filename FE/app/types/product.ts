@@ -30,8 +30,13 @@ export interface IProductData {
     reviewCount: number;
     inventory: number;
     description: string;
+    extraImages: IImage[];
 }
-
+export interface IImage {
+    imageId: string;
+    productId: string;
+    imageUrl: string;
+}
 export interface IProductInCart {
     activate: boolean;
     customerId: string;
@@ -58,4 +63,12 @@ export interface IProductInCompare {
     id: string;
     name?: string;
     picture: string;
+}
+
+export interface IProductInStatistic {
+    productId: string;
+    productName: string;
+    price: number;
+    sold: number;
+    image: string;
 }

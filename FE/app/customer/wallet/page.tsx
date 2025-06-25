@@ -4,8 +4,8 @@ import React, {useEffect, useRef, useState} from "react";
 import Cookies from "js-cookie";
 import {useRouter} from "next/navigation";
 import {IWallet} from "@/app/types/wallet";
-import {TbWallet} from "react-icons/tb";
 import {HiOutlineWallet} from "react-icons/hi2";
+import VndText from "@/app/components/vnd-text";
 export default function WalletPage(){
     const id = Cookies.get("id");
     const router = useRouter();
@@ -34,32 +34,7 @@ export default function WalletPage(){
         window.location.href = data.url;
     };
 
-    const GetWallet = async () => {
-        const token = Cookies.get("token");
-        if (!token) {
-            router.push("/login");
-            return;
-        }
 
-        try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/wallet`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`
-                },
-            });
-            if (response.ok){
-                const data = await response.json();
-                setWallet(data.data);
-                console.log(data);
-                setHasWallet(1)
-            } else
-            setHasWallet(2);
-        } catch (error) {
-            console.log(error);
-        }
-    }
     const CreateWallet = async () => {
         const token = Cookies.get("token");
         if (!token) {
@@ -92,8 +67,34 @@ export default function WalletPage(){
 
     }
     useEffect(() => {
+        const GetWallet = async () => {
+            const token = Cookies.get("token");
+            if (!token) {
+                router.push("/login");
+                return;
+            }
+
+            try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/wallet`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`
+                    },
+                });
+                if (response.ok){
+                    const data = await response.json();
+                    setWallet(data.data);
+                    console.log(data);
+                    setHasWallet(1)
+                } else
+                    setHasWallet(2);
+            } catch (error) {
+                console.log(error);
+            }
+        }
         GetWallet()
-    }, [reload]);
+    }, [reload, router]);
     const [price, setPrice] = React.useState<number>(0);
     const [openFormRecharge, setOpenFormRecharge] = React.useState(false);
 
@@ -135,7 +136,7 @@ export default function WalletPage(){
                                 <button onClick={()=>router.push("/customer/wallet/history")} className={"px-[20px] h-full bg-stone-200 font-sf text-stone-80 text-[15px] rounded-full"}>
                                     Lịch Sử Giao Dịch
                                 </button>
-                                <button onClick={()=>router.push("/customer/wallet/history")} className={"px-[20px] h-full bg-amber-600 font-sf text-white text-[15px] rounded-full"}>
+                                <button onClick={()=>router.push("/customer/wallet/transfer")} className={"px-[20px] h-full bg-amber-600 font-sf text-white text-[15px] rounded-full"}>
                                     Chuyển Tiền
                                 </button>
                             </div>
@@ -144,8 +145,21 @@ export default function WalletPage(){
                                     Số Dư Ví
                                 </div>
                                 <div className={"h-[70px] flex w-full font-sf text-blue-600 text-[40px] justify-center items-center"}>
-                                    <p className={"font-[700]"}>{wallet?.balance}</p>
-                                    <p className={"font-sf text-stone-700 text-[20px]"}>đ</p>
+                                    {
+                                        wallet?.balance ?
+                                            <VndText
+                                                amount={wallet.balance}
+                                                classNameCurrency={"font-[400] text-[30px] font-sf text-amber-600" }
+                                                classNameNumber={"font-sf font-[600]  text-amber-600"}
+                                            />
+                                            :
+                                            <VndText
+                                                amount={0}
+                                                classNameCurrency={"font-[400] text-[14px] font-sf " }
+                                                classNameNumber={"font-sf text-amber-600"}
+                                            />
+                                    }
+
                                 </div>
                             </div>
 

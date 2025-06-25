@@ -9,6 +9,7 @@
     <ItemGroup>
         <PackageReference Include="CloudinaryDotNet" Version="1.27.5" />
         <PackageReference Include="linq2db" Version="1.0.7.3" />
+        <PackageReference Include="MailKit" Version="4.12.1" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.15" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.4" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.4">

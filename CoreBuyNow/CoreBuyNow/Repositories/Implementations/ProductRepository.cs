@@ -1,4 +1,7 @@
-﻿using CoreBuyNow.Models;
+﻿using System.Net;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
+using CoreBuyNow.Models;
 using CoreBuyNow.Models.DTOs;
 using CoreBuyNow.Models.Entities;
 using CoreBuyNow.Recommend;
@@ -8,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CoreBuyNow.Repositories.Implementations;
 
-public class ProductRepository(AppDbContext dbContext, ILogger<ProductRepository> logger) : IProductRepository
+public class ProductRepository(AppDbContext dbContext, ILogger<ProductRepository> logger, IConfiguration configuration) : IProductRepository
 {
     public async Task AddProductAndVector(Product product)
     {
@@ -82,12 +85,68 @@ public class ProductRepository(AppDbContext dbContext, ILogger<ProductRepository
                 throw new Exception($"Attribute '{key}' is not valid for this subcategory");
             }
         }
-        var shop = dbContext.Shops.Find(product.ShopId);
-        shop.ProductCount = shop.ProductCount + 1;
-        dbContext.Shops.Update(shop);
+        var shop = await dbContext.Shops.FindAsync(product.ShopId);
+        if (shop != null)
+        {
+            shop.ProductCount = shop.ProductCount + 1;
+            dbContext.Shops.Update(shop);
+        }
+
         product.ProductId = Guid.NewGuid();
         product.CreatedDate = DateTime.Now;
         dbContext.Products.Add(product);
+        await dbContext.SaveChangesAsync();
+    }
+    
+    public async Task AddProduct2(Product product, IFormFile mainImage, List<IFormFile> extraImages)
+    {
+        var productAttribute =  dbContext.SubCategoryAttributes 
+            .Where(sa => sa.SubcategoryId == product.SubCategoryId)
+            .Include(sa => sa.ProductAttribute)
+            .Select(sa => sa.ProductAttribute.AttributeName)
+            .ToList();
+        logger.LogInformation("{id} Product Attribute: {ProductAttribute}",product.SubCategoryId, productAttribute);
+        foreach (var key in product.Specifications)
+        {
+            logger.LogInformation("Key: {key}",key.Key);
+            if (!productAttribute.Contains(key.Key))
+            {
+                throw new Exception($"Attribute '{key}' is not valid for this subcategory");
+            }
+        }
+        var shop = await dbContext.Shops.FindAsync(product.ShopId);
+        if (shop != null)
+        {
+            shop.ProductCount = shop.ProductCount + 1;
+            dbContext.Shops.Update(shop);
+        }
+
+        product.ProductId = Guid.NewGuid();
+        product.CreatedDate = DateTime.Now;
+        dbContext.Products.Add(product);
+        logger.LogInformation("Uploading image {link}", configuration.GetConnectionString("CLOUDINARY_URL"));
+        var cloudinary = new Cloudinary(configuration.GetConnectionString("CLOUDINARY_URL"));
+        var mainUpload = await cloudinary.UploadAsync(new ImageUploadParams
+        {
+            File = new FileDescription(mainImage.FileName, mainImage.OpenReadStream()),
+            PublicId = $"products/main/{Guid.NewGuid()}"
+        });
+        product.MainImage = mainUpload.SecureUrl.ToString();
+        foreach (var image in extraImages)
+        {
+            var uploadResult = await cloudinary.UploadAsync(new ImageUploadParams
+            {
+                File = new FileDescription(image.FileName, image.OpenReadStream()),
+                PublicId = $"products/extra/{Guid.NewGuid()}"
+            });
+            var image1 = new Image
+            {
+                ImageId = Guid.NewGuid(),
+                ProductId = product.ProductId,
+                ImageUrl = uploadResult.SecureUrl.ToString(),
+            };
+            dbContext.Images.Add(image1);
+        }
         await dbContext.SaveChangesAsync();
     }
 
@@ -98,10 +157,10 @@ public class ProductRepository(AppDbContext dbContext, ILogger<ProductRepository
         {
             throw new InvalidOperationException("Enter your shop id!");
         }
-        dbContext.Products.Remove(product);
+        product.Active = false;
+        dbContext.Products.Update(product);
         await dbContext.SaveChangesAsync();
     }
-
     public async Task<ProductInfoResponseDto?> GetProductById(Guid productId)
     {
         var res = await dbContext.Products
@@ -128,7 +187,8 @@ public class ProductRepository(AppDbContext dbContext, ILogger<ProductRepository
                 Specifications = p.Specifications,
                 IsFlashSale = p.IsFlashSale,
                 Inventory = p.Inventory,
-                Description = p.Description
+                Description = p.Description,
+                ExtraImages = dbContext.Images.Where(i => i.ProductId == p.ProductId).ToList(),
             })
             .FirstOrDefaultAsync();
         return res;
@@ -144,6 +204,7 @@ public class ProductRepository(AppDbContext dbContext, ILogger<ProductRepository
         existingProduct.ExtraImage = product.ExtraImage;
         existingProduct.Specifications = product.Specifications;
         existingProduct.IsFlashSale = product.IsFlashSale;
+        existingProduct.Inventory = product.Inventory;
         dbContext.Products.Update(existingProduct);
         await dbContext.SaveChangesAsync();
     }
@@ -167,6 +228,7 @@ public class ProductRepository(AppDbContext dbContext, ILogger<ProductRepository
     public async Task<PageResponseDto<ProductResponseDto>> GetProductByPage(ProductFilterDto filter)
     {
         var query = dbContext.Products.AsQueryable();
+        query = query.Where(p=>p.Active == true);
         logger.LogInformation("SubCategoryId1 {id}", filter.SubCategoryId);
 
         if (filter.CategoryId != Guid.Empty && filter.CategoryId != null && filter.SubCategoryId != null)

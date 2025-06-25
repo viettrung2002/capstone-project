@@ -8,23 +8,41 @@ namespace CoreBuyNow.Repositories.Implementations;
  
 public class AdminRepository (AppDbContext dbContext) : IAdminRepository
 {
-    public async Task<AdminDto> GetInfomation()
+    public async Task<AdminDto> GetInfomation(DateTime? startDate, DateTime? endDate)
     {
-        var customerCount = await dbContext.Customers.CountAsync();
-        var shopCount = await dbContext.Shops.CountAsync();
-        var billCount = await dbContext.Bills.CountAsync();
-        var revenue = await dbContext.Bills.Select(b=>b.TotalPrice).DefaultIfEmpty().SumAsync();
-        var productCount = await dbContext.Products.CountAsync();
-        return new AdminDto
+        if (startDate.HasValue && endDate.HasValue)
         {
-            ShopCount = shopCount,
-            ProductCount = productCount,
-            BillCount = billCount,
-            CustomerCount = customerCount,
-            Revenue = revenue,
-        };
+            var customerCount = await dbContext.Customers.Include(c=>c.Account).Where(c=>c.Account.CreatedDate >= startDate && c.Account.CreatedDate<= endDate).CountAsync();
+            var shopCount = await dbContext.Shops.Include(c=>c.Account).Where(c=>c.Account.CreatedDate >= startDate && c.Account.CreatedDate<= endDate).CountAsync();
+            var billCount = await dbContext.Bills.Where(b=>b.CreateDate >= startDate && b.CreateDate <= endDate).CountAsync();
+            var revenue = await dbContext.Bills.Where(b=>b.CreateDate >= startDate && b.CreateDate <= endDate).Select(b=>b.TotalPrice).DefaultIfEmpty().SumAsync();
+            var productCount = await dbContext.Products.Where(p=>p.CreatedDate >= startDate && p.CreatedDate <= endDate).CountAsync();
+            return new AdminDto
+            {
+                ShopCount = shopCount,
+                ProductCount = productCount,
+                BillCount = billCount,
+                CustomerCount = customerCount,
+                Revenue = revenue,
+            };
+        }
+        else
+        {   
+            var customerCount = await dbContext.Customers.CountAsync();
+            var shopCount = await dbContext.Shops.CountAsync();
+            var billCount = await dbContext.Bills.CountAsync();
+            var revenue = await dbContext.Bills.Select(b=>b.TotalPrice).DefaultIfEmpty().SumAsync();
+            var productCount = await dbContext.Products.CountAsync();
+            return new AdminDto
+            {
+                ShopCount = shopCount,
+                ProductCount = productCount,
+                BillCount = billCount,
+                CustomerCount = customerCount,
+                Revenue = revenue,
+            };
+        }
     }
-
     public async Task<decimal> GetRevenueOverTime(DateTime startDate, DateTime endDate)
     {
         var revenue = await dbContext.Bills
