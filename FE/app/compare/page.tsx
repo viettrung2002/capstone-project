@@ -78,7 +78,7 @@ export default function ComparePage(){
                                 <div className={"flex text-yellow-500 items-center justify-center mr-[5px] text-[18px] mt-[10px]"}>
                                     {
                                         (products[1].rating > 0) ?
-                                            <div>
+                                            <div className="flex">
                                                 {Array.from({length: Math.round(products[1].rating)}, (_, index) => (
                                                     <HiStar className={"mb-[1px] "} key={index} />
                                                 ))}

@@ -34,7 +34,7 @@ public static class ApplicationServicesExtensions
         {
             options.AddPolicy("AllowFrontend", policy =>
             {
-                policy.WithOrigins("http://localhost:3000")
+                policy.WithOrigins("https://capstone-project-beryl-nine.vercel.app")
                     .AllowAnyHeader()
                     .AllowAnyMethod();
             });

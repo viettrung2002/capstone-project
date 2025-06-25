@@ -77,28 +77,31 @@ public class VoucherRepository ( IScheduler scheduler ,AppDbContext dbContext, I
 
         await dbContext.SaveChangesAsync();
 
+        if (voucher.AdminId != null && voucher.AdminId != Guid.Empty)
+        {
+            var jobDetail = JobBuilder.Create<IssueVoucherJob>()
+                .UsingJobData("VoucherId", voucher.VoucherId.ToString())
+                .Build();
+
+            var trigger = TriggerBuilder.Create()
+                .WithIdentity("VoucherTrigger_" + voucher.VoucherId)
+                .StartAt(startTimeUtc)
+                .WithSimpleSchedule(x => x
+                    .WithRepeatCount(0) // Chỉ chạy 1 lần
+                    .WithMisfireHandlingInstructionFireNow())
+                .Build();
+
+            logger.LogInformation("Trigger created: Key={key}, StartTime={startTime}, NextFireTime={nextFireTime}",
+                trigger.Key, trigger.StartTimeUtc, trigger.GetNextFireTimeUtc());
+            await scheduler.ScheduleJob(jobDetail, trigger);
+            logger.LogInformation("Trigger scheduled: Key={key}, StartTime={startTime}, NextFireTime={nextFireTime}, State={state}",
+                trigger.Key, trigger.StartTimeUtc, trigger.GetNextFireTimeUtc(), await scheduler.GetTriggerState(trigger.Key));
+
+            // Kiểm tra trigger
+            var triggerState = await scheduler.GetTriggerState(trigger.Key);
+            logger.LogInformation("Trigger {key} state after scheduling: {state}", trigger.Key, triggerState);
+        }
         // Tạo job và trigger
-        var jobDetail = JobBuilder.Create<IssueVoucherJob>()
-            .UsingJobData("VoucherId", voucher.VoucherId.ToString())
-            .Build();
-
-        var trigger = TriggerBuilder.Create()
-            .WithIdentity("VoucherTrigger_" + voucher.VoucherId)
-            .StartAt(startTimeUtc)
-            .WithSimpleSchedule(x => x
-                .WithRepeatCount(0) // Chỉ chạy 1 lần
-                .WithMisfireHandlingInstructionFireNow())
-            .Build();
-
-        logger.LogInformation("Trigger created: Key={key}, StartTime={startTime}, NextFireTime={nextFireTime}",
-            trigger.Key, trigger.StartTimeUtc, trigger.GetNextFireTimeUtc());
-        await scheduler.ScheduleJob(jobDetail, trigger);
-        logger.LogInformation("Trigger scheduled: Key={key}, StartTime={startTime}, NextFireTime={nextFireTime}, State={state}",
-            trigger.Key, trigger.StartTimeUtc, trigger.GetNextFireTimeUtc(), await scheduler.GetTriggerState(trigger.Key));
-
-        // Kiểm tra trigger
-        var triggerState = await scheduler.GetTriggerState(trigger.Key);
-        logger.LogInformation("Trigger {key} state after scheduling: {state}", trigger.Key, triggerState);
     }
     public async Task<VoucherDto> GetVoucher(Guid voucherId)
     {
@@ -384,4 +387,3 @@ public class IssueVoucherJob : IJob
     }
 }
 
-    
